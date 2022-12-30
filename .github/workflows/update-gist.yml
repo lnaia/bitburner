@@ -21,7 +21,8 @@ jobs:
           name: transpiled-files
           path: build/**/*.js
           retention-days: 5
-      - run: ls -l
+      - run: pwd
+      - run: ls -l build
       - name: Deploy
         uses: exuanbo/actions-deploy-gist@v1      
         with:
