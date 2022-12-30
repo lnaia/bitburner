@@ -10,10 +10,11 @@
   "scripts": {
     "lint": "gts lint",
     "clean": "gts clean",
-    "compile": "tsc",
+    "compile": "rm -rf build && tsc",
     "fix": "gts fix",
     "prepare": "yarn.cmd run compile",
     "pretest": "yarn.cmd run compile",
-    "posttest": "yarn.cmd run lint"
+    "posttest": "yarn.cmd run lint",
+    "sync": "npx bitburner-filesync"
   }
 }
