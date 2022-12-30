@@ -15,17 +15,10 @@ jobs:
           node-version: '19.x'
       - run: yarn --frozen-lockfile
       - run: yarn run build
-      - name: Archive build files
-        uses: actions/upload-artifact@v3
-        with:
-          name: transpiled-files
-          path: build/**/*.js
-          retention-days: 5
-      - run: pwd
-      - run: ls -l build/*
       - name: Deploy
-        uses: exuanbo/actions-deploy-gist@v1      
+        uses: sergeysova/gist-write-action@v1      
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: ./build/exec-list-owned-servers.js
+          filename: sample.js
+          content: ${{ cat ./build/exec-list-owned-servers.js }}
