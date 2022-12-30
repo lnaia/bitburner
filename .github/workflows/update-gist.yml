@@ -18,7 +18,7 @@ jobs:
       - name: Archive build files
         uses: actions/upload-artifact@v3
         with:
-          name: transpiled js
+          name: transpiled-files
           path: build/**/*.js
           retention-days: 5
       - name: Deploy
@@ -26,5 +26,5 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: build/exec-list-owned-servers.js
+          file_path: ./build/exec-list-owned-servers.js
           file_type: text
