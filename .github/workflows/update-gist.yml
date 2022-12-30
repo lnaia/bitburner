@@ -15,12 +15,14 @@ jobs:
           node-version: '19.x'
       - run: yarn --frozen-lockfile
       - run: yarn run build
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+      - name: Archive build files
+        uses: actions/upload-artifact@v3
+        with:
+          name: transpiled js
+          path: build/**/*.js
+          retention-days: 5
       - name: Deploy
-        uses: exuanbo/actions-deploy-gist@v1
+      - uses: exuanbo/actions-deploy-gist@v1
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
