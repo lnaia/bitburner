@@ -21,6 +21,10 @@ jobs:
           name: transpiled-files
           path: build/**/*.js
           retention-days: 5
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v3
       - name: Deploy
         uses: exuanbo/actions-deploy-gist@v1      
         with:
