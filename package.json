@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "gts lint",
     "clean": "gts clean",
-    "compile": "rm -rf build && tsc",
+    "build": "rm -rf build && tsc",
     "fix": "gts fix"
   }
 }
