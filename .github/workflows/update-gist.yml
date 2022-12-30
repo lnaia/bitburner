@@ -18,6 +18,7 @@ jobs:
       - name: Deploy
         uses: sergeysova/gist-write-action@v1      
         with:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_name: sample.js
           content: ${cat ./build/exec-list-owned-servers.js }
