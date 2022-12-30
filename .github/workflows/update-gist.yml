@@ -30,5 +30,5 @@ jobs:
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: ./build/exec-list-owned-servers.js
+          file_path: ./src/exec-list-owned-servers.ts
           file_type: text
