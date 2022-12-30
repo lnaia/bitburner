@@ -21,8 +21,8 @@ jobs:
           name: transpiled js
           path: build/**/*.js
           retention-days: 5
-      - uses: exuanbo/actions-deploy-gist@v1
       - name: Deploy
+        uses: exuanbo/actions-deploy-gist@v1      
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
