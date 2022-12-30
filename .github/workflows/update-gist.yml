@@ -22,7 +22,7 @@ jobs:
           path: build/**/*.js
           retention-days: 5
       - run: pwd
-      - run: ls -l build
+      - run: ls -l build/*
       - name: Deploy
         uses: exuanbo/actions-deploy-gist@v1      
         with:
