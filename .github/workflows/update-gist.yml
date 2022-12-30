@@ -19,6 +19,7 @@ jobs:
       - name: Content
         id: content
         run: |
+          ls ./build/
           export FILE_CONTENT=`cat ./build/exec-list-owned-servers.js`
           echo "::set-output name=value::$FILE_CONTENT"
 
