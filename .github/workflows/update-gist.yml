@@ -25,10 +25,10 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v3
+      - run: ls -l
       - name: Deploy
         uses: exuanbo/actions-deploy-gist@v1      
         with:
           token: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: ./src/exec-list-owned-servers.ts
-          file_type: text
+          file_path: ./build/exec-list-owned-servers.js
