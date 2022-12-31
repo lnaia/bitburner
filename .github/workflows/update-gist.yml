@@ -16,7 +16,9 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: |
           yarn run build
-          echo "file_content=`cat ./build/exec-list-owned-servers.`" >> $GITHUB_ENV
+          ls -l build/
+          pwd
+          echo "file_content=`cat ./build/exec-list-owned-servers.js`" >> $GITHUB_ENV
       - run: |
           echo "${{ env.file_content }}"
 
