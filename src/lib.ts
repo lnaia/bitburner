@@ -479,7 +479,6 @@ export const autoProvisionHosts = (ns: NS) => {
       return hackableHosts[0].host;
     })();
 
-    ns.tprint('host: ', host);
     const status = provision(ns, host, HACK_SCRIPT, [profitableHost]);
     statusReports.push(status);
   }
