@@ -266,16 +266,16 @@ interface AugmentPair {
 
 /** @public */
 declare enum PositionTypes {
-  Long = "L",
-  Short = "S",
+  Long = 'L',
+  Short = 'S',
 }
 
 /** @public */
 declare enum OrderTypes {
-  LimitBuy = "Limit Buy Order",
-  LimitSell = "Limit Sell Order",
-  StopBuy = "Stop Buy Order",
-  StopSell = "Stop Sell Order",
+  LimitBuy = 'Limit Buy Order',
+  LimitSell = 'Limit Sell Order',
+  StopBuy = 'Stop Buy Order',
+  StopSell = 'Stop Sell Order',
 }
 
 /**
@@ -866,42 +866,46 @@ interface GangMemberAscension {
 
 /** @public */
 type SleeveBladeburnerTask = {
-  type: "BLADEBURNER";
-  actionType: "General" | "Contracts";
+  type: 'BLADEBURNER';
+  actionType: 'General' | 'Contracts';
   actionName: string;
 };
 
 /** @public */
 type SleeveClassTask = {
-  type: "CLASS";
-  classType: UniversityClassType | GymType | `${UniversityClassType}` | `${GymType}`;
+  type: 'CLASS';
+  classType:
+    | UniversityClassType
+    | GymType
+    | `${UniversityClassType}`
+    | `${GymType}`;
   location: LocationName | `${LocationName}`;
 };
 
 /** @public */
-type SleeveCompanyTask = { type: "COMPANY"; companyName: string };
+type SleeveCompanyTask = {type: 'COMPANY'; companyName: string};
 
 /** @public */
-type SleeveCrimeTask = { type: "CRIME"; crimeType: CrimeType | `${CrimeType}` };
+type SleeveCrimeTask = {type: 'CRIME'; crimeType: CrimeType | `${CrimeType}`};
 
 /** @public */
 type SleeveFactionTask = {
-  type: "FACTION";
+  type: 'FACTION';
   factionWorkType: FactionWorkType | `${FactionWorkType}`;
   factionName: string;
 };
 
 /** @public */
-type SleeveInfiltrateTask = { type: "INFILTRATE" };
+type SleeveInfiltrateTask = {type: 'INFILTRATE'};
 
 /** @public */
-type SleeveRecoveryTask = { type: "RECOVERY" };
+type SleeveRecoveryTask = {type: 'RECOVERY'};
 
 /** @public */
-type SleeveSupportTask = { type: "SUPPORT" };
+type SleeveSupportTask = {type: 'SUPPORT'};
 
 /** @public */
-type SleeveSynchroTask = { type: "SYNCHRO" };
+type SleeveSynchroTask = {type: 'SYNCHRO'};
 
 /** Object representing a sleeve current task.
  * @public */
@@ -1290,7 +1294,13 @@ export interface TIX {
    * @param pos - Specifies whether the order is a “Long” or “Short” position.
    * @returns True if the order is successfully placed, and false otherwise.
    */
-  placeOrder(sym: string, shares: number, price: number, type: string, pos: string): boolean;
+  placeOrder(
+    sym: string,
+    shares: number,
+    price: number,
+    type: string,
+    pos: string
+  ): boolean;
 
   /**
    * Cancel order for stocks.
@@ -1307,7 +1317,13 @@ export interface TIX {
    * @param type - Type of order.
    * @param pos - Specifies whether the order is a “Long” or “Short” position.
    */
-  cancelOrder(sym: string, shares: number, price: number, type: string, pos: string): void;
+  cancelOrder(
+    sym: string,
+    shares: number,
+    price: number,
+    type: string,
+    pos: string
+  ): void;
 
   /**
    * Returns your order book for the stock market.
@@ -1486,7 +1502,11 @@ export interface Singularity {
    * @param focus - Acquire player focus on this class. Optional. Defaults to true.
    * @returns True if action is successfully started, false otherwise.
    */
-  universityCourse(universityName: string, courseName: string, focus?: boolean): boolean;
+  universityCourse(
+    universityName: string,
+    courseName: string,
+    focus?: boolean
+  ): boolean;
 
   /**
    * Workout at the gym.
@@ -1825,7 +1845,11 @@ export interface Singularity {
    * @param focus - Acquire player focus on this work operation. Optional. Defaults to true.
    * @returns True if the player starts working, and false otherwise.
    */
-  workForFaction(faction: string, workType: FactionWorkType | `${FactionWorkType}`, focus?: boolean): boolean;
+  workForFaction(
+    faction: string,
+    workType: FactionWorkType | `${FactionWorkType}`,
+    focus?: boolean
+  ): boolean;
 
   /**
    * Get faction reputation.
@@ -3200,7 +3224,11 @@ export interface CodingContract {
    *   provided.
    * @returns A reward description string on success, or an empty string on failure.
    */
-  attempt(answer: string | number | any[], filename: string, host?: string): string;
+  attempt(
+    answer: string | number | any[],
+    filename: string,
+    host?: string
+  ): string;
 
   /**
    * Get the type of a coding contract.
@@ -3631,7 +3659,10 @@ export interface Sleeve {
    * @param name - Name of the crime.
    * @returns True if this action was set successfully, false otherwise.
    */
-  setToCommitCrime(sleeveNumber: number, crimeType: CrimeType | `${CrimeType}`): boolean;
+  setToCommitCrime(
+    sleeveNumber: number,
+    crimeType: CrimeType | `${CrimeType}`
+  ): boolean;
 
   /**
    * Set a sleeve to work for a faction.
@@ -3648,7 +3679,7 @@ export interface Sleeve {
   setToFactionWork(
     sleeveNumber: number,
     factionName: string,
-    factionWorkType: FactionWorkType | `${FactionWorkType}`,
+    factionWorkType: FactionWorkType | `${FactionWorkType}`
   ): boolean | undefined;
 
   /**
@@ -3676,7 +3707,11 @@ export interface Sleeve {
    * @param className - Name of the class to follow.
    * @returns True if this action was set successfully, false otherwise.
    */
-  setToUniversityCourse(sleeveNumber: number, university: string, className: string): boolean;
+  setToUniversityCourse(
+    sleeveNumber: number,
+    university: string,
+    className: string
+  ): boolean;
 
   /**
    * Set a sleeve to workout at the gym.
@@ -3776,7 +3811,11 @@ export interface Sleeve {
    * @param contract - Name of the contract if applicable.
    * @returns True if the sleeve started working out, false otherwise.
    */
-  setToBladeburnerAction(sleeveNumber: number, action: string, contract?: string): boolean;
+  setToBladeburnerAction(
+    sleeveNumber: number,
+    action: string,
+    contract?: string
+  ): boolean;
 }
 
 /**
@@ -3873,21 +3912,37 @@ interface WorkStats {
  * @public
  */
 interface WorkFormulas {
-  crimeSuccessChance(person: Person, crimeType: CrimeType | `${CrimeType}`): number;
+  crimeSuccessChance(
+    person: Person,
+    crimeType: CrimeType | `${CrimeType}`
+  ): number;
   /** @returns The WorkStats gained when completing one instance of the specified crime. */
   crimeGains(person: Person, crimeType: CrimeType | `${CrimeType}`): WorkStats;
   /** @returns The WorkStats applied every game cycle (200ms) by taking the specified gym class. */
-  gymGains(person: Person, gymType: GymType | `${GymType}`, locationName: string): WorkStats;
+  gymGains(
+    person: Person,
+    gymType: GymType | `${GymType}`,
+    locationName: string
+  ): WorkStats;
   /** @returns The WorkStats applied every game cycle (200ms) by taking the specified university class. */
   universityGains(
     person: Person,
     classType: UniversityClassType | `${UniversityClassType}`,
-    locationName: string,
+    locationName: string
   ): WorkStats;
   /** @returns The WorkStats applied every game cycle (200ms) by performing the specified faction work. */
-  factionGains(person: Person, workType: FactionWorkType | `${FactionWorkType}`, favor: number): WorkStats;
+  factionGains(
+    person: Person,
+    workType: FactionWorkType | `${FactionWorkType}`,
+    favor: number
+  ): WorkStats;
   /** @returns The WorkStats applied every game cycle (200ms) by performing the specified company work. */
-  companyGains(person: Person, companyName: string, workType: JobName | `${JobName}`, favor: number): WorkStats;
+  companyGains(
+    person: Person,
+    companyName: string,
+    workType: JobName | `${JobName}`,
+    favor: number
+  ): WorkStats;
 }
 
 /**
@@ -3958,7 +4013,12 @@ interface HackingFormulas {
    * @param cores - Number of cores on the computer that will execute grow.
    * @returns The calculated grow percent.
    */
-  growPercent(server: Server, threads: number, player: Person, cores?: number): number;
+  growPercent(
+    server: Server,
+    threads: number,
+    player: Person,
+    cores?: number
+  ): number;
   /**
    * Calculate hack time.
    * @param server - Server info from {@link NS.getServer | getServer}
@@ -3995,7 +4055,12 @@ interface HacknetNodesFormulas {
    * @param mult - player production mult (default to 1)
    * @returns The calculated money gain rate.
    */
-  moneyGainRate(level: number, ram: number, cores: number, mult?: number): number;
+  moneyGainRate(
+    level: number,
+    ram: number,
+    cores: number,
+    mult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet node level.
    * @param startingLevel - starting level
@@ -4003,7 +4068,11 @@ interface HacknetNodesFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  levelUpgradeCost(startingLevel: number, extraLevels?: number, costMult?: number): number;
+  levelUpgradeCost(
+    startingLevel: number,
+    extraLevels?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet node ram.
    * @param startingRam - starting ram
@@ -4011,7 +4080,11 @@ interface HacknetNodesFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  ramUpgradeCost(startingRam: number, extraLevels?: number, costMult?: number): number;
+  ramUpgradeCost(
+    startingRam: number,
+    extraLevels?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet node cores.
    * @param startingCore - starting cores
@@ -4019,7 +4092,11 @@ interface HacknetNodesFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  coreUpgradeCost(startingCore: number, extraCores?: number, costMult?: number): number;
+  coreUpgradeCost(
+    startingCore: number,
+    extraCores?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate the cost of a hacknet node.
    * @param n - number of the hacknet node
@@ -4048,7 +4125,13 @@ interface HacknetServersFormulas {
    * @param mult - player production mult (default to 1)
    * @returns The calculated hash gain rate.
    */
-  hashGainRate(level: number, ramUsed: number, maxRam: number, cores: number, mult?: number): number;
+  hashGainRate(
+    level: number,
+    ramUsed: number,
+    maxRam: number,
+    cores: number,
+    mult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet server level.
    * @param startingLevel - starting level
@@ -4056,7 +4139,11 @@ interface HacknetServersFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  levelUpgradeCost(startingLevel: number, extraLevels?: number, costMult?: number): number;
+  levelUpgradeCost(
+    startingLevel: number,
+    extraLevels?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet server ram.
    * @param startingRam - starting ram
@@ -4064,7 +4151,11 @@ interface HacknetServersFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  ramUpgradeCost(startingRam: number, extraLevels?: number, costMult?: number): number;
+  ramUpgradeCost(
+    startingRam: number,
+    extraLevels?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet server cores.
    * @param startingCore - starting cores
@@ -4072,7 +4163,11 @@ interface HacknetServersFormulas {
    * @param costMult - player cost reduction (default to 1)
    * @returns The calculated cost.
    */
-  coreUpgradeCost(startingCore: number, extraCores?: number, costMult?: number): number;
+  coreUpgradeCost(
+    startingCore: number,
+    extraCores?: number,
+    costMult?: number
+  ): number;
   /**
    * Calculate cost of upgrading hacknet server cache.
    * @param startingCache - starting cache level
@@ -4119,7 +4214,11 @@ interface GangFormulas {
    * @param task - Gang info from {@link Gang.getTaskStats | getTaskStats}
    * @returns The calculated respect gain.
    */
-  respectGain(gang: GangGenInfo, member: GangMemberInfo, task: GangTaskStats): number;
+  respectGain(
+    gang: GangGenInfo,
+    member: GangMemberInfo,
+    task: GangTaskStats
+  ): number;
   /**
    * Calculate wanted gain per tick.
    * @param gang - Gang info from {@link Gang.getGangInformation | getGangInformation}
@@ -4127,7 +4226,11 @@ interface GangFormulas {
    * @param task - Task info from {@link Gang.getTaskStats | getTaskStats}
    * @returns The calculated wanted gain.
    */
-  wantedLevelGain(gang: GangGenInfo, member: GangMemberInfo, task: GangTaskStats): number;
+  wantedLevelGain(
+    gang: GangGenInfo,
+    member: GangMemberInfo,
+    task: GangTaskStats
+  ): number;
   /**
    * Calculate money gain per tick.
    * @param gang - Gang info from {@link Gang.getGangInformation | getGangInformation}
@@ -4135,7 +4238,11 @@ interface GangFormulas {
    * @param task - Task info from {@link Gang.getTaskStats | getTaskStats}
    * @returns The calculated money gain.
    */
-  moneyGain(gang: GangGenInfo, member: GangMemberInfo, task: GangTaskStats): number;
+  moneyGain(
+    gang: GangGenInfo,
+    member: GangMemberInfo,
+    task: GangTaskStats
+  ): number;
 
   /**
    * Calculate ascension point gain.
@@ -4263,7 +4370,12 @@ interface Stanek {
    * @param fragmentId - fragmentId ID of the fragment to place.
    * @returns true if the fragment can be placed at that position. false otherwise.
    */
-  canPlaceFragment(rootX: number, rootY: number, rotation: number, fragmentId: number): boolean;
+  canPlaceFragment(
+    rootX: number,
+    rootY: number,
+    rotation: number,
+    fragmentId: number
+  ): boolean;
   /**
    * Place fragment on Stanek's Gift.
    * @remarks
@@ -4275,7 +4387,12 @@ interface Stanek {
    * @param fragmentId - ID of the fragment to place.
    * @returns true if the fragment can be placed at that position. false otherwise.
    */
-  placeFragment(rootX: number, rootY: number, rotation: number, fragmentId: number): boolean;
+  placeFragment(
+    rootX: number,
+    rootY: number,
+    rotation: number,
+    fragmentId: number
+  ): boolean;
   /**
    * Get placed fragment at location.
    * @remarks
@@ -4820,7 +4937,11 @@ export interface NS {
    * @param cores - Optional. The number of cores of the server that would run grow.
    * @returns The security increase.
    */
-  growthAnalyzeSecurity(threads: number, hostname?: string, cores?: number): number;
+  growthAnalyzeSecurity(
+    threads: number,
+    hostname?: string,
+    cores?: number
+  ): number;
 
   /**
    * Suspends the script for n milliseconds.
@@ -5085,7 +5206,11 @@ export interface NS {
    * @param args - Arguments to identify which scripts to get logs for.
    * @returns Returns a string array, where each line is an element in the array. The most recently logged line is at the end of the array.
    */
-  getScriptLogs(fn?: string, host?: string, ...args: (string | number | boolean)[]): string[];
+  getScriptLogs(
+    fn?: string,
+    host?: string,
+    ...args: (string | number | boolean)[]
+  ): string[];
 
   /**
    * Get an array of recently killed scripts across all servers.
@@ -5148,7 +5273,11 @@ export interface NS {
    * @param host - Optional. Hostname of the script being tailed. Defaults to the server this script is running on. If args are specified, this is not optional.
    * @param args - Arguments for the script being tailed.
    */
-  tail(fn?: FilenameOrPID, host?: string, ...args: (string | number | boolean)[]): void;
+  tail(
+    fn?: FilenameOrPID,
+    host?: string,
+    ...args: (string | number | boolean)[]
+  ): void;
 
   /**
    * Move a tail window.
@@ -5432,7 +5561,11 @@ export interface NS {
    * @param args - Additional arguments to pass into the new script that is being run. Note that if any arguments are being passed into the new script, then the second argument numThreads must be filled in with a value.
    * @returns Returns the PID of a successfully started script, and 0 otherwise.
    */
-  run(script: string, numThreads?: number, ...args: (string | number | boolean)[]): number;
+  run(
+    script: string,
+    numThreads?: number,
+    ...args: (string | number | boolean)[]
+  ): number;
 
   /**
    * Start another script on any server.
@@ -5490,7 +5623,12 @@ export interface NS {
    * @param args - Additional arguments to pass into the new script that is being run. Note that if any arguments are being passed into the new script, then the third argument numThreads must be filled in with a value.
    * @returns Returns the PID of a successfully started script, and 0 otherwise.
    */
-  exec(script: string, host: string, numThreads?: number, ...args: (string | number | boolean)[]): number;
+  exec(
+    script: string,
+    host: string,
+    numThreads?: number,
+    ...args: (string | number | boolean)[]
+  ): number;
 
   /**
    * Terminate current script and start another in 10 seconds.
@@ -5522,7 +5660,11 @@ export interface NS {
    * @param numThreads - Number of threads to spawn new script with. Will be rounded to nearest integer.
    * @param args - Additional arguments to pass into the new script that is being run.
    */
-  spawn(script: string, numThreads?: number, ...args: (string | number | boolean)[]): void;
+  spawn(
+    script: string,
+    numThreads?: number,
+    ...args: (string | number | boolean)[]
+  ): void;
 
   /**
    * Terminate another script.
@@ -5592,7 +5734,11 @@ export interface NS {
    * ns.kill("foo.script", getHostname(), 1, "foodnstuff");
    * ```
    */
-  kill(script: string, host: string, ...args: (string | number | boolean)[]): boolean;
+  kill(
+    script: string,
+    host: string,
+    ...args: (string | number | boolean)[]
+  ): boolean;
 
   /**
    * Terminate all scripts on a server.
@@ -6057,7 +6203,11 @@ export interface NS {
    * @param args - Arguments to specify/identify which scripts to search for.
    * @returns True if the specified script is running on the target server, and false otherwise.
    */
-  isRunning(script: FilenameOrPID, host?: string, ...args: (string | number | boolean)[]): boolean;
+  isRunning(
+    script: FilenameOrPID,
+    host?: string,
+    ...args: (string | number | boolean)[]
+  ): boolean;
 
   /**
    * Get general info about a running script.
@@ -6243,7 +6393,7 @@ export interface NS {
    * @param data - Data to write.
    * @param mode - Defines the write mode.
    */
-  write(filename: string, data?: string, mode?: "w" | "a"): void;
+  write(filename: string, data?: string, mode?: 'w' | 'a'): void;
 
   /**
    * Attempt to write to a port.
@@ -6501,7 +6651,11 @@ export interface NS {
    * @param args - Arguments that the script is running with.
    * @returns Amount of income the specified script generates while online.
    */
-  getScriptIncome(script: string, host: string, ...args: (string | number | boolean)[]): number;
+  getScriptIncome(
+    script: string,
+    host: string,
+    ...args: (string | number | boolean)[]
+  ): number;
 
   /**
    * Get the exp gain of all scripts.
@@ -6529,7 +6683,11 @@ export interface NS {
    * @param args - Arguments that the script is running with.
    * @returns Amount of hacking experience the specified script generates while online.
    */
-  getScriptExpGain(script: string, host: string, ...args: (string | number | boolean)[]): number;
+  getScriptExpGain(
+    script: string,
+    host: string,
+    ...args: (string | number | boolean)[]
+  ): number;
 
   /**
    * Returns the amount of time in milliseconds that have passed since you last installed Augmentations.
@@ -6678,7 +6836,7 @@ export interface NS {
    */
   prompt(
     txt: string,
-    options?: { type?: "boolean" | "text" | "select"; choices?: string[] },
+    options?: {type?: 'boolean' | 'text' | 'select'; choices?: string[]}
   ): Promise<boolean | string>;
 
   /**
@@ -6693,7 +6851,11 @@ export interface NS {
    * @param variant - Type of toast. Must be one of success, info, warning, error. Defaults to success.
    * @param duration - Duration of toast in ms. Can also be `null` to create a persistent toast. Defaults to 2000.
    */
-  toast(msg: string, variant?: ToastVariant | `${ToastVariant}`, duration?: number | null): void;
+  toast(
+    msg: string,
+    variant?: ToastVariant | `${ToastVariant}`,
+    duration?: number | null
+  ): void;
 
   /**
    * Download a file from the internet.
@@ -6870,7 +7032,9 @@ export interface NS {
    * // {"_":[],"delay":0,"server":"foodnstuff","exclude":[],"help":true}
    * ```
    */
-  flags(schema: [string, string | number | boolean | string[]][]): { [key: string]: ScriptArg | string[] };
+  flags(schema: [string, string | number | boolean | string[]][]): {
+    [key: string]: ScriptArg | string[];
+  };
 
   /**
    * Share your computer with your factions.
@@ -6895,200 +7059,200 @@ export interface NS {
 // BASE ENUMS
 /** @public */
 declare enum ToastVariant {
-  SUCCESS = "success",
-  WARNING = "warning",
-  ERROR = "error",
-  INFO = "info",
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  ERROR = 'error',
+  INFO = 'info',
 }
 
 /** @public */
 declare enum CrimeType {
-  shoplift = "Shoplift",
-  robStore = "Rob Store",
-  mug = "Mug",
-  larceny = "Larceny",
-  dealDrugs = "Deal Drugs",
-  bondForgery = "Bond Forgery",
-  traffickArms = "Traffick Arms",
-  homicide = "Homicide",
-  grandTheftAuto = "Grand Theft Auto",
-  kidnap = "Kidnap",
-  assassination = "Assassination",
-  heist = "Heist",
+  shoplift = 'Shoplift',
+  robStore = 'Rob Store',
+  mug = 'Mug',
+  larceny = 'Larceny',
+  dealDrugs = 'Deal Drugs',
+  bondForgery = 'Bond Forgery',
+  traffickArms = 'Traffick Arms',
+  homicide = 'Homicide',
+  grandTheftAuto = 'Grand Theft Auto',
+  kidnap = 'Kidnap',
+  assassination = 'Assassination',
+  heist = 'Heist',
 }
 
 /** @public */
 declare enum FactionWorkType {
-  hacking = "hacking",
-  field = "field",
-  security = "security",
+  hacking = 'hacking',
+  field = 'field',
+  security = 'security',
 }
 
 /** @public */
 declare enum UniversityClassType {
-  computerScience = "Computer Science",
-  dataStructures = "Data Structures",
-  networks = "Networks",
-  algorithms = "Algorithms",
-  management = "Management",
-  leadership = "Leadership",
+  computerScience = 'Computer Science',
+  dataStructures = 'Data Structures',
+  networks = 'Networks',
+  algorithms = 'Algorithms',
+  management = 'Management',
+  leadership = 'Leadership',
 }
 
 /** @public */
 declare enum GymType {
-  strength = "str",
-  defense = "def",
-  dexterity = "dex",
-  agility = "agi",
+  strength = 'str',
+  defense = 'def',
+  dexterity = 'dex',
+  agility = 'agi',
 }
 
 /** @public */
 declare enum JobName {
-  software0 = "Software Engineering Intern",
-  software1 = "Junior Software Engineer",
-  software2 = "Senior Software Engineer",
-  software3 = "Lead Software Developer",
-  software4 = "Head of Software",
-  software5 = "Head of Engineering",
-  software6 = "Vice President of Technology",
-  software7 = "Chief Technology Officer",
-  IT0 = "IT Intern",
-  IT1 = "IT Analyst",
-  IT2 = "IT Manager",
-  IT3 = "Systems Administrator",
-  securityEng = "Security Engineer",
-  networkEng0 = "Network Engineer",
-  networkEng1 = "Network Administrator",
-  business0 = "Business Intern",
-  business1 = "Business Analyst",
-  business2 = "Business Manager",
-  business3 = "Operations Manager",
-  business4 = "Chief Financial Officer",
-  business5 = "Chief Executive Officer",
-  security0 = "Police Officer",
-  security1 = "Police Chief",
-  security2 = "Security Guard",
-  security3 = "Security Officer",
-  security4 = "Security Supervisor",
-  security5 = "Head of Security",
-  agent0 = "Field Agent",
-  agent1 = "Secret Agent",
-  agent2 = "Special Operative",
-  waiter = "Waiter",
-  employee = "Employee",
-  softwareConsult0 = "Software Consultant",
-  softwareConsult1 = "Senior Software Consultant",
-  businessConsult0 = "Business Consultant",
-  businessConsult1 = "Senior Business Consultant",
-  waiterPT = "Part-time Waiter",
-  employeePT = "Part-time Employee",
+  software0 = 'Software Engineering Intern',
+  software1 = 'Junior Software Engineer',
+  software2 = 'Senior Software Engineer',
+  software3 = 'Lead Software Developer',
+  software4 = 'Head of Software',
+  software5 = 'Head of Engineering',
+  software6 = 'Vice President of Technology',
+  software7 = 'Chief Technology Officer',
+  IT0 = 'IT Intern',
+  IT1 = 'IT Analyst',
+  IT2 = 'IT Manager',
+  IT3 = 'Systems Administrator',
+  securityEng = 'Security Engineer',
+  networkEng0 = 'Network Engineer',
+  networkEng1 = 'Network Administrator',
+  business0 = 'Business Intern',
+  business1 = 'Business Analyst',
+  business2 = 'Business Manager',
+  business3 = 'Operations Manager',
+  business4 = 'Chief Financial Officer',
+  business5 = 'Chief Executive Officer',
+  security0 = 'Police Officer',
+  security1 = 'Police Chief',
+  security2 = 'Security Guard',
+  security3 = 'Security Officer',
+  security4 = 'Security Supervisor',
+  security5 = 'Head of Security',
+  agent0 = 'Field Agent',
+  agent1 = 'Secret Agent',
+  agent2 = 'Special Operative',
+  waiter = 'Waiter',
+  employee = 'Employee',
+  softwareConsult0 = 'Software Consultant',
+  softwareConsult1 = 'Senior Software Consultant',
+  businessConsult0 = 'Business Consultant',
+  businessConsult1 = 'Senior Business Consultant',
+  waiterPT = 'Part-time Waiter',
+  employeePT = 'Part-time Employee',
 }
 
 // CORP ENUMS - Changed to types
 /** @public */
 type CorpEmployeePosition =
-  | "Operations"
-  | "Engineer"
-  | "Business"
-  | "Management"
-  | "Research & Development"
-  | "Training"
-  | "Unassigned";
+  | 'Operations'
+  | 'Engineer'
+  | 'Business'
+  | 'Management'
+  | 'Research & Development'
+  | 'Training'
+  | 'Unassigned';
 
 /** @public */
 type CorpIndustryName =
-  | "Energy"
-  | "Water Utilities"
-  | "Agriculture"
-  | "Fishing"
-  | "Mining"
-  | "Food"
-  | "Tobacco"
-  | "Chemical"
-  | "Pharmaceutical"
-  | "Computer Hardware"
-  | "Robotics"
-  | "Software"
-  | "Healthcare"
-  | "Real Estate";
+  | 'Energy'
+  | 'Water Utilities'
+  | 'Agriculture'
+  | 'Fishing'
+  | 'Mining'
+  | 'Food'
+  | 'Tobacco'
+  | 'Chemical'
+  | 'Pharmaceutical'
+  | 'Computer Hardware'
+  | 'Robotics'
+  | 'Software'
+  | 'Healthcare'
+  | 'Real Estate';
 
 /** Names of all cities
  * @public */
 declare enum CityName {
-  Aevum = "Aevum",
-  Chongqing = "Chongqing",
-  Sector12 = "Sector-12",
-  NewTokyo = "New Tokyo",
-  Ishima = "Ishima",
-  Volhaven = "Volhaven",
+  Aevum = 'Aevum',
+  Chongqing = 'Chongqing',
+  Sector12 = 'Sector-12',
+  NewTokyo = 'New Tokyo',
+  Ishima = 'Ishima',
+  Volhaven = 'Volhaven',
 }
 
 /** Names of all locations
  * @public */
 declare enum LocationName {
-  AevumAeroCorp = "AeroCorp",
-  AevumBachmanAndAssociates = "Bachman & Associates",
-  AevumClarkeIncorporated = "Clarke Incorporated",
-  AevumCrushFitnessGym = "Crush Fitness Gym",
-  AevumECorp = "ECorp",
-  AevumFulcrumTechnologies = "Fulcrum Technologies",
-  AevumGalacticCybersystems = "Galactic Cybersystems",
-  AevumNetLinkTechnologies = "NetLink Technologies",
-  AevumPolice = "Aevum Police Headquarters",
-  AevumRhoConstruction = "Rho Construction",
-  AevumSnapFitnessGym = "Snap Fitness Gym",
-  AevumSummitUniversity = "Summit University",
-  AevumWatchdogSecurity = "Watchdog Security",
-  AevumCasino = "Iker Molina Casino",
+  AevumAeroCorp = 'AeroCorp',
+  AevumBachmanAndAssociates = 'Bachman & Associates',
+  AevumClarkeIncorporated = 'Clarke Incorporated',
+  AevumCrushFitnessGym = 'Crush Fitness Gym',
+  AevumECorp = 'ECorp',
+  AevumFulcrumTechnologies = 'Fulcrum Technologies',
+  AevumGalacticCybersystems = 'Galactic Cybersystems',
+  AevumNetLinkTechnologies = 'NetLink Technologies',
+  AevumPolice = 'Aevum Police Headquarters',
+  AevumRhoConstruction = 'Rho Construction',
+  AevumSnapFitnessGym = 'Snap Fitness Gym',
+  AevumSummitUniversity = 'Summit University',
+  AevumWatchdogSecurity = 'Watchdog Security',
+  AevumCasino = 'Iker Molina Casino',
 
-  ChongqingKuaiGongInternational = "KuaiGong International",
-  ChongqingSolarisSpaceSystems = "Solaris Space Systems",
-  ChongqingChurchOfTheMachineGod = "Church of the Machine God",
+  ChongqingKuaiGongInternational = 'KuaiGong International',
+  ChongqingSolarisSpaceSystems = 'Solaris Space Systems',
+  ChongqingChurchOfTheMachineGod = 'Church of the Machine God',
 
-  Sector12AlphaEnterprises = "Alpha Enterprises",
-  Sector12BladeIndustries = "Blade Industries",
-  Sector12CIA = "Central Intelligence Agency",
-  Sector12CarmichaelSecurity = "Carmichael Security",
-  Sector12CityHall = "Sector-12 City Hall",
-  Sector12DeltaOne = "DeltaOne",
-  Sector12FoodNStuff = "FoodNStuff",
-  Sector12FourSigma = "Four Sigma",
-  Sector12IcarusMicrosystems = "Icarus Microsystems",
-  Sector12IronGym = "Iron Gym",
+  Sector12AlphaEnterprises = 'Alpha Enterprises',
+  Sector12BladeIndustries = 'Blade Industries',
+  Sector12CIA = 'Central Intelligence Agency',
+  Sector12CarmichaelSecurity = 'Carmichael Security',
+  Sector12CityHall = 'Sector-12 City Hall',
+  Sector12DeltaOne = 'DeltaOne',
+  Sector12FoodNStuff = 'FoodNStuff',
+  Sector12FourSigma = 'Four Sigma',
+  Sector12IcarusMicrosystems = 'Icarus Microsystems',
+  Sector12IronGym = 'Iron Gym',
   Sector12JoesGuns = "Joe's Guns",
-  Sector12MegaCorp = "MegaCorp",
-  Sector12NSA = "National Security Agency",
-  Sector12PowerhouseGym = "Powerhouse Gym",
-  Sector12RothmanUniversity = "Rothman University",
-  Sector12UniversalEnergy = "Universal Energy",
+  Sector12MegaCorp = 'MegaCorp',
+  Sector12NSA = 'National Security Agency',
+  Sector12PowerhouseGym = 'Powerhouse Gym',
+  Sector12RothmanUniversity = 'Rothman University',
+  Sector12UniversalEnergy = 'Universal Energy',
 
-  NewTokyoDefComm = "DefComm",
-  NewTokyoGlobalPharmaceuticals = "Global Pharmaceuticals",
-  NewTokyoNoodleBar = "Noodle Bar",
-  NewTokyoVitaLife = "VitaLife",
-  NewTokyoArcade = "Arcade",
+  NewTokyoDefComm = 'DefComm',
+  NewTokyoGlobalPharmaceuticals = 'Global Pharmaceuticals',
+  NewTokyoNoodleBar = 'Noodle Bar',
+  NewTokyoVitaLife = 'VitaLife',
+  NewTokyoArcade = 'Arcade',
 
-  IshimaNovaMedical = "Nova Medical",
-  IshimaOmegaSoftware = "Omega Software",
-  IshimaStormTechnologies = "Storm Technologies",
-  IshimaGlitch = "0x6C1",
+  IshimaNovaMedical = 'Nova Medical',
+  IshimaOmegaSoftware = 'Omega Software',
+  IshimaStormTechnologies = 'Storm Technologies',
+  IshimaGlitch = '0x6C1',
 
-  VolhavenCompuTek = "CompuTek",
-  VolhavenHeliosLabs = "Helios Labs",
-  VolhavenLexoCorp = "LexoCorp",
-  VolhavenMilleniumFitnessGym = "Millenium Fitness Gym",
-  VolhavenNWO = "NWO",
-  VolhavenOmniTekIncorporated = "OmniTek Incorporated",
-  VolhavenOmniaCybersystems = "Omnia Cybersystems",
-  VolhavenSysCoreSecurities = "SysCore Securities",
-  VolhavenZBInstituteOfTechnology = "ZB Institute of Technology",
+  VolhavenCompuTek = 'CompuTek',
+  VolhavenHeliosLabs = 'Helios Labs',
+  VolhavenLexoCorp = 'LexoCorp',
+  VolhavenMilleniumFitnessGym = 'Millenium Fitness Gym',
+  VolhavenNWO = 'NWO',
+  VolhavenOmniTekIncorporated = 'OmniTek Incorporated',
+  VolhavenOmniaCybersystems = 'Omnia Cybersystems',
+  VolhavenSysCoreSecurities = 'SysCore Securities',
+  VolhavenZBInstituteOfTechnology = 'ZB Institute of Technology',
 
-  Hospital = "Hospital",
-  Slums = "The Slums",
-  TravelAgency = "Travel Agency",
-  WorldStockExchange = "World Stock Exchange",
+  Hospital = 'Hospital',
+  Slums = 'The Slums',
+  TravelAgency = 'Travel Agency',
+  WorldStockExchange = 'World Stock Exchange',
 
-  Void = "The Void",
+  Void = 'The Void',
 }
 
 /** @public */
@@ -7118,14 +7282,22 @@ export interface OfficeAPI {
    * @param employeePosition - Position to place into. Defaults to "Unassigned".
    * @returns True if an employee was hired, false otherwise
    */
-  hireEmployee(divisionName: string, city: CityName | `${CityName}`, employeePosition?: CorpEmployeePosition): boolean;
+  hireEmployee(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    employeePosition?: CorpEmployeePosition
+  ): boolean;
   /**
    * Upgrade office size.
    * @param divisionName - Name of the division
    * @param city - Name of the city
    * @param size - Amount of positions to open
    */
-  upgradeOfficeSize(divisionName: string, city: CityName | `${CityName}`, size: number): void;
+  upgradeOfficeSize(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    size: number
+  ): void;
   /**
    * Throw a party for your employees
    * @param divisionName - Name of the division
@@ -7133,7 +7305,11 @@ export interface OfficeAPI {
    * @param costPerEmployee - Amount to spend per employee.
    * @returns Multiplier for happiness and morale, or zero on failure
    */
-  throwParty(divisionName: string, city: CityName | `${CityName}`, costPerEmployee: number): number;
+  throwParty(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    costPerEmployee: number
+  ): number;
   /**
    * Buy coffee for your employees
    * @param divisionName - Name of the division
@@ -7193,7 +7369,12 @@ export interface OfficeAPI {
    * @param amount - Number of employees to assign to that job
    * @returns true if the employee count reached the target amount, false if not
    */
-  setAutoJobAssignment(divisionName: string, city: CityName | `${CityName}`, job: string, amount: number): boolean;
+  setAutoJobAssignment(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    job: string,
+    amount: number
+  ): boolean;
   /**
    * Cost to Upgrade office size.
    * @param divisionName - Name of the division
@@ -7201,7 +7382,11 @@ export interface OfficeAPI {
    * @param size - Amount of positions to open
    * @returns Cost of upgrading the office
    */
-  getOfficeSizeUpgradeCost(divisionName: string, city: CityName | `${CityName}`, asize: number): number;
+  getOfficeSizeUpgradeCost(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    asize: number
+  ): number;
 }
 
 /**
@@ -7224,7 +7409,7 @@ export interface WarehouseAPI {
     city: CityName | `${CityName}`,
     materialName: string,
     amt: string,
-    price: string,
+    price: string
   ): void;
   /**
    * Set product sell data.
@@ -7241,7 +7426,7 @@ export interface WarehouseAPI {
     productName: string,
     amt: string,
     price: string,
-    all: boolean,
+    all: boolean
   ): void;
   /**
    * Discontinue a product.
@@ -7255,7 +7440,11 @@ export interface WarehouseAPI {
    * @param city - Name of the city
    * @param enabled - smart supply enabled
    */
-  setSmartSupply(divisionName: string, city: CityName | `${CityName}`, enabled: boolean): void;
+  setSmartSupply(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    enabled: boolean
+  ): void;
   /**
    * Set whether smart supply uses leftovers before buying
    * @param divisionName - Name of the division
@@ -7267,7 +7456,7 @@ export interface WarehouseAPI {
     divisionName: string,
     city: CityName | `${CityName}`,
     materialName: string,
-    enabled: boolean,
+    enabled: boolean
   ): void;
   /**
    * Set material buy data
@@ -7276,7 +7465,12 @@ export interface WarehouseAPI {
    * @param materialName - Name of the material
    * @param amt - Amount of material to buy
    */
-  buyMaterial(divisionName: string, city: CityName | `${CityName}`, materialName: string, amt: number): void;
+  buyMaterial(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    materialName: string,
+    amt: number
+  ): void;
   /**
    * Set material to bulk buy
    * @param divisionName - Name of the division
@@ -7284,7 +7478,12 @@ export interface WarehouseAPI {
    * @param materialName - Name of the material
    * @param amt - Amount of material to buy
    */
-  bulkPurchase(divisionName: string, city: CityName | `${CityName}`, materialName: string, amt: number): void;
+  bulkPurchase(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    materialName: string,
+    amt: number
+  ): void;
   /**
    * Get warehouse data
    * @param divisionName - Name of the division
@@ -7306,7 +7505,11 @@ export interface WarehouseAPI {
    * @param materialName - Name of the material
    * @returns material data
    */
-  getMaterial(divisionName: string, city: CityName | `${CityName}`, materialName: string): Material;
+  getMaterial(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    materialName: string
+  ): Material;
   /**
    * Set market TA 1 for a material.
    * @param divisionName - Name of the division
@@ -7314,7 +7517,12 @@ export interface WarehouseAPI {
    * @param materialName - Name of the material
    * @param on - market ta enabled
    */
-  setMaterialMarketTA1(divisionName: string, city: CityName | `${CityName}`, materialName: string, on: boolean): void;
+  setMaterialMarketTA1(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    materialName: string,
+    on: boolean
+  ): void;
   /**
    * Set market TA 2 for a material.
    * @param divisionName - Name of the division
@@ -7322,21 +7530,34 @@ export interface WarehouseAPI {
    * @param materialName - Name of the material
    * @param on - market ta enabled
    */
-  setMaterialMarketTA2(divisionName: string, city: CityName | `${CityName}`, materialName: string, on: boolean): void;
+  setMaterialMarketTA2(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    materialName: string,
+    on: boolean
+  ): void;
   /**
    * Set market TA 1 for a product.
    * @param divisionName - Name of the division
    * @param productName - Name of the product
    * @param on - market ta enabled
    */
-  setProductMarketTA1(divisionName: string, productName: string, on: boolean): void;
+  setProductMarketTA1(
+    divisionName: string,
+    productName: string,
+    on: boolean
+  ): void;
   /**
    * Set market TA 2 for a product.
    * @param divisionName - Name of the division
    * @param productName - Name of the product
    * @param on - market ta enabled
    */
-  setProductMarketTA2(divisionName: string, productName: string, on: boolean): void;
+  setProductMarketTA2(
+    divisionName: string,
+    productName: string,
+    on: boolean
+  ): void;
   /**
    * Set material export data
    * @param sourceDivision - Source division
@@ -7352,7 +7573,7 @@ export interface WarehouseAPI {
     targetDivision: string,
     targetCity: CityName | `${CityName}`,
     materialName: string,
-    amt: number,
+    amt: number
   ): void;
   /**
    * Cancel material export
@@ -7369,7 +7590,7 @@ export interface WarehouseAPI {
     targetDivision: string,
     targetCity: CityName | `${CityName}`,
     materialName: string,
-    amt: number,
+    amt: number
   ): void;
   /**
    * Purchase warehouse for a new city
@@ -7383,7 +7604,11 @@ export interface WarehouseAPI {
    * @param city - Name of the city
    * @param amt - amount of upgrades defaults to 1
    */
-  upgradeWarehouse(divisionName: string, city: CityName | `${CityName}`, amt?: number): void;
+  upgradeWarehouse(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    amt?: number
+  ): void;
   /**
    * Create a new product
    * @param divisionName - Name of the division
@@ -7397,7 +7622,7 @@ export interface WarehouseAPI {
     city: CityName | `${CityName}`,
     productName: string,
     designInvest: number,
-    marketingInvest: number,
+    marketingInvest: number
   ): void;
   /**
    * Limit Material Production.
@@ -7410,7 +7635,7 @@ export interface WarehouseAPI {
     divisionName: string,
     city: CityName | `${CityName}`,
     materialName: string,
-    qty: number,
+    qty: number
   ): void;
   /**
    * Limit Product Production.
@@ -7419,7 +7644,12 @@ export interface WarehouseAPI {
    * @param productName - Name of the product.
    * @param qty - Amount to limit to. Pass a negative value to remove the limit instead.
    */
-  limitProductProduction(divisionName: string, city: CityName | `${CityName}`, productName: string, qty: number): void;
+  limitProductProduction(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    productName: string,
+    qty: number
+  ): void;
   /**
    * Gets the cost to upgrade a warehouse to the next level
    * @param divisionName - Name of the division
@@ -7427,7 +7657,11 @@ export interface WarehouseAPI {
    * @param amt - amount of upgrades. Optional, defaults to 1
    * @returns cost to upgrade
    */
-  getUpgradeWarehouseCost(divisionName: string, city: CityName | `${CityName}`, amt?: number): number;
+  getUpgradeWarehouseCost(
+    divisionName: string,
+    city: CityName | `${CityName}`,
+    amt?: number
+  ): number;
   /**
    * Check if you have a warehouse in city
    * @returns true if warehouse is present, false if not
@@ -7682,72 +7916,72 @@ interface CorpConstants {
   maxProductsBase: number;
 }
 /** @public */
-type CorpStateName = "START" | "PURCHASE" | "PRODUCTION" | "SALE" | "EXPORT";
+type CorpStateName = 'START' | 'PURCHASE' | 'PRODUCTION' | 'SALE' | 'EXPORT';
 
 /** @public */
 type CorpMaterialName =
-  | "Water"
-  | "Energy"
-  | "Food"
-  | "Plants"
-  | "Metal"
-  | "Hardware"
-  | "Chemicals"
-  | "Drugs"
-  | "Robots"
-  | "AI Cores"
-  | "Real Estate";
+  | 'Water'
+  | 'Energy'
+  | 'Food'
+  | 'Plants'
+  | 'Metal'
+  | 'Hardware'
+  | 'Chemicals'
+  | 'Drugs'
+  | 'Robots'
+  | 'AI Cores'
+  | 'Real Estate';
 
 /** @public */
 type CorpUnlockName =
-  | "Export"
-  | "Smart Supply"
-  | "Market Research - Demand"
-  | "Market Data - Competition"
-  | "VeChain"
-  | "Shady Accounting"
-  | "Government Partnership"
-  | "Warehouse API"
-  | "Office API";
+  | 'Export'
+  | 'Smart Supply'
+  | 'Market Research - Demand'
+  | 'Market Data - Competition'
+  | 'VeChain'
+  | 'Shady Accounting'
+  | 'Government Partnership'
+  | 'Warehouse API'
+  | 'Office API';
 
 /** @public */
 type CorpUpgradeName =
-  | "Smart Factories"
-  | "Smart Storage"
-  | "DreamSense"
-  | "Wilson Analytics"
-  | "Nuoptimal Nootropic Injector Implants"
-  | "Speech Processor Implants"
-  | "Neural Accelerators"
-  | "FocusWires"
-  | "ABC SalesBots"
-  | "Project Insight";
+  | 'Smart Factories'
+  | 'Smart Storage'
+  | 'DreamSense'
+  | 'Wilson Analytics'
+  | 'Nuoptimal Nootropic Injector Implants'
+  | 'Speech Processor Implants'
+  | 'Neural Accelerators'
+  | 'FocusWires'
+  | 'ABC SalesBots'
+  | 'Project Insight';
 
 /** @public */
 type CorpResearchName =
-  | "Hi-Tech R&D Laboratory"
-  | "AutoBrew"
-  | "AutoPartyManager"
-  | "Automatic Drug Administration"
-  | "Bulk Purchasing"
-  | "CPH4 Injections"
-  | "Drones"
-  | "Drones - Assembly"
-  | "Drones - Transport"
-  | "Go-Juice"
-  | "HRBuddy-Recruitment"
-  | "HRBuddy-Training"
-  | "JoyWire"
-  | "Market-TA.I"
-  | "Market-TA.II"
-  | "Overclock"
-  | "Self-Correcting Assemblers"
-  | "Sti.mu"
-  | "uPgrade: Capacity.I"
-  | "uPgrade: Capacity.II"
-  | "uPgrade: Dashboard"
-  | "uPgrade: Fulcrum"
-  | "sudo.Assist";
+  | 'Hi-Tech R&D Laboratory'
+  | 'AutoBrew'
+  | 'AutoPartyManager'
+  | 'Automatic Drug Administration'
+  | 'Bulk Purchasing'
+  | 'CPH4 Injections'
+  | 'Drones'
+  | 'Drones - Assembly'
+  | 'Drones - Transport'
+  | 'Go-Juice'
+  | 'HRBuddy-Recruitment'
+  | 'HRBuddy-Training'
+  | 'JoyWire'
+  | 'Market-TA.I'
+  | 'Market-TA.II'
+  | 'Overclock'
+  | 'Self-Correcting Assemblers'
+  | 'Sti.mu'
+  | 'uPgrade: Capacity.I'
+  | 'uPgrade: Capacity.II'
+  | 'uPgrade: Dashboard'
+  | 'uPgrade: Fulcrum'
+  | 'sudo.Assist';
 
 /**
  * Corporation material information
@@ -7803,7 +8037,7 @@ interface Product {
   /** Product Rating */
   rat: number;
   /** Product Properties. The data is \{qlt, per, dur, rel, aes, fea\} */
-  properties: { [key: string]: number };
+  properties: {[key: string]: number};
   /** Production cost */
   pCost: number;
   /** Sell cost, can be "MP+5" */
@@ -8024,5 +8258,7 @@ interface AutocompleteData {
   servers: string[];
   scripts: string[];
   txts: string[];
-  flags(schema: [string, string | number | boolean | string[]][]): { [key: string]: ScriptArg | string[] };
+  flags(schema: [string, string | number | boolean | string[]][]): {
+    [key: string]: ScriptArg | string[];
+  };
 }

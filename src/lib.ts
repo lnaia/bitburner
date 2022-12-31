@@ -1,5 +1,5 @@
-import { REMOTE_SERVER_PREFIX, HACK_SCRIPT } from './constants';
-import type { NS } from './NetscriptDefinitions';
+import {REMOTE_SERVER_PREFIX, HACK_SCRIPT} from './constants';
+import type {NS} from './NetscriptDefinitions';
 
 type StatusReport = [boolean, string?];
 
@@ -37,7 +37,10 @@ export const buyServer = (ns: NS): StatusReport => {
     const confirmedHostname = ns.purchaseServer(newHostname, purchaseServerRam);
 
     if (confirmedHostname.length) {
-      return [true, `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`];
+      return [
+        true,
+        `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`,
+      ];
     } else {
       return [false, 'buyServer: failed'];
     }
@@ -152,7 +155,7 @@ const openPorts = (ns: NS, host: string): StatusReport => {
     return [true];
   }
 
-  for (let [app, cmd] of Object.entries(portEnforcers)) {
+  for (const [app, cmd] of Object.entries(portEnforcers)) {
     if (ns.fileExists(app, 'home')) {
       cmd(host);
       portsOpen += 1;
@@ -240,7 +243,7 @@ export const printObjList = (
   const longestHeader = longestStr(headers);
   const findLongestValue = (
     acc: [string, number],
-    obj: { [key: string]: string }
+    obj: {[key: string]: string}
   ): [string, number] => {
     const longestVals = Object.values(obj)
       .map(forceString)
@@ -457,7 +460,7 @@ export const autoProvisionHosts = (ns: NS) => {
   );
 
   // hosts sorted by ram desc
-  const hosts = ['home', ...ownedServers, , ...hackedServers]
+  const hosts = ['home', ...ownedServers, ...hackedServers]
     .map(host => ({
       host,
       ram: ns.getServerMaxRam(host),
