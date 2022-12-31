@@ -10,6 +10,7 @@
     "noImplicitAny": true,
     "sourceMap": false,
     "strict": false,
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*.ts",

@@ -1,5 +1,5 @@
-import {REMOTE_SERVER_PREFIX, HACK_SCRIPT} from './constants';
-import type {NS} from './NetscriptDefinitions';
+import { REMOTE_SERVER_PREFIX, HACK_SCRIPT } from './constants';
+import type { NS } from './NetscriptDefinitions';
 
 type StatusReport = [boolean, string?];
 
@@ -36,17 +36,17 @@ export const buyServer = (ns: NS): StatusReport => {
     const newHostname = `${REMOTE_SERVER_PREFIX}-${serverId}`;
     const confirmedHostname = ns.purchaseServer(newHostname, purchaseServerRam);
 
-    if (confirmedHostname) {
-      [true, `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`];
+    if (confirmedHostname.length) {
+      return [true, `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`];
     } else {
-      [false, 'buyServer: failed'];
+      return [false, 'buyServer: failed'];
     }
   }
 
   return [false, 'buyServer: failed, not enough funds'];
 };
 
-const upgradeServer = (ns: NS, host: string): StatusReport => {
+export const upgradeServer = (ns: NS, host: string): StatusReport => {
   const currentRam = ns.getServerMaxRam(host);
   const newRamValue = currentRam * 2;
   const upgradeCost = Math.round(
@@ -240,7 +240,7 @@ export const printObjList = (
   const longestHeader = longestStr(headers);
   const findLongestValue = (
     acc: [string, number],
-    obj: {[key: string]: string}
+    obj: { [key: string]: string }
   ): [string, number] => {
     const longestVals = Object.values(obj)
       .map(forceString)
