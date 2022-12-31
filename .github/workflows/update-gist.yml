@@ -15,7 +15,6 @@ jobs:
           node-version: '19.x'
       - run: yarn --frozen-lockfile
       - run: yarn test
-      - run: yarn lint
       - run: yarn run build
       - name: Deploy lib.js
         uses: exuanbo/actions-deploy-gist@v1
