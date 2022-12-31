@@ -6,10 +6,10 @@ https://bitburner.readthedocs.io/en/latest/
 
 ## Sync instructions
 
-Transpiled files need to be manually coppied into a gist.
-Which will then be downloaded by the game.
+Each file that needs to be downloaded has to be:
 
-1. manually write the contents of manual-copy/ as a src file in your game
+- added to the in game exec that downloads a list of files
+- added to the deploy job, to ensure it gets uploaded
 
 ## Type definitions
 

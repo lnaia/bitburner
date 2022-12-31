@@ -459,7 +459,7 @@ export const autoProvisionHosts = (ns: NS) => {
   const statusReports: StatusReport[] = [];
   const hackableHosts = listHackableHosts(ns);
 
-  for (let i = 0, targetIndex = 0; i <= hosts.length; i += 1) {
+  for (let i = 0, targetIndex = 0; i < hosts.length - 1; i += 1) {
     const host = hosts[i];
 
     // evolution of this would be to spread among available threads...
@@ -479,6 +479,7 @@ export const autoProvisionHosts = (ns: NS) => {
       return hackableHosts[0].host;
     })();
 
+    ns.tprint('host: ', host);
     const status = provision(ns, host, HACK_SCRIPT, [profitableHost]);
     statusReports.push(status);
   }
