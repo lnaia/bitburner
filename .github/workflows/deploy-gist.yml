@@ -16,12 +16,77 @@ jobs:
       - run: yarn --frozen-lockfile
       - run: yarn test
       - run: yarn run build
-      - name: Deploy lib.js
+
+      - name: Deploy lib-auto-provision-hosts.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
           TOKEN: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: ./build/src/lib.js
+          file_path: ./build/src/lib-auto-provision-hosts.js
+
+      - name: Deploy lib-auto-root-hosts.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-auto-root-hosts.js
+
+      - name: Deploy lib-calculate-threads.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-calculate-threads.js
+
+      - name: Deploy lib-discover-hosts.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-discover-hosts.js
+
+      - name: Deploy lib-hackable-hosts.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-hackable-hosts.js
+
+      - name: Deploy lib-host-info.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-host-info.js
+
+      - name: Deploy lib-human-readable-money.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-human-readable-money.js
+
+      - name: Deploy lib-nodes.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-nodes.js
+
+      - name: Deploy lib-provision.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-provision.js
+
+      - name: Deploy lib-servers.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-servers.js
+
       - name: Deploy exec-coordinator.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
