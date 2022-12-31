@@ -1,13 +1,8 @@
-import type {NS} from './NetscriptDefinitions';
-
-import {
-  buyServer,
-  upgradeServers,
-  buyNode,
-  upgradeNodes,
-  autoRootHosts,
-  autoProvisionHosts,
-} from './lib';
+import type { NS } from './NetscriptDefinitions';
+import { buyServer, upgradeServers } from './lib-servers';
+import { buyNode, upgradeNodes } from './lib-nodes';
+import { autoRootHosts } from './lib-auto-root-hosts';
+import { autoProvisionHosts } from './lib-auto-provision-hosts';
 
 export async function main(ns: NS) {
   ns.disableLog('ALL');
