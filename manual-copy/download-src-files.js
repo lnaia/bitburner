@@ -1,16 +1,35 @@
 export async function main(ns) {
-    const [gistId, user, ...files] = ns.args
+  const [user, gistId, ...files] = ns.args;
 
-    if (!gistId || !user || files.length === 0) {
-        ns.tprint(`err missing args: userId@${userId}, gistId@${gistId}, files@${files.join(', ')}`)
-        ns.exit()
+  if (!gistId || !user || files.length === 0) {
+    ns.ptrint(
+      `err missing args: gistId@${gistId}, user@${user}, files@${files.join(
+        ','
+      )}`
+    );
+    ns.exit();
+  }
+
+  for (let file of files) {
+    let backupPath = '';
+    if (ns.fileExists(file)) {
+      backupPath = `backup.${file}`;
+      ns.mv('home', file, backupPath);
+      ns.tprint(`${file} backed up`);
     }
 
-    for (let file of files) {
-        const url = `https://gist.githubusercontent.com/${user}/${gistId}/raw/${file}`
-        const result = await ns.wget(url, file)
-        const msg = result ? `ok...${url}` : `err...${url}`
+    const url = `https://gist.githubusercontent.com/${user}/${gistId}/raw/${file}`;
+    const result = await ns.wget(url, file);
+    ns.tprint(`${file} download ${result ? 'ok' : 'error'}`);
 
-        ns.print(msg)
+    if (result) {
+      if (backupPath.length) {
+        ns.rm(backupPath);
+        ns.tprint(`${file} backup deleted`);
+      }
+    } else {
+      ns.mv('home', backupPath, file);
+      ns.tprint(`${file} backup restored`);
     }
+  }
 }
