@@ -371,12 +371,21 @@ const provision = (
 export const calculateThreads = (
   ns: NS,
   scriptMemory: number,
-  host: string
+  host: string,
+  reserveRam?: number
 ) => {
   const maxRam = ns.getServerMaxRam(host);
   const usedRam = ns.getServerUsedRam(host);
-  const availableRam = maxRam - usedRam;
-  return Math.floor(availableRam / scriptMemory);
+  let availableRam = maxRam - usedRam;
+  if (reserveRam) {
+    availableRam -= reserveRam;
+  }
+
+  try {
+    return Math.floor(availableRam / scriptMemory);
+  } catch (e) {
+    return 0;
+  }
 };
 
 export const execScript = (

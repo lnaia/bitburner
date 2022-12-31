@@ -1,4 +1,5 @@
 import type {NS} from './NetscriptDefinitions';
+
 import {
   buyServer,
   upgradeServers,
