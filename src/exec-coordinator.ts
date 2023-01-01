@@ -17,6 +17,6 @@ export async function main(ns: NS) {
     autoRootHosts(ns);
     autoProvisionHosts(ns);
 
-    await ns.sleep(3000);
+    await ns.sleep(1000);
   }
 }
