@@ -76,7 +76,17 @@ export const hackingManager = async (ns: NS, targetHost: string) => {
   );
 
   ns.print(`resources available: ${JSON.stringify(resources)}`);
+
+  // upload hack scripts to resources
+  const files = [
+    SCRIPTS.WEAKEN.script,
+    SCRIPTS.GROW.script,
+    SCRIPTS.HACK.script,
+  ];
   Object.entries(resources).forEach(([host, threads]) => {
+    if (host !== 'home') {
+      ns.scp(files, host);
+    }
     const args = [targetHost, threads];
     ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
   });
