@@ -32,6 +32,8 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
 export const hackingManager = async (ns: NS, targetHost: string) => {
   ns.disableLog('scp');
   ns.disableLog('sleep');
+  ns.disableLog('getServerMaxRam');
+  ns.disableLog('getServerUsedRam');
   const SCRIPTS = (() => {
     const hackScript = 'hack-hack.js';
     const growScript = 'hack-grow.js';
