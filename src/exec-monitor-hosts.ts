@@ -8,13 +8,24 @@ export async function main(ns: NS) {
   ns.tail();
 
   const maxHosts = +ns.args[0];
+  const sortOrder = `${ns.args[1]}`;
 
   while (true) {
     const list = (() => {
       const hosts = discoverHosts(ns)
         .map(host => hostInfo(ns, host))
         .filter(host => host.mm > 0)
-        .sort((a, b) => b.mm - a.mm);
+        .sort((a, b) => {
+          if (sortOrder === 'cm') {
+            return b.cm - a.cm;
+          } else if (sortOrder === 'rh') {
+            return b.rh - a.rh;
+          } else if (sortOrder === 'ms') {
+            return b.ms - a.ms;
+          }
+
+          return b.mm - a.mm;
+        });
       if (maxHosts > 0) {
         return hosts.slice(0, maxHosts);
       }
