@@ -69,15 +69,14 @@ export const hackingManager = async (
       },
     };
   })();
-  const safetyMargin = 5000;
 
   // with one thread
   const weakensRequired = calculateWeakensRequired(ns, targetHost);
-  let totalWeakenTime = safetyMargin;
-
+  let totalWeakenTime = 0;
   if (weakensRequired) {
-    totalWeakenTime = ns.getWeakenTime(targetHost) * weakensRequired;
-    totalWeakenTime += safetyMargin;
+    const weakenTime = Math.round(ns.getWeakenTime(targetHost));
+    totalWeakenTime = weakenTime * weakensRequired;
+    ns.print(`weakenTime=${weakenTime}`);
   }
 
   const resources = allocateResources(
@@ -122,12 +121,16 @@ export const hackingManager = async (
     }
   });
 
+  const totalSeconds = Math.round(totalWeakenTime / 1000);
+  const totalMinutes = Math.round(totalWeakenTime / 1000 / 60);
+  const totalHours = Math.round(totalWeakenTime / 1000 / 60 / 60);
+
   ns.print(
-    `waking up from weaken in: seconds=${Math.round(
-      totalWeakenTime / 1000
-    )} or minutes=${Math.round(totalWeakenTime / 1000 / 60)}`
+    `waking up from weaken in: seconds=${totalSeconds} or minutes=${totalMinutes} or hours=${totalHours}`
   );
-  await ns.sleep(totalWeakenTime);
+
+  const safetyMargin = 5000;
+  await ns.sleep(totalWeakenTime + safetyMargin);
 
   const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
   const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
