@@ -13,7 +13,7 @@ export async function main(ns: NS) {
 
   while (true) {
     const list = (() => {
-      const hosts = discoverHosts(ns)
+      let hosts = discoverHosts(ns)
         .map(host => hostInfo(ns, host))
         .filter(host => host.mm > 0)
         .sort((a, b) => {
@@ -27,8 +27,9 @@ export async function main(ns: NS) {
 
           return b.mm - a.mm;
         });
+
       if (maxHosts > 0) {
-        return hosts.slice(0, maxHosts);
+        hosts = hosts.slice(0, maxHosts);
       }
 
       if (invert === 1) {
