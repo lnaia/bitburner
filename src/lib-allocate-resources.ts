@@ -37,6 +37,7 @@ export const allocateResources = (
 ) => {
   const resources = availableResources(ns, script, scriptRam);
   let threadsRemaining = threadsNeeded;
+  let totalThreadsAvailable = 0;
   const resourcesAllocated: {[key: string]: number} = {};
 
   for (const resource of Object.entries(resources)) {
@@ -54,10 +55,11 @@ export const allocateResources = (
         })();
 
         resourcesAllocated[host] = threadsReserved;
+        totalThreadsAvailable += threadsReserved;
         threadsRemaining -= threadsReserved;
       }
     }
   }
 
-  return resourcesAllocated;
+  return [resourcesAllocated, totalThreadsAvailable];
 };

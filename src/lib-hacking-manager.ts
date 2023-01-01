@@ -91,12 +91,26 @@ export const hackingManager = async (
     }
   }
 
-  const resources = allocateResources(
+  let [resources, totalThreadsAvailable] = allocateResources(
     ns,
     SCRIPTS.WEAKEN.script,
     SCRIPTS.WEAKEN.ram,
     weakensRequired
   );
+
+  while (totalThreadsAvailable < weakensRequired) {
+    ns.print(
+      `waiting for resources weakensRequired=${weakensRequired}, totalThreadsAvailable:${totalThreadsAvailable}`
+    );
+    [resources, totalThreadsAvailable] = allocateResources(
+      ns,
+      SCRIPTS.WEAKEN.script,
+      SCRIPTS.WEAKEN.ram,
+      weakensRequired
+    );
+
+    await ns.sleep(1000);
+  }
 
   ns.print(
     `weakensRequired=${weakensRequired}, resources available: ${JSON.stringify(
@@ -145,12 +159,6 @@ export const hackingManager = async (
   const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
   let waitingSeconds = 0;
   while (currentSecurityLevel > minSecurityLevel + 5) {
-    // too spammy for early debug...
-    if (waitingSeconds % 5 === 0) {
-      ns.print(
-        `target sec lvl: curr=${currentSecurityLevel} min=${minSecurityLevel} s=${waitingSeconds}`
-      );
-    }
     currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
     waitingSeconds += 1;
     await ns.sleep(1000);
