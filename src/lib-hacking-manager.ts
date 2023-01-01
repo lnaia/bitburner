@@ -31,9 +31,9 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
 
 export const hackingManager = async (ns: NS, targetHost: string) => {
   const SCRIPTS = (() => {
-    const hackScript = 'hack-spec.js';
-    const growScript = 'grow-spec.js';
-    const weakenScript = 'weaken-spec.js';
+    const hackScript = 'hack-hack.js';
+    const growScript = 'hack-grow.js';
+    const weakenScript = 'hack-weaken.js';
 
     [hackScript, growScript, weakenScript].forEach(script => {
       if (!ns.fileExists(script)) {
