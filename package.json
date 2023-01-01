@@ -15,7 +15,8 @@
     "clean": "gts clean",
     "build": "tsc",
     "fix": "gts fix",
-    "test": "jest "
+    "test": "jest ",
+    "prettier": "prettier -w src"
   },
   "resolutions": {
     "typescript": "4.5.4"
