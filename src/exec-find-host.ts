@@ -37,7 +37,7 @@ export async function main(ns: NS) {
     }
 
     const adjacentHosts = connectedHosts(baseHost);
-    for (let adjacentHost of adjacentHosts) {
+    for (const adjacentHost of adjacentHosts) {
       const result = findHost({
         path: [...path, baseHost],
         baseHost: adjacentHost,

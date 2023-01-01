@@ -1,7 +1,7 @@
 import type {NS} from './NetscriptDefinitions';
 
 export async function main(ns: NS) {
-  const host: string = `${ns.args[0]}`;
+  const host = `${ns.args[0]}`;
   const moneyThresh = ns.getServerMaxMoney(host) * 0.75;
   const securityThresh = ns.getServerMinSecurityLevel(host) + 5;
 

@@ -15,6 +15,7 @@ jobs:
           node-version: '19.x'
       - run: yarn --frozen-lockfile
       - run: yarn test
+      - run: yarn lint
       - run: yarn run build
 
       - name: Deploy lib-auto-provision-hosts.js
@@ -114,7 +115,7 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/exec-find-host.js
-      
+
       - name: Deploy constants.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
@@ -128,4 +129,3 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/hack.js
-      

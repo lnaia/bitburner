@@ -1,11 +1,11 @@
-import type { Config } from 'jest';
+import type {Config} from 'jest';
 
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
   clearMocks: true,
-  coverageReporters: ['lcov', ['text', { skipFull: true }]],
+  coverageReporters: ['lcov', ['text', {skipFull: true}]],
   collectCoverage: true,
   coverageDirectory: './coverage',
   collectCoverageFrom: [
