@@ -143,12 +143,13 @@ export const hackingManager = async (
 
   let currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
   const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
+  let waitingSeconds = 0;
   while (currentSecurityLevel > minSecurityLevel + 5) {
     ns.print(
-      `target sec lvl: curr=${currentSecurityLevel} min=${minSecurityLevel}`
+      `target sec lvl: curr=${currentSecurityLevel} min=${minSecurityLevel} s=${waitingSeconds}`
     );
     currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
-
+    waitingSeconds += 1;
     await ns.sleep(1000);
   }
 
