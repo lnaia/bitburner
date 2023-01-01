@@ -40,6 +40,7 @@ export const hackingManager = async (
   ns.disableLog('getServerMaxRam');
   ns.disableLog('getServerUsedRam');
   ns.disableLog('getServerRequiredHackingLevel');
+  ns.disableLog('getHackingLevel');
 
   const SCRIPTS = (() => {
     const hackScript = 'hack-hack.js';
@@ -75,8 +76,8 @@ export const hackingManager = async (
   let totalWeakenTime = safetyMargin;
 
   if (weakensRequired) {
-    totalWeakenTime =
-      (ns.getWeakenTime(targetHost) + safetyMargin) * weakensRequired;
+    totalWeakenTime = ns.getWeakenTime(targetHost) * weakensRequired;
+    totalWeakenTime += safetyMargin;
   }
 
   const resources = allocateResources(
@@ -110,14 +111,21 @@ export const hackingManager = async (
     if (!dryRun) {
       ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
     } else {
-      ns.print(`dryRun enabled - skipping executable`);
+      ns.print(
+        `dryRun: ${JSON.stringify([
+          SCRIPTS.WEAKEN.script,
+          host,
+          threads,
+          ...args,
+        ])}`
+      );
     }
   });
 
   ns.print(
-    `waking up from weaken in: seconds=${totalWeakenTime / 1000}, minutes=${
-      totalWeakenTime / 1000 / 60
-    }`
+    `waking up from weaken in: seconds=${Math.round(
+      totalWeakenTime / 1000
+    )} or minutes=${Math.round(totalWeakenTime / 1000 / 60)}`
   );
   await ns.sleep(totalWeakenTime);
 
