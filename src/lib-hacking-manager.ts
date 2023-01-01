@@ -29,11 +29,18 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
   return weakensRequired;
 };
 
-export const hackingManager = async (ns: NS, targetHost: string) => {
+export const hackingManager = async (
+  ns: NS,
+  targetHost: string,
+  dryRun = true
+) => {
   ns.disableLog('scp');
+  ns.disableLog('scan');
   ns.disableLog('sleep');
   ns.disableLog('getServerMaxRam');
   ns.disableLog('getServerUsedRam');
+  ns.disableLog('getServerRequiredHackingLevel');
+
   const SCRIPTS = (() => {
     const hackScript = 'hack-hack.js';
     const growScript = 'hack-grow.js';
@@ -79,7 +86,11 @@ export const hackingManager = async (ns: NS, targetHost: string) => {
     weakensRequired
   );
 
-  ns.print(`resources available: ${JSON.stringify(resources)}`);
+  ns.print(
+    `weakensRequired=${weakensRequired}, resources available: ${JSON.stringify(
+      resources
+    )}`
+  );
 
   // upload hack scripts to resources
   const files = [
@@ -96,7 +107,11 @@ export const hackingManager = async (ns: NS, targetHost: string) => {
       });
     }
     const args = [targetHost, threads];
-    ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
+    if (!dryRun) {
+      ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
+    } else {
+      ns.print(`dryRun enabled - skipping executable`);
+    }
   });
 
   ns.print(
