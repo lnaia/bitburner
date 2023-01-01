@@ -137,12 +137,17 @@ export const hackingManager = async (
     `waking up from weaken in: seconds=${totalSeconds} or minutes=${totalMinutes} or hours=${totalHours}`
   );
 
-  const safetyMargin = 5000;
-  await ns.sleep(totalWeakenTime + safetyMargin);
+  let currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
+  let minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
+  while (currentSecurityLevel > minSecurityLevel + 5) {
+    ns.print(
+      `target sec lvl: curr=${currentSecurityLevel} min=${minSecurityLevel}`
+    );
+    currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
+    minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
 
-  const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
-  const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
-  ns.print(
-    `target security level: curr=${currentSecurityLevel} min=${minSecurityLevel}`
-  );
+    await ns.sleep(1000);
+  }
+  //   const safetyMargin = 5000;
+  //   await ns.sleep(totalWeakenTime + safetyMargin);
 };
