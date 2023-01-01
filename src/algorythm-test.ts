@@ -1,8 +1,9 @@
-/** @param {NS} ns */
-export async function main(ns) {
-  const host = ns.args[0];
+import type {NS} from './NetscriptDefinitions';
 
-  const secMargin = 5;
+/** @param {NS} ns */
+export async function main(ns: NS) {
+  const host = ns.args[0].toString();
+
   const minSecurity = ns.getServerMinSecurityLevel(host);
   const currSec = ns.getServerSecurityLevel(host).toFixed(4);
   const weakenAmountPerThread = ns.weakenAnalyze(1);
@@ -10,7 +11,7 @@ export async function main(ns) {
 
   // how many weakens to bring it to the minimum
   // also how many threads
-  const securityToBeReduced = Math.round(currSec - (minSecurity + secMargin));
+  const securityToBeReduced = Math.round(currSec - minSecurity);
 
   let weakensRequired = 0;
   let totalWeakenTime = 0;
@@ -49,7 +50,8 @@ export async function main(ns) {
     ns.exit();
   }
 
-  ns.exec('weaken.js', 'home', weakensRequired, host);
+  const args = [host, weakensRequired];
+  ns.exec('weaken.js', 'home', weakensRequired, ...args);
 
   const minutes = weakenTimeSeconds / 60;
   const hours = minutes / 60;
