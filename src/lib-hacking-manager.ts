@@ -30,6 +30,8 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
 };
 
 export const hackingManager = async (ns: NS, targetHost: string) => {
+  ns.disableLog('scp');
+  ns.disableLog('sleep');
   const SCRIPTS = (() => {
     const hackScript = 'hack-hack.js';
     const growScript = 'hack-grow.js';
@@ -85,13 +87,21 @@ export const hackingManager = async (ns: NS, targetHost: string) => {
   ];
   Object.entries(resources).forEach(([host, threads]) => {
     if (host !== 'home') {
-      ns.scp(files, host);
+      files.forEach(file => {
+        if (!ns.fileExists(file, host)) {
+          ns.scp(files, host);
+        }
+      });
     }
     const args = [targetHost, threads];
     ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
   });
 
-  ns.print(`waking up from weaken in: ${msToHMS(totalWeakenTime)}`);
+  ns.print(
+    `waking up from weaken in: seconds=${totalWeakenTime / 1000}, minutes=${
+      totalWeakenTime / 1000 / 60
+    }`
+  );
   await ns.sleep(totalWeakenTime);
 
   const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
