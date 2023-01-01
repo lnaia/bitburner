@@ -16,7 +16,7 @@
     "build": "tsc",
     "fix": "gts fix",
     "test": "jest ",
-    "prettier": "prettier -w src"
+    "prettier": "prettier -w jest.config.ts src"
   },
   "resolutions": {
     "typescript": "4.5.4"
