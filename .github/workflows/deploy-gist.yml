@@ -95,6 +95,20 @@ jobs:
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/lib-print-obj-list.js
 
+      - name: Deploy lib-allocate-resources.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-allocate-resources.js
+
+      - name: Deploy lib-hacking-manager.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-hacking-manager.js
+
       - name: Deploy exec-coordinator.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
