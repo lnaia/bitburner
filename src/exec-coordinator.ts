@@ -5,7 +5,7 @@ import { autoRootHosts } from './lib-auto-root-hosts';
 import { autoProvisionHosts } from './lib-auto-provision-hosts';
 
 export async function main(ns: NS) {
-  ns.disableLog('ALL');
+  ns.disableLog('sleep');
   ns.clearLog();
   ns.print(`started@${new Date()}`);
 
