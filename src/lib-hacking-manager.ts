@@ -57,39 +57,36 @@ export const hackingManager = async (ns: NS, targetHost: string) => {
       },
     };
   })();
-
   const safetyMargin = 5000;
 
-  while (true) {
-    // with one thread
-    const weakensRequired = calculateWeakensRequired(ns, targetHost);
-    let totalWeakenTime = safetyMargin;
+  // with one thread
+  const weakensRequired = calculateWeakensRequired(ns, targetHost);
+  let totalWeakenTime = safetyMargin;
 
-    if (weakensRequired) {
-      totalWeakenTime =
-        (ns.getWeakenTime(targetHost) + safetyMargin) * weakensRequired;
-    }
-
-    const resources = allocateResources(
-      ns,
-      SCRIPTS.WEAKEN.script,
-      SCRIPTS.WEAKEN.ram,
-      weakensRequired
-    );
-
-    ns.print(`resources available: ${JSON.stringify(resources)}`);
-    Object.entries(resources).forEach(([host, threads]) => {
-      const args = [targetHost, threads];
-      ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
-    });
-
-    ns.print(`waking up from weaken in: ${msToHMS(totalWeakenTime)}`);
-    await ns.sleep(totalWeakenTime);
-
-    const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
-    const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
-    ns.print(
-      `target security level: curr=${currentSecurityLevel} min=${minSecurityLevel}`
-    );
+  if (weakensRequired) {
+    totalWeakenTime =
+      (ns.getWeakenTime(targetHost) + safetyMargin) * weakensRequired;
   }
+
+  const resources = allocateResources(
+    ns,
+    SCRIPTS.WEAKEN.script,
+    SCRIPTS.WEAKEN.ram,
+    weakensRequired
+  );
+
+  ns.print(`resources available: ${JSON.stringify(resources)}`);
+  Object.entries(resources).forEach(([host, threads]) => {
+    const args = [targetHost, threads];
+    ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
+  });
+
+  ns.print(`waking up from weaken in: ${msToHMS(totalWeakenTime)}`);
+  await ns.sleep(totalWeakenTime);
+
+  const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
+  const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
+  ns.print(
+    `target security level: curr=${currentSecurityLevel} min=${minSecurityLevel}`
+  );
 };
