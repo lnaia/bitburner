@@ -1,7 +1,7 @@
-import { calculateThreads } from './lib-calculate-threads';
-import { listHackableHosts } from './lib-hackable-hosts';
-import { HACK_SCRIPT, COORDINATOR_SCRIPT } from './constants.js';
-import type { NS } from './NetscriptDefinitions';
+import {calculateThreads} from './lib-calculate-threads';
+import {listHackableHosts} from './lib-hackable-hosts';
+import {HACK_SCRIPT, COORDINATOR_SCRIPT} from './constants.js';
+import type {NS} from './NetscriptDefinitions';
 
 export async function main(ns: NS) {
   let targetHost = ns.args[0];
@@ -19,7 +19,7 @@ export async function main(ns: NS) {
 
   const script = HACK_SCRIPT;
   const scriptMemory = ns.getScriptRam(script);
-  const reserveRam = ns.getScriptRam(COORDINATOR_SCRIPT);
+  const reserveRam = ns.getScriptRam(COORDINATOR_SCRIPT) * 5;
   const numThreads = calculateThreads(ns, scriptMemory, 'home', reserveRam);
 
   ns.spawn(script, numThreads, targetHost);
