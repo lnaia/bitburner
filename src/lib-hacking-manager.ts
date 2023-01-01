@@ -150,6 +150,6 @@ export const hackingManager = async (
 
     await ns.sleep(1000);
   }
-  //   const safetyMargin = 5000;
-  //   await ns.sleep(totalWeakenTime + safetyMargin);
+
+  ns.print('weaken sucess');
 };
