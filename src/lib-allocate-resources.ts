@@ -22,7 +22,7 @@ export const availableResources = (
     const serverMaxRam = ns.getServerMaxRam(host);
     const serverRamInUse = ns.getServerUsedRam(host);
     const serverRamAvailable = serverMaxRam - serverRamInUse;
-    const threads = Math.ceil(serverRamAvailable / scriptRam);
+    const threads = Math.floor(serverRamAvailable / scriptRam);
     resources[host] = threads;
   }
 

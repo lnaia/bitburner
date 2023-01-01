@@ -40,6 +40,8 @@ export const hackingManager = async (
   ns.disableLog('getServerMaxRam');
   ns.disableLog('getServerUsedRam');
   ns.disableLog('getServerRequiredHackingLevel');
+  ns.disableLog('getServerSecurityLevel');
+  ns.disableLog('getServerMinSecurityLevel');
   ns.disableLog('getHackingLevel');
 
   const SCRIPTS = (() => {
@@ -140,13 +142,12 @@ export const hackingManager = async (
   );
 
   let currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
-  let minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
+  const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
   while (currentSecurityLevel > minSecurityLevel + 5) {
     ns.print(
       `target sec lvl: curr=${currentSecurityLevel} min=${minSecurityLevel}`
     );
     currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
-    minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
 
     await ns.sleep(1000);
   }
