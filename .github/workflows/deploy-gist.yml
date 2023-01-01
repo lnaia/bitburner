@@ -143,3 +143,24 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/hack.js
+
+      - name: Deploy hack-spec.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/hack-spec.js
+
+      - name: Deploy weaken-spec.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/weaken-spec.js
+
+      - name: Deploy grow-spec.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/grow-spec.js
