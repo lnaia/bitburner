@@ -76,7 +76,15 @@ export const hackingManager = async (
   if (weakensRequired) {
     const weakenTime = Math.round(ns.getWeakenTime(targetHost));
     totalWeakenTime = weakenTime * weakensRequired;
-    ns.print(`weakenTime=${weakenTime}`);
+
+    try {
+      const server = ns.getServer(targetHost);
+      const player = ns.getPlayer();
+      const formulasWeakenTime = ns.formulas.hacking.weakenTime(server, player);
+      ns.print(`FormulasAPI weakenTime=${Math.round(formulasWeakenTime)}`);
+    } catch (err) {
+      ns.print(`weakenTime=${weakenTime}`);
+    }
   }
 
   const resources = allocateResources(
