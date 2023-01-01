@@ -1,15 +1,22 @@
 import type {NS} from './NetscriptDefinitions';
 import {discoverHosts} from './lib-discover-hosts';
 
-export const availableResources = (ns: NS, script: string) => {
+export const availableResources = (
+  ns: NS,
+  script: string,
+  scriptRam: number
+) => {
   if (!ns.fileExists) {
     ns.print(`requested script does not exist - ${script}`);
     ns.exit();
   }
 
   const resources: {[key: string]: number} = {};
-  const scriptRam = ns.getScriptRam(script);
-  const hosts = discoverHosts(ns);
+  const rootedServers = discoverHosts(ns).filter(host =>
+    ns.hasRootAccess(host)
+  );
+  const ownedServers = ns.getPurchasedServers();
+  const hosts = [...rootedServers, ...ownedServers];
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
@@ -25,9 +32,10 @@ export const availableResources = (ns: NS, script: string) => {
 export const allocateResources = (
   ns: NS,
   script: string,
+  scriptRam: number,
   threadsNeeded: number
 ) => {
-  const resources = availableResources(ns, script);
+  const resources = availableResources(ns, script, scriptRam);
   let threadsRemaining = threadsNeeded;
   const resourcesAllocated: {[key: string]: number} = {};
 

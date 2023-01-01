@@ -1,64 +1,95 @@
-// import type {NS} from './NetscriptDefinitions';
+import type {NS} from './NetscriptDefinitions';
+import {allocateResources} from './lib-allocate-resources';
 
-// export const hackingManager = (ns: NS, targetHost) => {
-//   const SCRIPTS = (() => {
-//     const hackScript = 'hack-spec.js';
-//     const growScript = 'grow-spec.js';
-//     const weakenScript = 'weaken-spec.js';
+export const msToHMS = (ms: number) => {
+  // 1- Convert to seconds:
+  let seconds = ms / 1000;
+  // 2- Extract hours:
+  const hours = seconds / 3600; // 3,600 seconds in 1 hour
+  seconds = seconds % 3600; // seconds remaining after extracting hours
+  // 3- Extract minutes:
+  const minutes = seconds / 60; // 60 seconds in 1 minute
+  // 4- Keep only seconds not extracted to minutes:
+  seconds = seconds % 60;
+  return `${hours}:${minutes}:${seconds}`;
+};
 
-//     [hackScript, growScript, weakenScript].forEach(script => {
-//       if (!ns.fileExists(script)) {
-//         ns.tprint('missing hacking script');
-//         ns.exit();
-//       }
-//     });
+export const calculateWeakensRequired = (ns: NS, host: string) => {
+  const minSecurity = ns.getServerMinSecurityLevel(host);
+  const currSec = +ns.getServerSecurityLevel(host).toFixed(4);
+  const weakenAmountPerThread = ns.weakenAnalyze(1);
+  const securityToBeReduced = Math.ceil(currSec - minSecurity);
 
-//     return {
-//       HACK: {
-//         script: hackScript,
-//         ram: ns.getScriptRam(hackScript),
-//       },
-//       GROW: {
-//         script: hackScript,
-//         ram: ns.getScriptRam(growScript),
-//       },
-//       WEAKEN: {
-//         script: weakenScript,
-//         ram: ns.getScriptRam(weakenScript),
-//       },
-//     };
-//   })();
+  let weakensRequired = 0;
+  if (securityToBeReduced > 0) {
+    weakensRequired = Math.ceil(securityToBeReduced / weakenAmountPerThread);
+  }
 
-//   const servers = ns
-//     .getPurchasedServers()
-//     .map(server => ({
-//       host: server,
-//       ram: ns.getServerMaxRam(server),
-//     }))
-//     .sort((a, b) => b.ram - a.ram);
+  ns.print(`${host}: weakensRequired=${weakensRequired}`);
+  return weakensRequired;
+};
 
-//   const securityThreshold = 5;
-//   const minSecurity =
-//     ns.getServerMinSecurityLevel(targetHost) + securityThreshold;
+export const hackingManager = async (ns: NS, targetHost: string) => {
+  const SCRIPTS = (() => {
+    const hackScript = 'hack-spec.js';
+    const growScript = 'grow-spec.js';
+    const weakenScript = 'weaken-spec.js';
 
-//   while (true) {
-//     const curSecurity = ns.getServerSecurityLevel(targetHost);
-//     if (curSecurity > minSecurity) {
-//       ns.getWeakenTime(targetHost);
-//       ns.weakenAnalyze(1);
-//     }
-//   }
+    [hackScript, growScript, weakenScript].forEach(script => {
+      if (!ns.fileExists(script)) {
+        ns.print('missing hacking script');
+        ns.exit();
+      }
+    });
 
-//   // one manager per target?
+    return {
+      HACK: {
+        script: hackScript,
+        ram: ns.getScriptRam(hackScript),
+      },
+      GROW: {
+        script: hackScript,
+        ram: ns.getScriptRam(growScript),
+      },
+      WEAKEN: {
+        script: weakenScript,
+        ram: ns.getScriptRam(weakenScript),
+      },
+    };
+  })();
 
-//   // quantity ns.getServerGrowth()
-//   // time ns.getGrowTime()
-//   // x = quantity left to 100
-//   // threads to grow to 100: (x / ns.getServerGrowth())
-//   //  threads * ns.getGrowTime() = how long it will take to reach 100
-//   //
-//   //   ns.formulas.hacking.growTime(ns.formulas.mockPerson())
-//   for (const server of servers) {
-//     const threadsAvailable = server.ram / hackingScriptRam;
-//   }
-// };
+  const safetyMargin = 5000;
+
+  while (true) {
+    // with one thread
+    const weakensRequired = calculateWeakensRequired(ns, targetHost);
+    let totalWeakenTime = safetyMargin;
+
+    if (weakensRequired) {
+      totalWeakenTime =
+        (ns.getWeakenTime(targetHost) + safetyMargin) * weakensRequired;
+    }
+
+    const resources = allocateResources(
+      ns,
+      SCRIPTS.WEAKEN.script,
+      SCRIPTS.WEAKEN.ram,
+      weakensRequired
+    );
+
+    ns.print(`resources available: ${JSON.stringify(resources)}`);
+    Object.entries(resources).forEach(([host, threads]) => {
+      const args = [targetHost, threads];
+      ns.exec(SCRIPTS.WEAKEN.script, host, threads, ...args);
+    });
+
+    ns.print(`waking up from weaken in: ${msToHMS(totalWeakenTime)}`);
+    await ns.sleep(totalWeakenTime);
+
+    const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
+    const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
+    ns.print(
+      `target security level: curr=${currentSecurityLevel} min=${minSecurityLevel}`
+    );
+  }
+};
