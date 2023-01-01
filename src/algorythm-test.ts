@@ -1,7 +1,15 @@
 import type {NS} from './NetscriptDefinitions';
 
+const resources = {
+  a: 100,
+  b: 50,
+};
+
 /** @param {NS} ns */
 export async function main(ns: NS) {
+  const needs = 111;
+
+  ns.exit();
   const host = ns.args[0].toString();
 
   const minSecurity = ns.getServerMinSecurityLevel(host);
