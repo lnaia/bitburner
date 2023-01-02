@@ -175,7 +175,7 @@ export const weakenTarget = async (
     `waking up from weaken in: seconds=${totalSeconds} or minutes=${totalMinutes} or hours=${totalHours}`
   );
 
-  let currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
+  const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
   const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
   await ns.sleep(actionTime + 1000);
 
