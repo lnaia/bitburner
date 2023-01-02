@@ -29,11 +29,10 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
   return weakensRequired;
 };
 
-export const calculateGrowthsRequired = async (ns: NS, host: string) => {
+export const calculateGrowthsRequired = (ns: NS, host: string) => {
   let currMoney = ns.getServerMoneyAvailable(host);
   if (currMoney <= 0) {
-    await ns.grow(host);
-    currMoney = ns.getServerMoneyAvailable(host);
+    currMoney = 1;
   }
   const maxMoney = ns.getServerMaxMoney(host);
   const requiredThreads = Math.ceil(
@@ -188,7 +187,7 @@ export const weakenTarget = async (
 
 export const growTarget = async (ns: NS, targetHost: string, dryRun = true) => {
   const SCRIPTS = getScripts(ns);
-  const threadsRequired = await calculateGrowthsRequired(ns, targetHost);
+  const threadsRequired = calculateGrowthsRequired(ns, targetHost);
   let actionTime = 0;
   if (threadsRequired) {
     actionTime = Math.round(ns.getGrowTime(targetHost));
