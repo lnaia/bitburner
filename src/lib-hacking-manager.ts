@@ -89,6 +89,7 @@ export const hackingManager = async (
   dryRun = true
 ) => {
   ns.disableLog('ALL');
+  ns.enableLog('hack');
 
   await weakenTarget(ns, targetHost, dryRun);
   await growTarget(ns, targetHost, dryRun);
