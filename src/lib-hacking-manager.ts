@@ -93,8 +93,8 @@ export const hackingManager = async (
 
   await weakenTarget(ns, targetHost, dryRun);
   await growTarget(ns, targetHost, dryRun);
-  //   await weakenTarget(ns, targetHost, dryRun);
-  //   await hackTarget(ns, targetHost, dryRun);
+  await weakenTarget(ns, targetHost, dryRun);
+  await hackTarget(ns, targetHost, dryRun);
 };
 
 export const weakenTarget = async (
