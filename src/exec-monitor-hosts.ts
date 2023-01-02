@@ -10,6 +10,7 @@ export async function main(ns: NS) {
   const maxHosts = +ns.args[0];
   const sortOrder = `${ns.args[1]}`;
   const invert = +ns.args[2];
+  const name = ns.args[3].toString();
 
   while (true) {
     const list = (() => {
@@ -23,6 +24,10 @@ export async function main(ns: NS) {
 
       if (invert === 1) {
         hosts = hosts.reverse();
+      }
+
+      if (name.length) {
+        hosts = hosts.filter(host => new RegExp(name).test(host.host));
       }
 
       return hosts.sort((a, b) => {

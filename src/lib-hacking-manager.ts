@@ -29,12 +29,13 @@ export const calculateWeakensRequired = (ns: NS, host: string) => {
   return weakensRequired;
 };
 
-export const calculateGrowthsRequired = (ns: NS, host: string) => {
-  const maxMoney = ns.getServerMaxMoney(host);
+export const calculateGrowthsRequired = async (ns: NS, host: string) => {
   let currMoney = ns.getServerMoneyAvailable(host);
   if (currMoney <= 0) {
-    currMoney = 1;
+    await ns.grow(host);
+    currMoney = ns.getServerMoneyAvailable(host);
   }
+  const maxMoney = ns.getServerMaxMoney(host);
   const requiredThreads = Math.ceil(
     ns.growthAnalyze(host, maxMoney / currMoney)
   );
@@ -92,8 +93,8 @@ export const hackingManager = async (
 
   await weakenTarget(ns, targetHost, dryRun);
   await growTarget(ns, targetHost, dryRun);
-  await weakenTarget(ns, targetHost, dryRun);
-  await hackTarget(ns, targetHost, dryRun);
+  //   await weakenTarget(ns, targetHost, dryRun);
+  //   await hackTarget(ns, targetHost, dryRun);
 };
 
 export const weakenTarget = async (
@@ -177,7 +178,7 @@ export const weakenTarget = async (
 
   const currentSecurityLevel = ns.getServerSecurityLevel(targetHost);
   const minSecurityLevel = ns.getServerMinSecurityLevel(targetHost);
-  await ns.sleep(actionTime + 1000);
+  await ns.sleep(actionTime + 5000);
 
   ns.print('weaken sucess');
   ns.print(
@@ -187,7 +188,7 @@ export const weakenTarget = async (
 
 export const growTarget = async (ns: NS, targetHost: string, dryRun = true) => {
   const SCRIPTS = getScripts(ns);
-  const threadsRequired = calculateGrowthsRequired(ns, targetHost);
+  const threadsRequired = await calculateGrowthsRequired(ns, targetHost);
   let actionTime = 0;
   if (threadsRequired) {
     actionTime = Math.round(ns.getGrowTime(targetHost));
@@ -258,7 +259,7 @@ export const growTarget = async (ns: NS, targetHost: string, dryRun = true) => {
     `waking up from grow in: seconds=${totalSeconds} or minutes=${totalMinutes} or hours=${totalHours}`
   );
 
-  await ns.sleep(actionTime + 1000);
+  await ns.sleep(actionTime + 5000);
 
   ns.print('grow sucess');
   ns.print(
@@ -343,7 +344,7 @@ export const hackTarget = async (ns: NS, targetHost: string, dryRun = true) => {
     `waking up from hack in: seconds=${totalSeconds} or minutes=${totalMinutes} or hours=${totalHours}`
   );
 
-  await ns.sleep(actionTime + 1000);
+  await ns.sleep(actionTime + 5000);
 
   ns.print('hack sucess');
   ns.print(
