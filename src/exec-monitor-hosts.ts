@@ -15,28 +15,27 @@ export async function main(ns: NS) {
     const list = (() => {
       let hosts = discoverHosts(ns)
         .map(host => hostInfo(ns, host))
-        .filter(host => host.mm > 0)
-        .sort((a, b) => {
-          if (sortOrder === 'cm') {
-            return b.cm - a.cm;
-          } else if (sortOrder === 'rh') {
-            return b.rh - a.rh;
-          } else if (sortOrder === 'ms') {
-            return b.ms - a.ms;
-          }
-
-          return b.mm - a.mm;
-        });
+        .filter(host => host.mm > 0);
 
       if (maxHosts > 0) {
         hosts = hosts.slice(0, maxHosts);
       }
 
       if (invert === 1) {
-        return hosts.reverse();
+        hosts = hosts.reverse();
       }
 
-      return hosts;
+      return hosts.sort((a, b) => {
+        if (sortOrder === 'cm') {
+          return b.cm - a.cm;
+        } else if (sortOrder === 'rh') {
+          return b.rh - a.rh;
+        } else if (sortOrder === 'ms') {
+          return b.ms - a.ms;
+        }
+
+        return b.mm - a.mm;
+      });
     })();
 
     ns.clearLog();
