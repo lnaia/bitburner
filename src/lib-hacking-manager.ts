@@ -74,7 +74,7 @@ export const getScripts = (ns: NS) => {
       ram: ns.getScriptRam(hackScript),
     },
     GROW: {
-      script: hackScript,
+      script: growScript,
       ram: ns.getScriptRam(growScript),
     },
     WEAKEN: {
