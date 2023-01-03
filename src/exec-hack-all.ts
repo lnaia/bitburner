@@ -7,16 +7,16 @@ const HACK_MANAGER_HOST = 'home';
 
 export async function main(ns: NS) {
   ns.disableLog('ALL');
+  ns.tail();
 
   const scriptRamCost = ns.getScriptRam(HACK_MANAGER_SCRIPT);
+  const hostsUnderManagement: string[] = [];
 
   while (true) {
     const hosts = discoverHosts(ns)
       .map(host => hostInfo(ns, host))
       .filter(host => host.mm > 0)
       .sort((a, b) => a.mm - b.mm); // less max money first, easier to snowball
-
-    const hostsUnderManagement: string[] = [];
 
     for (const host of hosts) {
       if (!hostsUnderManagement.includes(host.host)) {
@@ -26,7 +26,7 @@ export async function main(ns: NS) {
         const canRunScript = serverFreeRam >= scriptRamCost; // assumed is, that we run it on a SINGLE thread.
 
         if (ns.hasRootAccess(host.host) && canRunScript) {
-          ns.exec(HACK_MANAGER_SCRIPT, HACK_MANAGER_HOST, 1, host.host); // home is our controller HQ! because otherwise CBA to code dynamic HQ
+          ns.exec(HACK_MANAGER_SCRIPT, HACK_MANAGER_HOST, 1, host.host, false); // home is our controller HQ! because otherwise CBA to code dynamic HQ
           hostsUnderManagement.push(host.host);
         }
       }
