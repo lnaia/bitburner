@@ -17,7 +17,7 @@ const GROW_ACTION = 'grow';
 
 export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const safetyMargin = 10000;
+  const safetyMargin = 1000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
   const isTargetRich = moneyAvailable > safetyMargin;
 
@@ -40,10 +40,9 @@ export const stopConditionWeaken = (ns: NS, targetHost: string) => {
 
 export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const safetyMargin = 10000;
-  const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.75;
-  const isMoneyMaxed = safetyMargin + moneyAvailable >= maxMoney;
+  const moneyAvailable = ns.getServerMoneyAvailable(targetHost) * 0.75;
+  const maxMoney = ns.getServerMaxMoney(targetHost);
+  const isMoneyMaxed = moneyAvailable >= maxMoney;
 
   // ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
 
@@ -274,6 +273,7 @@ export const hackManager = async (
 ) => {
   await cleanupExistingScripts(ns, targetHost);
 
+  ns.print(`${targetHost}@${hackManager}: loop-start`);
   await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
   await genericAction(ns, targetHost, GROW_ACTION, isDryRun);
   await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
