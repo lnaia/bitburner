@@ -17,9 +17,8 @@ const GROW_ACTION = 'grow';
 
 export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const securityMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const isTargetRich = moneyAvailable + securityMargin >= 0;
+  const isTargetRich = moneyAvailable > 0;
 
   ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
 
@@ -28,10 +27,9 @@ export const stopConditionHack = (ns: NS, targetHost: string) => {
 
 export const stopConditionWeaken = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const securityMargin = 5;
   const minSecurity = ns.getServerMinSecurityLevel(targetHost);
   const currSecurity = ns.getServerSecurityLevel(targetHost);
-  const isSecurityMin = securityMargin + currSecurity >= minSecurity;
+  const isSecurityMin = currSecurity <= minSecurity;
 
   ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
 
@@ -40,11 +38,9 @@ export const stopConditionWeaken = (ns: NS, targetHost: string) => {
 
 export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-
-  const moneyMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
   const maxMoney = ns.getServerMaxMoney(targetHost) * 0.04;
-  const isMoneyMaxed = moneyMargin + moneyAvailable >= maxMoney;
+  const isMoneyMaxed = moneyAvailable >= maxMoney;
 
   ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
 
