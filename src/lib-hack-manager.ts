@@ -250,7 +250,7 @@ export const genericAction = async (
   }
 
   ns.print(
-    `${targetHost}@genericAction: stop condition fulfilled? ${
+    `${targetHost}@${action}: stop condition fulfilled? ${
       stopCondition(ns, targetHost) ? 'yes' : 'no'
     }`
   );
