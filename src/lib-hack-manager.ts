@@ -1,6 +1,10 @@
 import type {NS} from './NetscriptDefinitions';
 import {allocateResources} from './lib-allocate-resources';
-import type {AllocatedResources, ActionMap} from './typings';
+import type {
+  AllocatedResources,
+  ActionMap,
+  CalculateActionTime,
+} from './typings';
 
 const WEAKEN_SCRIPT = 'hack-weaken.js';
 const WEAKEN_ACTION = 'weaken';
@@ -83,7 +87,7 @@ export const calculateThreadsGrow = (ns: NS, host: string) => {
 export const calculateThreadsHack = (ns: NS, host: string) => {
   ns.disableLog('ALL');
   const currMoney = ns.getServerMoneyAvailable(host);
-  const requiredThreads = ns.hackAnalyzeThreads(host, currMoney);
+  const requiredThreads = Math.ceil(ns.hackAnalyzeThreads(host, currMoney));
 
   if (requiredThreads === -1) {
     return 0;
@@ -170,6 +174,7 @@ export const runScriptAgainstTarget = async (
   script: string,
   targetHost: string,
   threads: number,
+  calculateActionTime: CalculateActionTime,
   isDryRun: boolean
 ) => {
   ns.disableLog('ALL');
@@ -177,6 +182,18 @@ export const runScriptAgainstTarget = async (
   ensureScriptIsPresent(ns, targetHost, script);
   const [resources] = await getResources(ns, script, scriptRam, threads);
   dispatchScriptToResources(ns, resources, script, targetHost, isDryRun);
+
+  const singleThreadActionTime = calculateActionTime(targetHost);
+  const totalSeconds = Math.round(singleThreadActionTime / 1000);
+  const totalMinutes = Math.round(totalSeconds / 60);
+  const totalHours = Math.round(totalMinutes / 60);
+  const safetyMargin = 2000;
+
+  ns.print(
+    `${targetHost}@runScriptAgainstTarget: waking up in ${totalSeconds}(s) or ${totalMinutes}(m) or ${totalHours}(h)`
+  );
+
+  await ns.sleep(singleThreadActionTime + safetyMargin);
 };
 
 export const genericAction = async (
@@ -191,30 +208,37 @@ export const genericAction = async (
     weaken: {
       stopCondition: stopConditionWeaken,
       calculateThreads: calculateThreadsWeaken,
+      calculateActionTime: (host: string) => ns.getWeakenTime(host),
     },
     grow: {
       stopCondition: stopConditionGrow,
       calculateThreads: calculateThreadsGrow,
+      calculateActionTime: (host: string) => ns.getGrowTime(host),
     },
     hack: {
       stopCondition: stopConditionHack,
       calculateThreads: calculateThreadsHack,
+      calculateActionTime: (host: string) => ns.getHackTime(host),
     },
   };
 
-  const {calculateThreads, stopCondition} = actionMap[action];
-  let threadsRequired = calculateThreads(ns, targetHost);
-  while (!stopCondition(ns, targetHost)) {
-    threadsRequired = calculateThreads(ns, targetHost);
-    await runScriptAgainstTarget(
-      ns,
-      GROW_SCRIPT,
-      targetHost,
-      threadsRequired,
-      isDryRun
-    );
-    await ns.sleep(1000);
-  }
+  const {calculateThreads, stopCondition, calculateActionTime} =
+    actionMap[action];
+  const threadsRequired = calculateThreads(ns, targetHost);
+  await runScriptAgainstTarget(
+    ns,
+    GROW_SCRIPT,
+    targetHost,
+    threadsRequired,
+    calculateActionTime,
+    isDryRun
+  );
+
+  ns.print(
+    `${targetHost}@genericAction: stop condition fulfilled? ${
+      stopCondition(ns, targetHost) ? 'yes' : 'no'
+    }`
+  );
 };
 
 export const hackManager = async (
