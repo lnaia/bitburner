@@ -43,7 +43,7 @@ export const stopConditionGrow = (ns: NS, targetHost: string) => {
 
   const moneyMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const maxMoney = ns.getServerMaxMoney(targetHost);
+  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.04;
   const isMoneyMaxed = moneyMargin + moneyAvailable >= maxMoney;
 
   ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
