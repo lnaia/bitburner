@@ -273,7 +273,7 @@ export const hackManager = async (
 ) => {
   await cleanupExistingScripts(ns, targetHost);
 
-  ns.print(`${targetHost}@${hackManager}: loop-start`);
+  ns.print(`${targetHost}@hackManager: loop-start`);
   await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
   await genericAction(ns, targetHost, GROW_ACTION, isDryRun);
   await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
