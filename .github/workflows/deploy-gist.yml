@@ -137,6 +137,20 @@ jobs:
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/exec-monitor-hosts.js
 
+      - name: Deploy exec-hack-all.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/exec-hack-all.js
+
+      - name: Deploy exec-hm.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/exec-hm.js
+
       - name: Deploy constants.js
         uses: exuanbo/actions-deploy-gist@v1
         with:

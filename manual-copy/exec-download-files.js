@@ -13,10 +13,16 @@ export async function main(ns) {
     'lib-provision.js',
     'lib-servers.js',
     'lib-print-obj-list.js',
+    'lib-allocate-resources.js',
+    'lib-hacking-manager.js',
     'exec-coordinator.js',
     'exec-provision-home.js',
     'exec-find-host.js',
+    'exec-monitor-hosts.js',
     'hack.js',
+    'hack-hack.js',
+    'hack-grow.js',
+    'hack-weaken.js',
     'constants.js',
   ];
 
@@ -24,4 +30,6 @@ export async function main(ns) {
     ns.exec('download-files.js', 'home', 1, ...scriptArgs, file);
     await ns.sleep(3000);
   }
+
+  ns.tprintf('download finished');
 }
