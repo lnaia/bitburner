@@ -238,6 +238,8 @@ export const genericAction = async (
     actionMap[action];
   const threadsRequired = calculateThreads(ns, targetHost);
 
+  ns.print(`${targetHost}@${action}: threadsRequired=${threadsRequired}`);
+
   if (threadsRequired > 0) {
     let stopConditionFullfilled = stopCondition(ns, targetHost);
 
@@ -259,8 +261,6 @@ export const genericAction = async (
         stopConditionFullfilled ? 'yes' : 'no'
       }`
     );
-  } else {
-    ns.print(`${targetHost}@${action}: no threads required.`);
   }
 };
 
