@@ -239,21 +239,27 @@ export const genericAction = async (
   const threadsRequired = calculateThreads(ns, targetHost);
 
   if (threadsRequired > 0) {
-    await runScriptAgainstTarget(
-      ns,
-      GROW_SCRIPT,
-      targetHost,
-      threadsRequired,
-      calculateActionTime,
-      isDryRun
-    );
-  }
+    let stopConditionFullfilled = stopCondition(ns, targetHost);
 
-  ns.print(
-    `${targetHost}@${action}: stop condition fulfilled? ${
-      stopCondition(ns, targetHost) ? 'yes' : 'no'
-    }`
-  );
+    while (!stopConditionFullfilled) {
+      await runScriptAgainstTarget(
+        ns,
+        GROW_SCRIPT,
+        targetHost,
+        threadsRequired,
+        calculateActionTime,
+        isDryRun
+      );
+    }
+
+    ns.print(
+      `${targetHost}@${action}: stop condition fulfilled? ${
+        stopConditionFullfilled ? 'yes' : 'no'
+      }`
+    );
+  } else {
+    ns.print(`${targetHost}@${action}: no threads required.`);
+  }
 };
 
 export const hackManager = async (
