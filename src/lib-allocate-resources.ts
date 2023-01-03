@@ -1,4 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
+import type {AllocatedResources} from './typings';
+
 import {discoverHosts} from './lib-discover-hosts';
 
 export const availableResources = (
@@ -34,7 +36,7 @@ export const allocateResources = (
   script: string,
   scriptRam: number,
   threadsNeeded: number
-) => {
+): AllocatedResources => {
   const resources = availableResources(ns, script, scriptRam);
   let threadsRemaining = threadsNeeded;
   let totalThreadsAvailable = 0;

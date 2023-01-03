@@ -12,3 +12,5 @@ export interface HostDetails {
 }
 
 export type StatusReport = [boolean, string?];
+
+export type AllocatedResources = [{[key: string]: number}, number];

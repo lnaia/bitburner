@@ -1,5 +1,21 @@
 import type {NS} from './NetscriptDefinitions';
 import {allocateResources} from './lib-allocate-resources';
+import type {AllocatedResources} from './typings';
+
+const WEAKEN_SCRIPT = 'hack-weaken.js';
+const HACK_SCRIPT = 'hack-hack.js';
+const GROW_SCRIPT = 'hack-grow.js';
+
+export const isTargetRich = (ns: NS, targetHost: string) => {
+  ns.disableLog('ALL');
+  const securityMargin = 10000;
+  const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
+  const isTargetRich = moneyAvailable + securityMargin >= 0;
+
+  ns.print(`${targetHost}@hasTargetMoney: isTargetRich=${isTargetRich}`);
+
+  return isTargetRich;
+};
 
 export const isTargetAtMinSecurity = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
@@ -35,34 +51,43 @@ export const calcWeakensToMinSec = (ns: NS, host: string) => {
   const weakenAmountPerThread = ns.weakenAnalyze(1);
   const securityToBeReduced = Math.ceil(currSec - minSecurity);
 
-  let weakensRequired = 0;
+  let requiredThreads = 0;
   if (securityToBeReduced > 0) {
-    weakensRequired = Math.ceil(securityToBeReduced / weakenAmountPerThread);
+    requiredThreads = Math.ceil(securityToBeReduced / weakenAmountPerThread);
   }
 
-  ns.print(`${host}@calcWeakensToMinSec: weakensRequired=${weakensRequired}`);
-  return weakensRequired;
+  ns.print(`${host}@calcWeakensToMinSec: requiredThreads=${requiredThreads}`);
+  return requiredThreads;
 };
 
-export const getResources = async (
-  ns: NS,
-  weakenScript: string,
-  weakenScriptRam: number,
-  threads: number
-) => {
+export const calculateGrowthsToMaxMoney = (ns: NS, host: string) => {
   ns.disableLog('ALL');
-  const f = () => allocateResources(ns, weakenScript, weakenScriptRam, threads);
+  const maxMoney = ns.getServerMaxMoney(host);
+  let currMoney = ns.getServerMoneyAvailable(host);
+  if (currMoney <= 0) {
+    currMoney = 1;
+  }
+  const requiredThreads = Math.ceil(
+    ns.growthAnalyze(host, maxMoney / currMoney)
+  );
 
-  let [resources, totalThreadsAvailable] = f();
-  while (totalThreadsAvailable < threads) {
-    ns.print(
-      `getResources: waiting threads=${threads}, totalThreadsAvailable=${totalThreadsAvailable}`
-    );
-    [resources, totalThreadsAvailable] = f();
-    await ns.sleep(1000);
+  ns.print(
+    `${host}@calculateGrowthsToMaxMoney: requiredThreads=${requiredThreads}`
+  );
+  return requiredThreads;
+};
+
+export const calculateHacksToDrain = (ns: NS, host: string) => {
+  ns.disableLog('ALL');
+  const currMoney = ns.getServerMoneyAvailable(host);
+  const requiredThreads = ns.hackAnalyzeThreads(host, currMoney);
+
+  if (requiredThreads === -1) {
+    return 0;
   }
 
-  return [resources, totalThreadsAvailable];
+  ns.print(`${host}@calculateHacksToDrain: requiredThreads=${requiredThreads}`);
+  return requiredThreads;
 };
 
 export const ensureScriptIsPresent = (ns: NS, host: string, script: string) => {
@@ -71,29 +96,58 @@ export const ensureScriptIsPresent = (ns: NS, host: string, script: string) => {
   }
 };
 
-export const dispatchScriptToResources = () => {};
-export const lowerTargetSecurity = async (
+export const cleanupExistingScripts = async (ns: NS, host: string) => {
+  ns.disableLog('ALL');
+
+  for (const script of [HACK_SCRIPT, GROW_SCRIPT, WEAKEN_SCRIPT]) {
+    if (!ns.fileExists(script, host)) {
+      continue;
+    }
+
+    const foundScript = ns
+      .ps(host)
+      .find(runningScript => runningScript.filename === script);
+
+    if (foundScript) {
+      ns.kill(foundScript.pid);
+      ns.sleep(1000); // wait for kill to do it's thing
+    }
+
+    ns.rm(script, host);
+  }
+};
+
+export const getResources = async (
   ns: NS,
+  weakenScript: string,
+  weakenScriptRam: number,
+  threads: number
+): Promise<AllocatedResources> => {
+  ns.disableLog('ALL');
+  const f = () => allocateResources(ns, weakenScript, weakenScriptRam, threads);
+
+  let [resources, totalThreadsAvailable] = f();
+  while (totalThreadsAvailable < 1) {
+    ns.print(`getResources: waiting for an available thread`);
+    [resources, totalThreadsAvailable] = f();
+    await ns.sleep(1000);
+  }
+
+  return [resources, totalThreadsAvailable];
+};
+
+export const dispatchScriptToResources = (
+  ns: NS,
+  resources: AllocatedResources[0],
+  script: string,
   targetHost: string,
-  threads: number,
-  isDryRun = false
+  isDryRun: boolean
 ) => {
   ns.disableLog('ALL');
-  const weakenScript = 'hack-weaken.js';
-  const weakenScriptRam = ns.getScriptRam(weakenScript);
-
-  ensureScriptIsPresent(ns, targetHost, weakenScript);
-  const [resources] = await getResources(
-    ns,
-    weakenScript,
-    weakenScriptRam,
-    threads
-  );
-
   Object.entries(resources).forEach(([host, threads]) => {
-    const execArgs = [
-      weakenScript,
-      targetHost,
+    const execArgs: [string, string, number, string, number] = [
+      script,
+      host,
       threads,
       // args:
       targetHost,
@@ -106,19 +160,84 @@ export const lowerTargetSecurity = async (
       ns.exec(...execArgs);
     }
   });
+};
 
-  await ns.sleep(1000);
+export const lowerTargetSecurity = async (
+  ns: NS,
+  targetHost: string,
+  threads: number,
+  isDryRun = false
+) => {
+  ns.disableLog('ALL');
+  const scriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
+  ensureScriptIsPresent(ns, targetHost, WEAKEN_SCRIPT);
+  const [resources] = await getResources(ns, WEAKEN_SCRIPT, scriptRam, threads);
+  dispatchScriptToResources(ns, resources, WEAKEN_SCRIPT, targetHost, isDryRun);
+};
+
+export const growTargetMoney = async (
+  ns: NS,
+  targetHost: string,
+  threads: number,
+  isDryRun = false
+) => {
+  ns.disableLog('ALL');
+  const scriptRam = ns.getScriptRam(GROW_SCRIPT);
+  ensureScriptIsPresent(ns, targetHost, GROW_SCRIPT);
+  const [resources] = await getResources(ns, GROW_SCRIPT, scriptRam, threads);
+  dispatchScriptToResources(ns, resources, GROW_SCRIPT, targetHost, isDryRun);
+};
+
+export const hackTargetMoney = async (
+  ns: NS,
+  targetHost: string,
+  threads: number,
+  isDryRun = false
+) => {
+  ns.disableLog('ALL');
+  const scriptRam = ns.getScriptRam(HACK_SCRIPT);
+  ensureScriptIsPresent(ns, targetHost, HACK_SCRIPT);
+  const [resources] = await getResources(ns, HACK_SCRIPT, scriptRam, threads);
+  dispatchScriptToResources(ns, resources, HACK_SCRIPT, targetHost, isDryRun);
 };
 
 export const weakenTarget = async (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  let weakensToMinSec = calcWeakensToMinSec(ns, targetHost);
 
+  let threadsRequired = calcWeakensToMinSec(ns, targetHost);
   while (!isTargetAtMinSecurity(ns, targetHost)) {
-    weakensToMinSec = calcWeakensToMinSec(ns, targetHost);
-    await lowerTargetSecurity(ns, targetHost, weakensToMinSec);
+    threadsRequired = calcWeakensToMinSec(ns, targetHost);
+    await lowerTargetSecurity(ns, targetHost, threadsRequired);
     await ns.sleep(1000);
   }
 };
 
-export const hackManager = (ns: NS, targetHost: string) => {};
+export const growTarget = async (ns: NS, targetHost: string) => {
+  ns.disableLog('ALL');
+
+  let threadsRequired = calculateGrowthsToMaxMoney(ns, targetHost);
+  while (!isTargetAtMaxMoney(ns, targetHost)) {
+    threadsRequired = calculateGrowthsToMaxMoney(ns, targetHost);
+    await growTargetMoney(ns, targetHost, threadsRequired);
+    await ns.sleep(1000);
+  }
+};
+
+export const hackTarget = async (ns: NS, targetHost: string) => {
+  ns.disableLog('ALL');
+
+  let threadsRequired = calculateHacksToDrain(ns, targetHost);
+  while (!isTargetRich(ns, targetHost)) {
+    threadsRequired = calculateHacksToDrain(ns, targetHost);
+    await hackTargetMoney(ns, targetHost, threadsRequired);
+    await ns.sleep(1000);
+  }
+};
+
+export const hackManager = async (ns: NS, targetHost: string) => {
+  await cleanupExistingScripts(ns, targetHost);
+  await weakenTarget(ns, targetHost);
+  await growTarget(ns, targetHost);
+  await weakenTarget(ns, targetHost);
+  await hackTarget(ns, targetHost);
+};
