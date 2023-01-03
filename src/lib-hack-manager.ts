@@ -171,6 +171,7 @@ export const dispatchScriptToResources = (
     if (isDryRun) {
       ns.print(`dryRun: ${JSON.stringify(execArgs)}`);
     } else {
+      ns.print(`dispatchScriptToResources: ${JSON.stringify(execArgs)}`);
       ns.exec(...execArgs);
     }
   });

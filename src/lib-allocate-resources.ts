@@ -18,7 +18,7 @@ export const availableResources = (
     ns.hasRootAccess(host)
   );
   const ownedServers = ns.getPurchasedServers();
-  const hosts = ['home', ...rootedServers, ...ownedServers];
+  const hosts = [...rootedServers, ...ownedServers];
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
