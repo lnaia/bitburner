@@ -20,7 +20,7 @@ export const stopConditionHack = (ns: NS, targetHost: string) => {
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
   const isTargetRich = moneyAvailable > 0;
 
-  ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
+  // ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
 
   return isTargetRich;
 };
@@ -31,7 +31,7 @@ export const stopConditionWeaken = (ns: NS, targetHost: string) => {
   const currSecurity = ns.getServerSecurityLevel(targetHost);
   const isSecurityMin = currSecurity <= minSecurity;
 
-  ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
+  // ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
 
   return isSecurityMin;
 };
@@ -42,7 +42,7 @@ export const stopConditionGrow = (ns: NS, targetHost: string) => {
   const maxMoney = ns.getServerMaxMoney(targetHost) * 0.04;
   const isMoneyMaxed = moneyAvailable >= maxMoney;
 
-  ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
+  // ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
 
   return isMoneyMaxed;
 };
@@ -59,9 +59,9 @@ export const calculateThreadsWeaken = (ns: NS, host: string) => {
     requiredThreads = Math.ceil(securityToBeReduced / weakenAmountPerThread);
   }
 
-  ns.print(
-    `${host}@calculateThreadsWeaken: requiredThreads=${requiredThreads}`
-  );
+  // ns.print(
+  //   `${host}@calculateThreadsWeaken: requiredThreads=${requiredThreads}`
+  // );
   return requiredThreads;
 };
 
@@ -76,7 +76,7 @@ export const calculateThreadsGrow = (ns: NS, host: string) => {
     ns.growthAnalyze(host, maxMoney / currMoney)
   );
 
-  ns.print(`${host}@calculateThreadsGrow: requiredThreads=${requiredThreads}`);
+  // ns.print(`${host}@calculateThreadsGrow: requiredThreads=${requiredThreads}`);
   return requiredThreads;
 };
 
@@ -89,7 +89,7 @@ export const calculateThreadsHack = (ns: NS, host: string) => {
     return 0;
   }
 
-  ns.print(`${host}@calculateThreadsHack: requiredThreads=${requiredThreads}`);
+  // ns.print(`${host}@calculateThreadsHack: requiredThreads=${requiredThreads}`);
   return requiredThreads;
 };
 
@@ -136,7 +136,7 @@ export const getResources = async (
     // only print every 10 seconds, otherwise we can't read and debug.
     if (tick % 10 === 0) {
       ns.print(
-        `getResources: threads needed=${threads} required=${totalThreadsAvailable}`
+        `getResources: threads needed=${threads} available=${totalThreadsAvailable}`
       );
       ns.print(`${JSON.stringify(resources, null, 2)}`);
       tick = 0;
