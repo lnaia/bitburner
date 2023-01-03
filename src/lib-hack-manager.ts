@@ -238,9 +238,9 @@ export const genericAction = async (
   ns.print(`${targetHost}@${action}: threadsRequired=${threadsRequired}`);
 
   if (threadsRequired > 0) {
-    let stopConditionFullfilled = stopCondition(ns, targetHost);
+    let stopConditionFulfilled = stopCondition(ns, targetHost);
 
-    while (!stopConditionFullfilled) {
+    while (!stopConditionFulfilled) {
       await runScriptAgainstTarget(
         ns,
         GROW_SCRIPT,
@@ -250,12 +250,12 @@ export const genericAction = async (
         isDryRun
       );
 
-      stopConditionFullfilled = stopCondition(ns, targetHost);
+      stopConditionFulfilled = stopCondition(ns, targetHost);
     }
 
     ns.print(
       `${targetHost}@${action}: stop condition fulfilled? ${
-        stopConditionFullfilled ? 'yes' : 'no'
+        stopConditionFulfilled ? 'yes' : 'no'
       }`
     );
   }
