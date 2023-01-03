@@ -19,6 +19,7 @@ export type CalculateActionTime = (host: string) => number;
 
 export type ActionMap = {
   [key: string]: {
+    script: string;
     stopCondition: (ns: NS, str: string) => boolean;
     calculateThreads: (ns: NS, str: string) => number;
     calculateActionTime: CalculateActionTime;

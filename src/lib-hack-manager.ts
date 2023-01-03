@@ -17,8 +17,9 @@ const GROW_ACTION = 'grow';
 
 export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
+  const safetyMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const isTargetRich = moneyAvailable > 0;
+  const isTargetRich = moneyAvailable > safetyMargin;
 
   // ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
 
@@ -27,9 +28,10 @@ export const stopConditionHack = (ns: NS, targetHost: string) => {
 
 export const stopConditionWeaken = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
+  const safetyMargin = 5;
   const minSecurity = ns.getServerMinSecurityLevel(targetHost);
   const currSecurity = ns.getServerSecurityLevel(targetHost);
-  const isSecurityMin = currSecurity <= minSecurity;
+  const isSecurityMin = currSecurity <= minSecurity + safetyMargin;
 
   // ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
 
@@ -38,9 +40,10 @@ export const stopConditionWeaken = (ns: NS, targetHost: string) => {
 
 export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
+  const safetyMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.04;
-  const isMoneyMaxed = moneyAvailable >= maxMoney;
+  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.75;
+  const isMoneyMaxed = safetyMargin + moneyAvailable >= maxMoney;
 
   // ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
 
@@ -215,23 +218,26 @@ export const genericAction = async (
 
   const actionMap: ActionMap = {
     weaken: {
+      script: WEAKEN_SCRIPT,
       stopCondition: stopConditionWeaken,
       calculateThreads: calculateThreadsWeaken,
       calculateActionTime: (host: string) => ns.getWeakenTime(host),
     },
     grow: {
+      script: GROW_SCRIPT,
       stopCondition: stopConditionGrow,
       calculateThreads: calculateThreadsGrow,
       calculateActionTime: (host: string) => ns.getGrowTime(host),
     },
     hack: {
+      script: HACK_SCRIPT,
       stopCondition: stopConditionHack,
       calculateThreads: calculateThreadsHack,
       calculateActionTime: (host: string) => ns.getHackTime(host),
     },
   };
 
-  const {calculateThreads, stopCondition, calculateActionTime} =
+  const {script, calculateThreads, stopCondition, calculateActionTime} =
     actionMap[action];
   const threadsRequired = calculateThreads(ns, targetHost);
 
@@ -243,7 +249,7 @@ export const genericAction = async (
     while (!stopConditionFulfilled) {
       await runScriptAgainstTarget(
         ns,
-        GROW_SCRIPT,
+        script,
         targetHost,
         threadsRequired,
         calculateActionTime,
