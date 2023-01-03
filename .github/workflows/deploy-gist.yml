@@ -102,6 +102,13 @@ jobs:
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/lib-allocate-resources.js
 
+      - name: Deploy lib-hack-manager.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-hack-manager.js
+
       - name: Deploy lib-hacking-manager.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
