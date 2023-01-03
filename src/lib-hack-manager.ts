@@ -117,7 +117,7 @@ export const cleanupExistingScripts = async (ns: NS, host: string) => {
 
     if (foundScript) {
       ns.kill(foundScript.pid);
-      ns.sleep(1000); // wait for kill to do it's thing
+      await ns.sleep(1000); // wait for kill to do it's thing
     }
 
     ns.rm(script, host);
