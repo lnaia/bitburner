@@ -1,37 +1,40 @@
 import type {NS} from './NetscriptDefinitions';
 import {allocateResources} from './lib-allocate-resources';
-import type {AllocatedResources} from './typings';
+import type {AllocatedResources, ActionMap} from './typings';
 
 const WEAKEN_SCRIPT = 'hack-weaken.js';
-const HACK_SCRIPT = 'hack-hack.js';
-const GROW_SCRIPT = 'hack-grow.js';
+const WEAKEN_ACTION = 'weaken';
 
-export const isTargetRich = (ns: NS, targetHost: string) => {
+const HACK_SCRIPT = 'hack-hack.js';
+const HACK_ACTION = 'hack';
+
+const GROW_SCRIPT = 'hack-grow.js';
+const GROW_ACTION = 'grow';
+
+export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
   const securityMargin = 10000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
   const isTargetRich = moneyAvailable + securityMargin >= 0;
 
-  ns.print(`${targetHost}@hasTargetMoney: isTargetRich=${isTargetRich}`);
+  ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
 
   return isTargetRich;
 };
 
-export const isTargetAtMinSecurity = (ns: NS, targetHost: string) => {
+export const stopConditionWeaken = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
   const securityMargin = 5;
   const minSecurity = ns.getServerMinSecurityLevel(targetHost);
   const currSecurity = ns.getServerSecurityLevel(targetHost);
   const isSecurityMin = securityMargin + currSecurity >= minSecurity;
 
-  ns.print(
-    `${targetHost}@isTargetAtMinSecurity: isSecurityMin=${isSecurityMin}`
-  );
+  ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
 
   return isSecurityMin;
 };
 
-export const isTargetAtMaxMoney = (ns: NS, targetHost: string) => {
+export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
 
   const moneyMargin = 10000;
@@ -39,12 +42,12 @@ export const isTargetAtMaxMoney = (ns: NS, targetHost: string) => {
   const maxMoney = ns.getServerMaxMoney(targetHost);
   const isMoneyMaxed = moneyMargin + moneyAvailable >= maxMoney;
 
-  ns.print(`${targetHost}@isTargetAtMaxMoney: isMoneyMaxed=${isMoneyMaxed}`);
+  ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
 
   return isMoneyMaxed;
 };
 
-export const calcWeakensToMinSec = (ns: NS, host: string) => {
+export const calculateThreadsWeaken = (ns: NS, host: string) => {
   ns.disableLog('ALL');
   const minSecurity = ns.getServerMinSecurityLevel(host);
   const currSec = +ns.getServerSecurityLevel(host).toFixed(4);
@@ -56,11 +59,13 @@ export const calcWeakensToMinSec = (ns: NS, host: string) => {
     requiredThreads = Math.ceil(securityToBeReduced / weakenAmountPerThread);
   }
 
-  ns.print(`${host}@calcWeakensToMinSec: requiredThreads=${requiredThreads}`);
+  ns.print(
+    `${host}@calculateThreadsWeaken: requiredThreads=${requiredThreads}`
+  );
   return requiredThreads;
 };
 
-export const calculateGrowthsToMaxMoney = (ns: NS, host: string) => {
+export const calculateThreadsGrow = (ns: NS, host: string) => {
   ns.disableLog('ALL');
   const maxMoney = ns.getServerMaxMoney(host);
   let currMoney = ns.getServerMoneyAvailable(host);
@@ -71,13 +76,11 @@ export const calculateGrowthsToMaxMoney = (ns: NS, host: string) => {
     ns.growthAnalyze(host, maxMoney / currMoney)
   );
 
-  ns.print(
-    `${host}@calculateGrowthsToMaxMoney: requiredThreads=${requiredThreads}`
-  );
+  ns.print(`${host}@calculateThreadsGrow: requiredThreads=${requiredThreads}`);
   return requiredThreads;
 };
 
-export const calculateHacksToDrain = (ns: NS, host: string) => {
+export const calculateThreadsHack = (ns: NS, host: string) => {
   ns.disableLog('ALL');
   const currMoney = ns.getServerMoneyAvailable(host);
   const requiredThreads = ns.hackAnalyzeThreads(host, currMoney);
@@ -86,7 +89,7 @@ export const calculateHacksToDrain = (ns: NS, host: string) => {
     return 0;
   }
 
-  ns.print(`${host}@calculateHacksToDrain: requiredThreads=${requiredThreads}`);
+  ns.print(`${host}@calculateThreadsHack: requiredThreads=${requiredThreads}`);
   return requiredThreads;
 };
 
@@ -162,82 +165,67 @@ export const dispatchScriptToResources = (
   });
 };
 
-export const lowerTargetSecurity = async (
+export const runScriptAgainstTarget = async (
   ns: NS,
+  script: string,
   targetHost: string,
   threads: number,
-  isDryRun = false
+  isDryRun: boolean
 ) => {
   ns.disableLog('ALL');
-  const scriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
-  ensureScriptIsPresent(ns, targetHost, WEAKEN_SCRIPT);
-  const [resources] = await getResources(ns, WEAKEN_SCRIPT, scriptRam, threads);
-  dispatchScriptToResources(ns, resources, WEAKEN_SCRIPT, targetHost, isDryRun);
+  const scriptRam = ns.getScriptRam(script);
+  ensureScriptIsPresent(ns, targetHost, script);
+  const [resources] = await getResources(ns, script, scriptRam, threads);
+  dispatchScriptToResources(ns, resources, script, targetHost, isDryRun);
 };
 
-export const growTargetMoney = async (
+export const genericAction = async (
   ns: NS,
   targetHost: string,
-  threads: number,
-  isDryRun = false
+  action: string,
+  isDryRun: boolean
 ) => {
   ns.disableLog('ALL');
-  const scriptRam = ns.getScriptRam(GROW_SCRIPT);
-  ensureScriptIsPresent(ns, targetHost, GROW_SCRIPT);
-  const [resources] = await getResources(ns, GROW_SCRIPT, scriptRam, threads);
-  dispatchScriptToResources(ns, resources, GROW_SCRIPT, targetHost, isDryRun);
-};
 
-export const hackTargetMoney = async (
-  ns: NS,
-  targetHost: string,
-  threads: number,
-  isDryRun = false
-) => {
-  ns.disableLog('ALL');
-  const scriptRam = ns.getScriptRam(HACK_SCRIPT);
-  ensureScriptIsPresent(ns, targetHost, HACK_SCRIPT);
-  const [resources] = await getResources(ns, HACK_SCRIPT, scriptRam, threads);
-  dispatchScriptToResources(ns, resources, HACK_SCRIPT, targetHost, isDryRun);
-};
+  const actionMap: ActionMap = {
+    weaken: {
+      stopCondition: stopConditionWeaken,
+      calculateThreads: calculateThreadsWeaken,
+    },
+    grow: {
+      stopCondition: stopConditionGrow,
+      calculateThreads: calculateThreadsGrow,
+    },
+    hack: {
+      stopCondition: stopConditionHack,
+      calculateThreads: calculateThreadsHack,
+    },
+  };
 
-export const weakenTarget = async (ns: NS, targetHost: string) => {
-  ns.disableLog('ALL');
-
-  let threadsRequired = calcWeakensToMinSec(ns, targetHost);
-  while (!isTargetAtMinSecurity(ns, targetHost)) {
-    threadsRequired = calcWeakensToMinSec(ns, targetHost);
-    await lowerTargetSecurity(ns, targetHost, threadsRequired);
+  const {calculateThreads, stopCondition} = actionMap[action];
+  let threadsRequired = calculateThreads(ns, targetHost);
+  while (!stopCondition(ns, targetHost)) {
+    threadsRequired = calculateThreads(ns, targetHost);
+    await runScriptAgainstTarget(
+      ns,
+      GROW_SCRIPT,
+      targetHost,
+      threadsRequired,
+      isDryRun
+    );
     await ns.sleep(1000);
   }
 };
 
-export const growTarget = async (ns: NS, targetHost: string) => {
-  ns.disableLog('ALL');
-
-  let threadsRequired = calculateGrowthsToMaxMoney(ns, targetHost);
-  while (!isTargetAtMaxMoney(ns, targetHost)) {
-    threadsRequired = calculateGrowthsToMaxMoney(ns, targetHost);
-    await growTargetMoney(ns, targetHost, threadsRequired);
-    await ns.sleep(1000);
-  }
-};
-
-export const hackTarget = async (ns: NS, targetHost: string) => {
-  ns.disableLog('ALL');
-
-  let threadsRequired = calculateHacksToDrain(ns, targetHost);
-  while (!isTargetRich(ns, targetHost)) {
-    threadsRequired = calculateHacksToDrain(ns, targetHost);
-    await hackTargetMoney(ns, targetHost, threadsRequired);
-    await ns.sleep(1000);
-  }
-};
-
-export const hackManager = async (ns: NS, targetHost: string) => {
+export const hackManager = async (
+  ns: NS,
+  targetHost: string,
+  isDryRun: boolean
+) => {
   await cleanupExistingScripts(ns, targetHost);
-  await weakenTarget(ns, targetHost);
-  await growTarget(ns, targetHost);
-  await weakenTarget(ns, targetHost);
-  await hackTarget(ns, targetHost);
+
+  await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
+  await genericAction(ns, targetHost, GROW_ACTION, isDryRun);
+  await genericAction(ns, targetHost, WEAKEN_ACTION, isDryRun);
+  await genericAction(ns, targetHost, HACK_ACTION, isDryRun);
 };
