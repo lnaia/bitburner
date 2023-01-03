@@ -17,6 +17,5 @@ export const hostInfo = (ns: NS, host: string): HostDetails => {
     rh: Math.round(ns.getServerRequiredHackingLevel(host)),
     ms: Math.round(ns.getServerMinSecurityLevel(host)),
     cs: Math.round(ns.getServerSecurityLevel(host)),
-    ht: Math.round(ns.getHackTime(host)),
   };
 };

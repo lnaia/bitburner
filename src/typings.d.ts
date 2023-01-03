@@ -9,7 +9,6 @@ export interface HostDetails {
   rh: number;
   ms: number;
   cs: number;
-  ht: number;
 }
 
 export type StatusReport = [boolean, string?];
