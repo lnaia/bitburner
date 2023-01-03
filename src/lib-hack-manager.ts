@@ -237,14 +237,17 @@ export const genericAction = async (
   const {calculateThreads, stopCondition, calculateActionTime} =
     actionMap[action];
   const threadsRequired = calculateThreads(ns, targetHost);
-  await runScriptAgainstTarget(
-    ns,
-    GROW_SCRIPT,
-    targetHost,
-    threadsRequired,
-    calculateActionTime,
-    isDryRun
-  );
+
+  if (threadsRequired > 0) {
+    await runScriptAgainstTarget(
+      ns,
+      GROW_SCRIPT,
+      targetHost,
+      threadsRequired,
+      calculateActionTime,
+      isDryRun
+    );
+  }
 
   ns.print(
     `${targetHost}@genericAction: stop condition fulfilled? ${
