@@ -134,9 +134,20 @@ export const getResources = async (
   const f = () => allocateResources(ns, weakenScript, weakenScriptRam, threads);
 
   let [resources, totalThreadsAvailable] = f();
+
+  let tick = 0;
   while (totalThreadsAvailable < 1) {
-    ns.print(`getResources: waiting for an available thread`);
+    // only print every 10 seconds, otherwise we can't read and debug.
+    if (tick % 10 === 0) {
+      ns.print(
+        `getResources: threads needed=${threads} required=${totalThreadsAvailable}`
+      );
+      ns.print(`${JSON.stringify(resources, null, 2)}`);
+      tick = 0;
+    }
+
     [resources, totalThreadsAvailable] = f();
+    tick += 1;
     await ns.sleep(1000);
   }
 
@@ -181,6 +192,7 @@ export const runScriptAgainstTarget = async (
   const scriptRam = ns.getScriptRam(script);
   ensureScriptIsPresent(ns, targetHost, script);
   const [resources] = await getResources(ns, script, scriptRam, threads);
+
   dispatchScriptToResources(ns, resources, script, targetHost, isDryRun);
 
   const singleThreadActionTime = calculateActionTime(targetHost);
