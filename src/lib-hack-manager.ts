@@ -250,6 +250,8 @@ export const genericAction = async (
         calculateActionTime,
         isDryRun
       );
+
+      stopConditionFullfilled = stopCondition(ns, targetHost);
     }
 
     ns.print(
