@@ -5,7 +5,7 @@ export interface HostDetails {
   cm: number;
   hcm: string;
   host: string;
-  '% diff': string;
+  diff: string;
   rh: number;
   ms: number;
   cs: number;

@@ -30,17 +30,30 @@ export async function main(ns: NS) {
         hosts = hosts.filter(host => new RegExp(name).test(host.host));
       }
 
-      return hosts.sort((a, b) => {
-        if (sortOrder === 'cm') {
-          return b.cm - a.cm;
-        } else if (sortOrder === 'rh') {
-          return b.rh - a.rh;
-        } else if (sortOrder === 'ms') {
-          return b.ms - a.ms;
-        }
+      return hosts
+        .sort((a, b) => {
+          if (sortOrder === 'cm') {
+            return b.cm - a.cm;
+          } else if (sortOrder === 'rh') {
+            return b.rh - a.rh;
+          } else if (sortOrder === 'ms') {
+            return b.ms - a.ms;
+          }
 
-        return b.mm - a.mm;
-      });
+          return b.mm - a.mm;
+        })
+        .map(hostDetails => {
+          const {host, hmm, hcm, diff, rh, ms, cs} = hostDetails;
+          return {
+            host,
+            hmm,
+            hcm,
+            diff,
+            rh,
+            ms,
+            cs,
+          };
+        });
     })();
 
     ns.clearLog();
