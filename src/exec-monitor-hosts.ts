@@ -49,9 +49,9 @@ export async function main(ns: NS) {
             hmm,
             hcm,
             diff,
-            rh,
             ms,
             cs,
+            rh,
           };
         });
     })();
