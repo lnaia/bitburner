@@ -2,6 +2,7 @@ import type {NS} from './NetscriptDefinitions';
 import {hackManager} from './lib-hack-manager.js';
 
 export async function main(ns: NS) {
+  ns.clearLog();
   const host = ns.args[0].toString();
 
   while (true) {

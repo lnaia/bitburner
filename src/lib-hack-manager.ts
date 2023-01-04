@@ -15,11 +15,18 @@ const HACK_ACTION = 'hack';
 const GROW_SCRIPT = 'hack-grow.js';
 const GROW_ACTION = 'grow';
 
+export const getServerMinSecurity = (ns: NS, targetHost: string) => {
+  const safetyMargin = 5;
+  const minSecurity = ns.getServerMinSecurityLevel(targetHost);
+
+  return minSecurity + safetyMargin;
+};
+
 export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
   const safetyMargin = 1000;
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const isTargetRich = moneyAvailable > safetyMargin;
+  const isTargetRich = moneyAvailable <= safetyMargin;
 
   // ns.print(`${targetHost}@stopConditionHack: ${isTargetRich}`);
 
@@ -28,20 +35,19 @@ export const stopConditionHack = (ns: NS, targetHost: string) => {
 
 export const stopConditionWeaken = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const safetyMargin = 5;
-  const minSecurity = ns.getServerMinSecurityLevel(targetHost);
+  const minSecurity = getServerMinSecurity(ns, targetHost);
   const currSecurity = ns.getServerSecurityLevel(targetHost);
-  const isSecurityMin = currSecurity <= minSecurity + safetyMargin;
+  const isWeakEnough = currSecurity <= minSecurity;
 
   // ns.print(`${targetHost}@stopConditionWeaken: ${isSecurityMin}`);
 
-  return isSecurityMin;
+  return isWeakEnough;
 };
 
 export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
-  const moneyAvailable = ns.getServerMoneyAvailable(targetHost) * 0.75;
-  const maxMoney = ns.getServerMaxMoney(targetHost);
+  const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
+  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.9;
   const isMoneyMaxed = moneyAvailable >= maxMoney;
 
   // ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
@@ -51,7 +57,7 @@ export const stopConditionGrow = (ns: NS, targetHost: string) => {
 
 export const calculateThreadsWeaken = (ns: NS, host: string) => {
   ns.disableLog('ALL');
-  const minSecurity = ns.getServerMinSecurityLevel(host);
+  const minSecurity = getServerMinSecurity(ns, host);
   const currSec = +ns.getServerSecurityLevel(host).toFixed(4);
   const weakenAmountPerThread = ns.weakenAnalyze(1);
   const securityToBeReduced = Math.ceil(currSec - minSecurity);

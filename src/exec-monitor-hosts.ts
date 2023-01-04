@@ -45,7 +45,8 @@ export async function main(ns: NS) {
 
     ns.clearLog();
     ns.print(new Date());
-    printObjList(list, ns.print);
+    const print = ns.print.bind(ns);
+    printObjList(list, print);
     await ns.sleep(1000);
   }
 }
