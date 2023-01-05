@@ -85,7 +85,7 @@ export const calculateThreadsGrow = (ns: NS, host: string) => {
 
   let factor = 1;
   try {
-    factor = maxMoney / currMoney;
+    factor = Math.ceil(maxMoney / currMoney);
   } catch (e) {
     // ignore
     factor = 1;
