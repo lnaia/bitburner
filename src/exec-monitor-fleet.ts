@@ -4,6 +4,7 @@ import {humanReadableMoney} from './lib-human-readable-money';
 
 export async function main(ns: NS) {
   ns.disableLog('ALL');
+  ns.tail();
 
   const listUsableServers = () => {
     const ownedServers = ns.getPurchasedServers();
