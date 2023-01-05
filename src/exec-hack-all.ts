@@ -4,7 +4,35 @@ import type {NS} from './NetscriptDefinitions';
 
 const HACK_MANAGER_SCRIPT = 'exec-hm.js';
 const HACK_MANAGER_HOST = 'home';
+const RESERVED_SCRIPTS_RAM = [
+  'exec-coordinator.js',
+  'exec-monitor-hosts.js',
+  'exec-monitor-fleet.js',
+];
 
+const homeFreeRam = (ns: NS) => {
+  const serverMaxRam = ns.getServerMaxRam(HACK_MANAGER_HOST);
+  const serverUsedRam = ns.getServerUsedRam(HACK_MANAGER_HOST);
+  const maxReservedScriptsRam = RESERVED_SCRIPTS_RAM.reduce((acc, script) => {
+    return acc + ns.getScriptRam(script, 'home');
+  }, 0);
+  const processes = ns.ps('home');
+  const reservedScriptsRamAlreadyInUsed = processes.reduce((acc, process) => {
+    if (RESERVED_SCRIPTS_RAM.includes(process.filename)) {
+      return acc + ns.getScriptRam(process.filename);
+    }
+
+    return acc;
+  }, 0);
+
+  let reservedScriptsRam = maxReservedScriptsRam;
+  if (reservedScriptsRamAlreadyInUsed > 0) {
+    reservedScriptsRam -= reservedScriptsRamAlreadyInUsed;
+  }
+
+  const usedRam = serverUsedRam - reservedScriptsRam;
+  return serverMaxRam - (usedRam + reservedScriptsRam);
+};
 export async function main(ns: NS) {
   ns.disableLog('ALL');
   ns.tail();
@@ -20,9 +48,7 @@ export async function main(ns: NS) {
 
     for (const host of hosts) {
       if (!hostsUnderManagement.includes(host.host)) {
-        const serverMaxRam = ns.getServerMaxRam(HACK_MANAGER_HOST);
-        const serverUsedRam = ns.getServerUsedRam(HACK_MANAGER_HOST);
-        const serverFreeRam = serverMaxRam - serverUsedRam;
+        const serverFreeRam = homeFreeRam(ns);
         const canRunScript = serverFreeRam >= scriptRamCost; // assumed is, that we run it on a SINGLE thread.
 
         if (ns.hasRootAccess(host.host) && canRunScript) {
