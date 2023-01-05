@@ -15,6 +15,8 @@ const HACK_ACTION = 'hack';
 const GROW_SCRIPT = 'hack-grow.js';
 const GROW_ACTION = 'grow';
 
+const LIMIT_MAX_MONEY_PERCENT = 0.75;
+
 export const getServerMinSecurity = (ns: NS, targetHost: string) => {
   const safetyMargin = 5;
   const minSecurity = ns.getServerMinSecurityLevel(targetHost);
@@ -47,7 +49,7 @@ export const stopConditionWeaken = (ns: NS, targetHost: string) => {
 export const stopConditionGrow = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
   const moneyAvailable = ns.getServerMoneyAvailable(targetHost);
-  const maxMoney = ns.getServerMaxMoney(targetHost) * 0.9;
+  const maxMoney = ns.getServerMaxMoney(targetHost) * LIMIT_MAX_MONEY_PERCENT;
   const isMoneyMaxed = moneyAvailable >= maxMoney;
 
   // ns.print(`${targetHost}@stopConditionGrow: ${isMoneyMaxed}`);
@@ -75,7 +77,7 @@ export const calculateThreadsWeaken = (ns: NS, host: string) => {
 
 export const calculateThreadsGrow = (ns: NS, host: string) => {
   ns.disableLog('ALL');
-  const maxMoney = ns.getServerMaxMoney(host);
+  const maxMoney = ns.getServerMaxMoney(host) * LIMIT_MAX_MONEY_PERCENT;
   let currMoney = ns.getServerMoneyAvailable(host);
   if (currMoney <= 0) {
     currMoney = 1;
@@ -179,7 +181,7 @@ export const dispatchScriptToResources = (
     if (isDryRun) {
       ns.print(`dryRun: ${JSON.stringify(execArgs)}`);
     } else {
-      ns.print(`dispatchScriptToResources: ${JSON.stringify(execArgs)}`);
+      // ns.print(`dispatchScriptToResources: ${JSON.stringify(execArgs)}`);
       ns.exec(...execArgs);
     }
   });
@@ -207,7 +209,7 @@ export const runScriptAgainstTarget = async (
   const safetyMargin = 2000;
 
   ns.print(
-    `${targetHost}@runScriptAgainstTarget: waking up in ${totalSeconds}(s) or ${totalMinutes}(m) or ${totalHours}(h)`
+    `${targetHost}@runScriptAgainstTarget: ${script}, waking up in ${totalSeconds}(s) or ${totalMinutes}(m) or ${totalHours}(h)`
   );
 
   await ns.sleep(singleThreadActionTime + safetyMargin);
