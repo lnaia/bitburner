@@ -22,7 +22,7 @@ export async function main(ns: NS) {
   };
 
   while (true) {
-    autoRootHosts(ns).forEach(status => logPositiveStatus(status));
+    autoRootHosts(ns);
     logPositiveStatus(buyServer(ns));
     upgradeServers(ns).forEach(status => logPositiveStatus(status));
 
