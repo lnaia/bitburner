@@ -82,9 +82,16 @@ export const calculateThreadsGrow = (ns: NS, host: string) => {
   if (currMoney <= 0) {
     currMoney = 1;
   }
-  const requiredThreads = Math.ceil(
-    ns.growthAnalyze(host, maxMoney / currMoney)
-  );
+
+  let factor = 1;
+  try {
+    factor = maxMoney / currMoney;
+  } catch (e) {
+    // ignore
+    factor = 1;
+  }
+
+  const requiredThreads = Math.ceil(ns.growthAnalyze(host, factor));
 
   // ns.print(`${host}@calculateThreadsGrow: requiredThreads=${requiredThreads}`);
   return requiredThreads;
