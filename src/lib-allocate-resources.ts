@@ -6,11 +6,13 @@ import {discoverHosts} from './lib-discover-hosts';
 export const availableResources = (
   ns: NS,
   script: string,
-  scriptRam: number
+  scriptRam: number,
+  useHome?: boolean
 ) => {
-  if (!ns.fileExists) {
+  if (!ns.fileExists(script)) {
     ns.print(`requested script does not exist - ${script}`);
-    ns.exit();
+    const arr: AllocatedResources[] = [];
+    return arr;
   }
 
   const resources: {[key: string]: number} = {};
@@ -19,6 +21,10 @@ export const availableResources = (
   );
   const ownedServers = ns.getPurchasedServers();
   const hosts = [...rootedServers, ...ownedServers];
+
+  if (useHome) {
+    hosts.push('home');
+  }
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
