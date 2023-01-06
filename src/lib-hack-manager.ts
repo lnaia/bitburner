@@ -176,6 +176,7 @@ export const dispatchScriptToResources = (
 ) => {
   ns.disableLog('ALL');
   Object.entries(resources).forEach(([host, threads]) => {
+    ensureScriptIsPresent(ns, host, script);
     const execArgs: [string, string, number, string, number] = [
       script,
       host,
@@ -204,7 +205,6 @@ export const runScriptAgainstTarget = async (
 ) => {
   ns.disableLog('ALL');
   const scriptRam = ns.getScriptRam(script);
-  ensureScriptIsPresent(ns, targetHost, script);
   const [resources] = await getResources(ns, script, scriptRam, threads);
 
   dispatchScriptToResources(ns, resources, script, targetHost, isDryRun);

@@ -41,9 +41,10 @@ export const allocateResources = (
   ns: NS,
   script: string,
   scriptRam: number,
-  threadsNeeded: number
+  threadsNeeded: number,
+  useHome?: boolean
 ): AllocatedResources => {
-  const resources = availableResources(ns, script, scriptRam);
+  const resources = availableResources(ns, script, scriptRam, useHome);
   let threadsRemaining = threadsNeeded;
   let totalThreadsAvailable = 0;
   const resourcesAllocated: {[key: string]: number} = {};

@@ -1,22 +1,21 @@
 import {describe, expect, it, jest} from '@jest/globals';
-import {availableResources} from '../lib-allocate-resources';
+import {availableResources, allocateResources} from '../lib-allocate-resources';
 import * as discoverHostsLib from '../lib-discover-hosts';
 
 describe('lib-allocate-resources', () => {
+  const script = '[script]';
+  const scriptRam = 4;
+  const ns = {
+    fileExists: jest.fn(),
+    hasRootAccess: jest.fn(),
+    getPurchasedServers: jest.fn(),
+    print: jest.fn(),
+    exit: jest.fn(),
+    getServerMaxRam: jest.fn(),
+    getServerUsedRam: jest.fn(),
+  };
+
   describe('availableResources', () => {
-    const script = '[script]';
-    const scriptRam = 4;
-
-    const ns = {
-      fileExists: jest.fn(),
-      hasRootAccess: jest.fn(),
-      getPurchasedServers: jest.fn(),
-      print: jest.fn(),
-      exit: jest.fn(),
-      getServerMaxRam: jest.fn(),
-      getServerUsedRam: jest.fn(),
-    };
-
     it('stop running if script does not exist', () => {
       ns.fileExists.mockReturnValue(false);
 
@@ -87,6 +86,101 @@ describe('lib-allocate-resources', () => {
         'server-yes-root-1': 1,
         'server-yes-root-2': 1,
       });
+    });
+  });
+
+  describe('allocateResources', () => {
+    it('returns expected resources', () => {
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(8)
+        .mockReturnValueOnce(28);
+
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.fileExists.mockReturnValue(true);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      // @ts-expect-error ns type miss match
+      expect(allocateResources(ns, script, scriptRam, 10)).toEqual([
+        {
+          a: 1,
+          b: 2,
+          c: 7,
+        },
+        10,
+      ]);
+    });
+
+    it('returns expected resources including home', () => {
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(8)
+        .mockReturnValueOnce(28)
+        .mockReturnValueOnce(4);
+
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.fileExists.mockReturnValue(true);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      // @ts-expect-error ns type miss match
+      expect(allocateResources(ns, script, scriptRam, 11, true)).toEqual([
+        {
+          a: 1,
+          b: 2,
+          c: 7,
+          home: 1,
+        },
+        11,
+      ]);
+    });
+
+    it('requests more threads than those available', () => {
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(8)
+        .mockReturnValueOnce(28)
+        .mockReturnValueOnce(4);
+
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.fileExists.mockReturnValue(true);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      // @ts-expect-error ns type miss match
+      expect(allocateResources(ns, script, scriptRam, 100, true)).toEqual([
+        {
+          a: 1,
+          b: 2,
+          c: 7,
+          home: 1,
+        },
+        11,
+      ]);
+    });
+
+    it('requests no threads', () => {
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(8)
+        .mockReturnValueOnce(28)
+        .mockReturnValueOnce(4);
+
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.fileExists.mockReturnValue(true);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      // @ts-expect-error ns type miss match
+      expect(allocateResources(ns, script, scriptRam, 0, true)).toEqual([
+        {},
+        0,
+      ]);
     });
   });
 });
