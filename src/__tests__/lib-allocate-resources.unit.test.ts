@@ -141,11 +141,7 @@ describe('lib-allocate-resources', () => {
     it('requests more threads than those available', () => {
       jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
       ns.getPurchasedServers.mockReturnValue(['c']);
-      ns.getServerMaxRam
-        .mockReturnValueOnce(4)
-        .mockReturnValueOnce(8)
-        .mockReturnValueOnce(28)
-        .mockReturnValueOnce(4);
+      ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(4);
 
       ns.getServerUsedRam.mockReturnValue(0);
       ns.fileExists.mockReturnValue(true);
@@ -155,11 +151,9 @@ describe('lib-allocate-resources', () => {
       expect(allocateResources(ns, script, scriptRam, 100, true)).toEqual([
         {
           a: 1,
-          b: 2,
-          c: 7,
-          home: 1,
+          b: 1,
         },
-        11,
+        2,
       ]);
     });
 
