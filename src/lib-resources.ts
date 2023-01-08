@@ -78,7 +78,7 @@ export const allocateResources = async (
 ): Promise<AllocatedResources[]> => {
   if (isLockActive(ns)) {
     log(ns, 'allocateResources: unable to allocate resources - lock is active');
-    return [[{}, 0]];
+    return scriptRamThreads.map(() => [{}, 0]);
   } else {
     if (!lockResources(ns)) {
       log(ns, 'allocateResources: unable to lock resources - why?', 'fatal');
