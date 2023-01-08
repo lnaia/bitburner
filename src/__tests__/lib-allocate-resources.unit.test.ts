@@ -81,7 +81,7 @@ describe('lib-allocate-resources', () => {
     it('returns empty resource - lock is active', async () => {
       ns.fileExists.mockReturnValue(true);
       // @ts-expect-error ns type miss match
-      const result = await allocateResources(ns, [scriptRam, 10]);
+      const result = await allocateResources(ns, [[scriptRam, 10]]);
       expect(result).toEqual([[{}, 0]]);
     });
 
@@ -91,7 +91,7 @@ describe('lib-allocate-resources', () => {
         return undefined;
       });
       // @ts-expect-error ns type miss match
-      const result = await allocateResources(ns, [scriptRam, 10]);
+      const result = await allocateResources(ns, [[scriptRam, 10]]);
       expect(result).toBeUndefined();
       expect(ns.exit).toHaveBeenCalled();
     });
