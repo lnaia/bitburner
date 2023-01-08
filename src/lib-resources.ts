@@ -27,11 +27,7 @@ export const unlockResources = (ns: NS) => {
   return !isLockActive(ns);
 };
 
-export const availableResources = (
-  ns: NS,
-  scriptRam: number,
-  useHome?: boolean
-) => {
+export const availableResources = (ns: NS, useHome?: boolean) => {
   const resources: {[key: string]: number} = {};
   const rootedServers = discoverHosts(ns).filter(host =>
     ns.hasRootAccess(host)
@@ -46,25 +42,44 @@ export const availableResources = (
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
     const serverRamInUse = ns.getServerUsedRam(host);
+
     const serverRamAvailable = serverMaxRam - serverRamInUse;
-    const threads = Math.floor(serverRamAvailable / scriptRam);
-    resources[host] = threads;
+    resources[host] = serverRamAvailable;
+    console.log('map: ', {host, result: serverMaxRam - serverRamInUse});
   }
 
   return resources;
 };
 
-// will allocate resources and secure them for up to 5 seconds
-// after that time, those resources will be released
+/**
+ * Allocates resources and secure them for up to 5 seconds.
+ * After that time, those resources will be released.
+ * When receiving multiple pairs, ratio will always be 1:1
+ *
+ * Example:
+ *
+ * [[4 ram, 10 threads], [1 ram, 1000 threads]]
+ *
+ * const sample = [
+ *   [4, 10],
+ *   [1, 1000],
+ * ];
+ *
+ * With only 5 ram free, in 2 hosts:
+ *
+ * const sampleResult = [
+ *   [{a: 1}, 1],
+ *   [{b: 1}, 1],
+ * ];
+ */
 export const allocateResources = async (
   ns: NS,
-  scriptRam: number,
-  threadsNeeded: number,
+  scriptRamThreads: [number, number][],
   useHome?: boolean
-): Promise<AllocatedResources> => {
+): Promise<AllocatedResources[]> => {
   if (isLockActive(ns)) {
     log(ns, 'allocateResources: unable to allocate resources - lock is active');
-    return [{}, 0];
+    return [[{}, 0]];
   } else {
     if (!lockResources(ns)) {
       log(ns, 'allocateResources: unable to lock resources - why?', 'fatal');
@@ -72,34 +87,53 @@ export const allocateResources = async (
     }
   }
 
-  const resources = availableResources(ns, scriptRam, useHome);
-  let threadsRemaining = threadsNeeded;
-  let totalThreadsAvailable = 0;
-  const resourcesAllocated: {[key: string]: number} = {};
+  const resourcesAvailable = availableResources(ns, useHome);
+  console.log('resourcesAvailable: ', resourcesAvailable);
+  const threadsRemaining: number[] = scriptRamThreads.map(arr => arr[1]);
+  const allocatedResourceList: AllocatedResources[] = scriptRamThreads.map(
+    () => {
+      return [{}, 0];
+    }
+  );
 
-  for (const resource of Object.entries(resources)) {
-    const [host, threadsAvailable] = resource;
+  // A full cycle is when we get at least 1 slot, for every script/thread pair.
 
-    if (threadsRemaining > 0) {
-      if (threadsAvailable > 0) {
-        const threadsReserved = (() => {
-          const remainingThreads = threadsAvailable - threadsRemaining;
-          if (remainingThreads > 0) {
-            return threadsAvailable - remainingThreads;
-          }
+  for (let i = 0; i < scriptRamThreads.length; i += 1) {
+    const [scriptRam] = scriptRamThreads[i];
+    for (const resourceAvailable of Object.entries(resourcesAvailable)) {
+      const [host, serverRamAvailable] = resourceAvailable;
+      const currentThreadsRemaining = threadsRemaining[i];
 
-          return threadsRemaining - Math.abs(remainingThreads);
-        })();
-
-        resourcesAllocated[host] = threadsReserved;
-        totalThreadsAvailable += threadsReserved;
-        threadsRemaining -= threadsReserved;
+      if (currentThreadsRemaining <= 0) {
+        continue;
       }
+
+      if (serverRamAvailable < scriptRam) {
+        continue;
+      }
+
+      // update remaining threads in place
+      threadsRemaining.splice(i, 1, currentThreadsRemaining - 1);
+
+      // update remaining ram for this host
+      resourcesAvailable[host] = serverRamAvailable - scriptRam;
+
+      // updates host map for this scriptRamThread
+      const hostThreadMap = allocatedResourceList[i][0];
+      if (!(host in hostThreadMap)) {
+        hostThreadMap[host] = 1;
+      } else {
+        hostThreadMap[host] += 1;
+      }
+
+      // updates totalThread count for this scriptRamThread
+      const currentTotalThreadCount = allocatedResourceList[i][1];
+      allocatedResourceList[i].splice(1, 1, currentTotalThreadCount + 1);
     }
   }
 
   ns.exec('exec-unlock-resources', 'home');
-  return [resourcesAllocated, totalThreadsAvailable];
+  return allocatedResourceList;
 };
 
 export const dispatchScriptToResources = (

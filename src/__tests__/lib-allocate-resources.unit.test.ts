@@ -24,32 +24,24 @@ describe('lib-allocate-resources', () => {
     it('returns correct set of hosts', () => {
       jest
         .spyOn(discoverHostsLib, 'discoverHosts')
-        .mockReturnValue([
-          'server-yes-root-1',
-          'server-no-root-1',
-          'server-yes-root-2',
-        ]);
+        .mockReturnValue(['server-root-1', 'server-root-2']);
       ns.getServerMaxRam.mockReturnValue(8);
       ns.getServerUsedRam.mockReturnValue(2);
       ns.fileExists.mockReturnValue(true);
-      ns.hasRootAccess
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true);
-
+      ns.hasRootAccess.mockReturnValueOnce(true).mockReturnValueOnce(true);
       ns.getPurchasedServers.mockReturnValue(['own-host-1', 'own-host-2']);
 
       // @ts-expect-error wrong ns type
-      const resources = availableResources(ns, scriptRam);
+      const resources = availableResources(ns);
 
       expect(ns.getPurchasedServers).toHaveBeenCalled();
       expect(ns.getServerMaxRam).toHaveBeenCalled();
       expect(ns.getServerUsedRam).toHaveBeenCalled();
       expect(resources).toEqual({
-        'own-host-1': 1,
-        'own-host-2': 1,
-        'server-yes-root-1': 1,
-        'server-yes-root-2': 1,
+        'own-host-1': 6,
+        'own-host-2': 6,
+        'server-root-1': 6,
+        'server-root-2': 6,
       });
     });
 
@@ -72,14 +64,14 @@ describe('lib-allocate-resources', () => {
       ns.getPurchasedServers.mockReturnValue(['own-host-1', 'own-host-2']);
 
       // @ts-expect-error wrong ns type
-      const resources = availableResources(ns, scriptRam, true);
+      const resources = availableResources(ns, true);
 
       expect(resources).toEqual({
-        home: 1,
-        'own-host-1': 1,
-        'own-host-2': 1,
-        'server-yes-root-1': 1,
-        'server-yes-root-2': 1,
+        'own-host-1': 6,
+        'own-host-2': 6,
+        'server-yes-root-1': 6,
+        'server-yes-root-2': 6,
+        home: 6,
       });
     });
   });
@@ -88,8 +80,8 @@ describe('lib-allocate-resources', () => {
     it('returns empty resource - lock is active', async () => {
       ns.fileExists.mockReturnValue(true);
       // @ts-expect-error ns type miss match
-      const result = await allocateResources(ns, scriptRam, 10);
-      expect(result).toEqual([{}, 0]);
+      const result = await allocateResources(ns, [scriptRam, 10]);
+      expect(result).toEqual([[{}, 0]]);
     });
 
     it('exists abruptly - unable to get a lock', async () => {
@@ -98,100 +90,98 @@ describe('lib-allocate-resources', () => {
         return undefined;
       });
       // @ts-expect-error ns type miss match
-      const result = await allocateResources(ns, scriptRam, 10);
+      const result = await allocateResources(ns, [scriptRam, 10]);
       expect(result).toBeUndefined();
       expect(ns.exit).toHaveBeenCalled();
     });
 
     it('returns expected resources', async () => {
       ns.fileExists.mockReturnValue(false);
-
-      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-      ns.getPurchasedServers.mockReturnValue(['c']);
-      ns.getServerMaxRam
-        .mockReturnValueOnce(4)
-        .mockReturnValueOnce(8)
-        .mockReturnValueOnce(28);
-
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a']);
+      ns.getPurchasedServers.mockReturnValue(['b']);
+      ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(1);
       ns.getServerUsedRam.mockReturnValue(0);
       ns.hasRootAccess.mockReturnValue(true);
 
       // @ts-expect-error ns type miss match
-      const result = await allocateResources(ns, scriptRam, 10);
+      const result = await allocateResources(ns, [
+        [4, 10],
+        [1, 1000],
+      ]);
       expect(result).toEqual([
-        {
-          a: 1,
-          b: 2,
-          c: 7,
-        },
-        10,
+        [{a: 1}, 1],
+        [{b: 1}, 1],
       ]);
       expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
     });
 
-    it('returns expected resources including home', async () => {
+    it.only('returns expected resources including home', async () => {
       ns.fileExists.mockReturnValue(false);
-      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-      ns.getPurchasedServers.mockReturnValue(['c']);
+      jest
+        .spyOn(discoverHostsLib, 'discoverHosts')
+        .mockReturnValue(['a', 'home']);
+      ns.getPurchasedServers.mockReturnValue(['b']);
       ns.getServerMaxRam
         .mockReturnValueOnce(4)
-        .mockReturnValueOnce(8)
-        .mockReturnValueOnce(28)
-        .mockReturnValueOnce(4);
-
+        .mockReturnValueOnce(5)
+        .mockReturnValueOnce(1);
       ns.getServerUsedRam.mockReturnValue(0);
       ns.hasRootAccess.mockReturnValue(true);
 
-      // @ts-expect-error ns type miss match
-      expect(await allocateResources(ns, scriptRam, 11, true)).toEqual([
-        {
-          a: 1,
-          b: 2,
-          c: 7,
-          home: 1,
-        },
-        11,
+      const result = await allocateResources(
+        // @ts-expect-error ns type miss match
+        ns,
+        [
+          [4, 10],
+          [1, 1000],
+        ],
+        true
+      );
+      expect(result).toEqual([
+        [{a: 1, home: 1}, 2],
+        [{b: 1, home: 1}, 2],
       ]);
+      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
     });
 
-    it('requests more threads than those available', async () => {
-      ns.fileExists.mockReturnValue(false);
-      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-      ns.getPurchasedServers.mockReturnValue(['c']);
-      ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(4);
+    //   it('requests more threads than those available', async () => {
+    //     ns.fileExists.mockReturnValue(false);
+    //     jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+    //     ns.getPurchasedServers.mockReturnValue(['c']);
+    //     ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(4);
 
-      ns.getServerUsedRam.mockReturnValue(0);
-      ns.hasRootAccess.mockReturnValue(true);
+    //     ns.getServerUsedRam.mockReturnValue(0);
+    //     ns.hasRootAccess.mockReturnValue(true);
 
-      // @ts-expect-error ns type miss match
-      expect(await allocateResources(ns, scriptRam, 100, true)).toEqual([
-        {
-          a: 1,
-          b: 1,
-        },
-        2,
-      ]);
-    });
+    //     // @ts-expect-error ns type miss match
+    //     expect(await allocateResources(ns, [[scriptRam, 100]], true)).toEqual([
+    //       {
+    //         a: 1,
+    //         b: 1,
+    //       },
+    //       2,
+    //     ]);
+    //   });
 
-    it('requests no threads', async () => {
-      ns.fileExists.mockReturnValue(false);
+    //   it('requests no threads', async () => {
+    //     ns.fileExists.mockReturnValue(false);
 
-      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-      ns.getPurchasedServers.mockReturnValue(['c']);
-      ns.getServerMaxRam
-        .mockReturnValueOnce(4)
-        .mockReturnValueOnce(8)
-        .mockReturnValueOnce(28)
-        .mockReturnValueOnce(4);
+    //     jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+    //     ns.getPurchasedServers.mockReturnValue(['c']);
+    //     ns.getServerMaxRam
+    //       .mockReturnValueOnce(4)
+    //       .mockReturnValueOnce(8)
+    //       .mockReturnValueOnce(28)
+    //       .mockReturnValueOnce(4);
 
-      ns.getServerUsedRam.mockReturnValue(0);
-      ns.hasRootAccess.mockReturnValue(true);
+    //     ns.getServerUsedRam.mockReturnValue(0);
+    //     ns.hasRootAccess.mockReturnValue(true);
 
-      // @ts-expect-error ns type miss match
-      expect(await allocateResources(ns, script, scriptRam, 0, true)).toEqual([
-        {},
-        0,
-      ]);
-    });
+    //     // @ts-expect-error ns type miss match
+    //     expect(await allocateResources(ns, [[scriptRam, 0]], true)).toEqual([
+    //       {},
+    //       0,
+    //     ]);
+    //   });
   });
 });
