@@ -14,11 +14,22 @@ export async function main(ns) {
     'lib-servers.js',
     'lib-print-obj-list.js',
     'lib-allocate-resources.js',
-    'lib-hacking-manager.js',
+    'lib-hack-manager.js',
+    'lib-log.js',
+    'lib-hack.js',
+    'lib-weaken.js',
+    'lib-grow.js',
+    'lib-script.js',
+    'lib-time.js',
+    'lib-resources.js',
     'exec-coordinator.js',
+    'exec-hm.js',
+    'exec-hack-all.js',
     'exec-provision-home.js',
     'exec-find-host.js',
     'exec-monitor-hosts.js',
+    'exec-list-own-servers.js',
+    'exec-monitor-fleet.js',
     'hack.js',
     'hack-hack.js',
     'hack-grow.js',
@@ -28,7 +39,7 @@ export async function main(ns) {
 
   for (let file of files) {
     ns.exec('download-files.js', 'home', 1, ...scriptArgs, file);
-    await ns.sleep(3000);
+    await ns.sleep(1000);
   }
 
   ns.tprintf('download finished');
