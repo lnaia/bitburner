@@ -1,6 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
-import {HACK_SCRIPT} from './lib-hackts';
+import {HACK_SCRIPT} from './lib-hack';
 import {stopConditionGrow, growToPercent, GROW_SCRIPT} from './lib-grow';
 import {
   stopConditionWeaken,
@@ -36,6 +36,9 @@ export const hackCoordinator = async (
     await growToPercent(ns, targetHost, LIMIT_MAX_MONEY_PERCENT, useHome);
     await ns.sleep(1000);
   }
+
+  // at this point what do I expect?
+  // 0.75% max money grown, minimal security
 
   /**
    * grow money and diminuish security in percent batches until threads are aligned with exisitng resources

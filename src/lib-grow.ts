@@ -3,7 +3,7 @@ import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
 import {getActionTimeDuration} from './lib-time';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
-import {calculateThreadsWeaken, stopConditionWeaken} from './lib-weaken';
+import {calculateThreadsWeaken, WEAKEN_SCRIPT} from './lib-weaken';
 
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
 export const GROW_SCRIPT = 'hack-grow.js';
@@ -69,18 +69,18 @@ export const growToPercent = async (
     securityIncrease
   );
   const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
-  const growSriptRam = ns.getScriptRam(GROW_SCRIPT);
+  const growScriptRam = ns.getScriptRam(GROW_SCRIPT);
 
-  if (weakenScriptRam !== growSriptRam) {
+  if (weakenScriptRam !== growScriptRam) {
     log(
       ns,
-      `growToPercent: ram missmatch unable to allocate resources with current logic weakenScriptRam=${weakenScriptRam} vs growSriptRam=${growSriptRam}`,
+      `growToPercent: ram mismatch unable to allocate resources with current logic weakenScriptRam=${weakenScriptRam} vs growSriptRam=${growScriptRam}`,
       'fatal'
     );
     ns.exit();
   }
 
-  const scriptRam = growSriptRam + weakenScriptRam;
+  const scriptRam = growScriptRam + weakenScriptRam;
   const threads = growThreads + weakenThreads;
   let [resources, totalThreadsAvailable] = await allocateResources(
     ns,
@@ -88,9 +88,9 @@ export const growToPercent = async (
     threads,
     useHome
   );
-  // wait for at leat two threads: one for each script
+  // wait for at least two threads: one for each script
   // resources might be locked for another concurrent execution
-  // this is a compounded problem, because we are tring to do two operations in one go.
+  // this is a compounded problem, because we are trying to do two operations in one go.
   while (totalThreadsAvailable < 2) {
     [resources, totalThreadsAvailable] = await allocateResources(
       ns,
@@ -107,7 +107,7 @@ export const growToPercent = async (
     dispatchScriptToResources(ns, resources, WEAKEN_SCRIPT, targetHost, false);
     log(
       ns,
-      `growToPercent@${targetHost}: all thread requirements fullfilled - optimal performance`
+      `${targetHost}@growToPercent: all thread requirements fulfilled - optimal performance`
     );
   } else {
     // at least two threads are available, and we want a 1:1 ratio
