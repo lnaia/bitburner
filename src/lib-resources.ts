@@ -45,7 +45,6 @@ export const availableResources = (ns: NS, useHome?: boolean) => {
 
     const serverRamAvailable = serverMaxRam - serverRamInUse;
     resources[host] = serverRamAvailable;
-    console.log('map: ', {host, result: serverMaxRam - serverRamInUse});
   }
 
   return resources;
@@ -88,7 +87,6 @@ export const allocateResources = async (
   }
 
   const resourcesAvailable = availableResources(ns, useHome);
-  console.log('resourcesAvailable: ', resourcesAvailable);
   const threadsRemaining: number[] = scriptRamThreads.map(arr => arr[1]);
   const allocatedResourceList: AllocatedResources[] = scriptRamThreads.map(
     () => {

@@ -115,16 +115,14 @@ describe('lib-allocate-resources', () => {
       expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
     });
 
-    it.only('returns expected resources including home', async () => {
+    it('returns expected resources including home', async () => {
       ns.fileExists.mockReturnValue(false);
-      jest
-        .spyOn(discoverHostsLib, 'discoverHosts')
-        .mockReturnValue(['a', 'home']);
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a']);
       ns.getPurchasedServers.mockReturnValue(['b']);
       ns.getServerMaxRam
         .mockReturnValueOnce(4)
-        .mockReturnValueOnce(5)
-        .mockReturnValueOnce(1);
+        .mockReturnValueOnce(1)
+        .mockReturnValueOnce(5);
       ns.getServerUsedRam.mockReturnValue(0);
       ns.hasRootAccess.mockReturnValue(true);
 
@@ -144,44 +142,42 @@ describe('lib-allocate-resources', () => {
       expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
     });
 
-    //   it('requests more threads than those available', async () => {
-    //     ns.fileExists.mockReturnValue(false);
-    //     jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-    //     ns.getPurchasedServers.mockReturnValue(['c']);
-    //     ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(4);
+    it('requests more threads than those available', async () => {
+      ns.fileExists.mockReturnValue(false);
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(4)
+        .mockReturnValue(0);
 
-    //     ns.getServerUsedRam.mockReturnValue(0);
-    //     ns.hasRootAccess.mockReturnValue(true);
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.hasRootAccess.mockReturnValue(true);
 
-    //     // @ts-expect-error ns type miss match
-    //     expect(await allocateResources(ns, [[scriptRam, 100]], true)).toEqual([
-    //       {
-    //         a: 1,
-    //         b: 1,
-    //       },
-    //       2,
-    //     ]);
-    //   });
+      // @ts-expect-error ns type miss match
+      expect(await allocateResources(ns, [[scriptRam, 100]], true)).toEqual([
+        [{a: 1, b: 1}, 2],
+      ]);
+    });
 
-    //   it('requests no threads', async () => {
-    //     ns.fileExists.mockReturnValue(false);
+    it('requests no threads', async () => {
+      ns.fileExists.mockReturnValue(false);
 
-    //     jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
-    //     ns.getPurchasedServers.mockReturnValue(['c']);
-    //     ns.getServerMaxRam
-    //       .mockReturnValueOnce(4)
-    //       .mockReturnValueOnce(8)
-    //       .mockReturnValueOnce(28)
-    //       .mockReturnValueOnce(4);
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue(['c']);
+      ns.getServerMaxRam
+        .mockReturnValueOnce(4)
+        .mockReturnValueOnce(8)
+        .mockReturnValueOnce(28)
+        .mockReturnValueOnce(4);
 
-    //     ns.getServerUsedRam.mockReturnValue(0);
-    //     ns.hasRootAccess.mockReturnValue(true);
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.hasRootAccess.mockReturnValue(true);
 
-    //     // @ts-expect-error ns type miss match
-    //     expect(await allocateResources(ns, [[scriptRam, 0]], true)).toEqual([
-    //       {},
-    //       0,
-    //     ]);
-    //   });
+      // @ts-expect-error ns type miss match
+      expect(await allocateResources(ns, [[scriptRam, 0]], true)).toEqual([
+        [{}, 0],
+      ]);
+    });
   });
 });
