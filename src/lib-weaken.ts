@@ -80,7 +80,7 @@ export const lowerToMinSecurity = async (
     `${targetHost}@lowerToMinSecurity: waking up in ${s}(s) or ${m}(m) or ${h}(h)`
   );
 
-  const safetyMargin = 2000;
+  const safetyMargin = 5000;
   await ns.sleep(singleThreadActionTime + safetyMargin);
 
   return lowerToMinSecurity(ns, targetHost, useHome, currentLoop + 1);

@@ -92,6 +92,7 @@ export const growToPercent = async (
   // resources might be locked for another concurrent execution
   // this is a compounded problem, because we are trying to do two operations in one go.
   while (growResources[1] < 1 && weakenResources[1] < 1) {
+    await ns.sleep(1000);
     [growResources, weakenResources] = await allocateResources(
       ns,
       [
@@ -100,7 +101,6 @@ export const growToPercent = async (
       ],
       useHome
     );
-    await ns.sleep(1000);
   }
 
   dispatchScriptToResources(
@@ -130,7 +130,7 @@ export const growToPercent = async (
     `${targetHost}@lowerToMinSecurity: waking up in ${s}(s) or ${m}(m) or ${h}(h)`
   );
 
-  const safetyMargin = 2000;
+  const safetyMargin = 5000;
   await ns.sleep(singleThreadActionTime + safetyMargin);
   return growToPercent(ns, targetHost, percentLimit, useHome, currentLoop + 1);
 };

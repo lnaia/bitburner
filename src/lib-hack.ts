@@ -89,7 +89,7 @@ export const hackPercent = async (
   const {s, m, h} = getActionTimeDuration(singleThreadActionTime);
   log(ns, `${host}@hackPercent: waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
 
-  const safetyMargin = 2000;
+  const safetyMargin = 5000;
   await ns.sleep(singleThreadActionTime + safetyMargin);
 
   return true;

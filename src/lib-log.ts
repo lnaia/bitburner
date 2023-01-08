@@ -28,7 +28,7 @@ export const log = (ns: NS, msg: string, level?: ErrorLevel) => {
   ns.disableLog('ALL');
   const date = getFormattedDate();
 
-  const logMsg = `${date}@${level}: ${msg}`;
+  const logMsg = `${date}@${level ? level : 'debug'}: ${msg}`;
   ns.print(logMsg);
   if (level === 'fatal') {
     ns.tprint(logMsg);
