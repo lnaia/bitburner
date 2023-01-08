@@ -1,6 +1,7 @@
 import {describe, expect, it, jest} from '@jest/globals';
 import {availableResources, allocateResources} from '../lib-resources';
 import * as discoverHostsLib from '../lib-discover-hosts';
+import {OrderTypes} from '../NetscriptDefinitions';
 
 describe('lib-allocate-resources', () => {
   const script = '[script]';
@@ -177,6 +178,46 @@ describe('lib-allocate-resources', () => {
       // @ts-expect-error ns type miss match
       expect(await allocateResources(ns, [[scriptRam, 0]], true)).toEqual([
         [{}, 0],
+      ]);
+    });
+
+    it('serves resources, takes 5 cycles to map them', async () => {
+      ns.fileExists.mockReturnValue(false);
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue([]);
+      ns.getServerMaxRam.mockReturnValue(256);
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      expect(
+        // @ts-expect-error ns type miss match
+        await allocateResources(ns, [
+          [4, 10],
+          [10, 10],
+        ])
+      ).toEqual([
+        [{a: 5, b: 5}, 10],
+        [{a: 5, b: 5}, 10],
+      ]);
+    });
+
+    it('serves resources, takes a few cycles, and they are incomplete', async () => {
+      ns.fileExists.mockReturnValue(false);
+      jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
+      ns.getPurchasedServers.mockReturnValue([]);
+      ns.getServerMaxRam.mockReturnValueOnce(70).mockReturnValueOnce(56);
+      ns.getServerUsedRam.mockReturnValue(0);
+      ns.hasRootAccess.mockReturnValue(true);
+
+      expect(
+        // @ts-expect-error ns type miss match
+        await allocateResources(ns, [
+          [4, 10],
+          [10, 10],
+        ])
+      ).toEqual([
+        [{a: 5, b: 4}, 9],
+        [{a: 5, b: 4}, 9],
       ]);
     });
   });

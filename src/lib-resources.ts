@@ -86,6 +86,23 @@ export const allocateResources = async (
     }
   }
 
+  const arraysEqual = (a1: number[], a2: number[]) => {
+    let result = true;
+
+    if (!Array.isArray(a1) || !Array.isArray(a2)) {
+      return false;
+    }
+
+    for (let i = 0; i < a1.length; i += 1) {
+      if (a1[i] !== a2[i]) {
+        result = false;
+        break;
+      }
+    }
+
+    return result;
+  };
+
   const resourcesAvailable = availableResources(ns, useHome);
   const threadsRemaining: number[] = scriptRamThreads.map(arr => arr[1]);
   const allocatedResourceList: AllocatedResources[] = scriptRamThreads.map(
@@ -95,39 +112,73 @@ export const allocateResources = async (
   );
 
   // A full cycle is when we get at least 1 slot, for every script/thread pair.
+  let lastCycleThreadRemaining: number[] | null = null;
+  const equalThreadsRemaining = () => {
+    return threadsRemaining.every(el => el > 0);
+  };
 
-  for (let i = 0; i < scriptRamThreads.length; i += 1) {
-    const [scriptRam] = scriptRamThreads[i];
-    for (const resourceAvailable of Object.entries(resourcesAvailable)) {
-      const [host, serverRamAvailable] = resourceAvailable;
-      const currentThreadsRemaining = threadsRemaining[i];
+  const MAX_LOOP_PREVENTION_COUNT = 1000;
+  let cycleCounter = 0;
+  let equalCounter = 0;
 
-      if (currentThreadsRemaining <= 0) {
-        continue;
-      }
-
-      if (serverRamAvailable < scriptRam) {
-        continue;
-      }
-
-      // update remaining threads in place
-      threadsRemaining.splice(i, 1, currentThreadsRemaining - 1);
-
-      // update remaining ram for this host
-      resourcesAvailable[host] = serverRamAvailable - scriptRam;
-
-      // updates host map for this scriptRamThread
-      const hostThreadMap = allocatedResourceList[i][0];
-      if (!(host in hostThreadMap)) {
-        hostThreadMap[host] = 1;
-      } else {
-        hostThreadMap[host] += 1;
-      }
-
-      // updates totalThread count for this scriptRamThread
-      const currentTotalThreadCount = allocatedResourceList[i][1];
-      allocatedResourceList[i].splice(1, 1, currentTotalThreadCount + 1);
+  // if threadsRemaining does not change in two sequential cycles, it's time to exit
+  // as we cannot take it further, given the ratio is 1:1
+  const calcEqualCounter = () => {
+    if (arraysEqual(lastCycleThreadRemaining, threadsRemaining)) {
+      equalCounter += 1;
     }
+  };
+
+  while (
+    equalThreadsRemaining() &&
+    cycleCounter < MAX_LOOP_PREVENTION_COUNT &&
+    equalCounter <= 1
+  ) {
+    lastCycleThreadRemaining = JSON.parse(JSON.stringify(threadsRemaining));
+
+    for (let i = 0; i < scriptRamThreads.length; i += 1) {
+      const [scriptRam] = scriptRamThreads[i];
+      for (const resourceAvailable of Object.entries(resourcesAvailable)) {
+        const [host, serverRamAvailable] = resourceAvailable;
+        const currentThreadsRemaining = threadsRemaining[i];
+
+        if (currentThreadsRemaining <= 0) {
+          continue;
+        }
+
+        if (serverRamAvailable < scriptRam) {
+          continue;
+        }
+
+        // update remaining threads in place
+        threadsRemaining.splice(i, 1, currentThreadsRemaining - 1);
+
+        // update remaining ram for this host
+        resourcesAvailable[host] = serverRamAvailable - scriptRam;
+
+        // updates host map for this scriptRamThread
+        const hostThreadMap = allocatedResourceList[i][0];
+        if (!(host in hostThreadMap)) {
+          hostThreadMap[host] = 1;
+        } else {
+          hostThreadMap[host] += 1;
+        }
+
+        // updates totalThread count for this scriptRamThread
+        const currentTotalThreadCount = allocatedResourceList[i][1];
+        allocatedResourceList[i].splice(1, 1, currentTotalThreadCount + 1);
+      }
+    }
+
+    calcEqualCounter();
+    cycleCounter += 1;
+  }
+
+  if (cycleCounter >= MAX_LOOP_PREVENTION_COUNT) {
+    log(
+      ns,
+      'allocateResources: MAX_LOOP_PREVENTION_COUNT enforcement - investigate'
+    );
   }
 
   ns.exec('exec-unlock-resources', 'home');
