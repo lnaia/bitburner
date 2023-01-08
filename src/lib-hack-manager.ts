@@ -12,7 +12,7 @@ import {cleanupExistingScripts} from './lib-script';
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
 const MAX_HACK_PERCENT = 0.1;
 
-export const hackCoordinator = async (
+export const hackManager = async (
   ns: NS,
   targetHost: string,
   useHome: boolean
@@ -25,22 +25,22 @@ export const hackCoordinator = async (
     HACK_SCRIPT,
   ]);
 
-  log(ns, `${targetHost}@hackCoordinator: loop-start`);
+  log(ns, `${targetHost}@hackManager: loop-start`);
 
   while (!stopConditionWeaken(ns, targetHost)) {
-    log(ns, `${targetHost}@hackCoordinator: not weak enough`);
+    log(ns, `${targetHost}@hackManager: not weak enough`);
     await lowerToMinSecurity(ns, targetHost, useHome);
     await ns.sleep(1000);
   }
 
   while (!stopConditionGrow(ns, targetHost, LIMIT_MAX_MONEY_PERCENT)) {
-    log(ns, `${targetHost}@hackCoordinator: not grown enough`);
+    log(ns, `${targetHost}@hackManager: not grown enough`);
     await growToPercent(ns, targetHost, LIMIT_MAX_MONEY_PERCENT, useHome);
     await ns.sleep(1000);
   }
 
   while (!stopConditionHack(ns, targetHost)) {
-    log(ns, `${targetHost}@hackCoordinator: not hacked enough`);
+    log(ns, `${targetHost}@hackManager: not hacked enough`);
     await hackPercent(ns, targetHost, MAX_HACK_PERCENT, useHome);
     await ns.sleep(1000);
   }
