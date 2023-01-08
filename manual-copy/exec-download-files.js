@@ -13,7 +13,6 @@ export async function main(ns) {
     'lib-provision.js',
     'lib-servers.js',
     'lib-print-obj-list.js',
-    'lib-allocate-resources.js',
     'lib-hack-manager.js',
     'lib-log.js',
     'lib-hack.js',
