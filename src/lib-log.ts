@@ -22,9 +22,15 @@ const getFormattedDate = () => {
     addLeadingZeros(currentDateTime.getSeconds())
   );
 };
-export const log = (ns: NS, msg: string, level = 'debug') => {
+
+type ErrorLevel = 'debug' | 'fatal';
+export const log = (ns: NS, msg: string, level?: ErrorLevel) => {
   ns.disableLog('ALL');
   const date = getFormattedDate();
 
-  ns.print(`${date}@${level}: ${msg}`);
+  const logMsg = `${date}@${level}: ${msg}`;
+  ns.print(logMsg);
+  if (level === 'fatal') {
+    ns.tprint(logMsg);
+  }
 };

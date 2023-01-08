@@ -1,5 +1,5 @@
 import {describe, expect, it, jest} from '@jest/globals';
-import {availableResources, allocateResources} from '../lib-allocate-resources';
+import {availableResources, allocateResources} from '../lib-resources';
 import * as discoverHostsLib from '../lib-discover-hosts';
 
 describe('lib-allocate-resources', () => {
