@@ -68,7 +68,7 @@ export const allocateResources = async (
   } else {
     if (!lockResources(ns)) {
       log(ns, 'allocateResources: unable to lock resources - why?', 'fatal');
-      ns.exit();
+      return ns.exit();
     }
   }
 

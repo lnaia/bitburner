@@ -7,7 +7,6 @@ const config: Config = {
   clearMocks: true,
   resetMocks: true,
   coverageReporters: ['lcov', ['text', {skipFull: true}]],
-  collectCoverage: true,
   coverageDirectory: './coverage',
   collectCoverageFrom: [
     'src/**/*.ts',

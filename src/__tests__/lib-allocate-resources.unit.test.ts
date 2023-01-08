@@ -6,26 +6,21 @@ describe('lib-allocate-resources', () => {
   const script = '[script]';
   const scriptRam = 4;
   const ns = {
+    write: jest.fn(),
+    exec: jest.fn(),
+    rm: jest.fn(),
+    disableLog: jest.fn(),
     fileExists: jest.fn(),
     hasRootAccess: jest.fn(),
     getPurchasedServers: jest.fn(),
     print: jest.fn(),
+    tprint: jest.fn(),
     exit: jest.fn(),
     getServerMaxRam: jest.fn(),
     getServerUsedRam: jest.fn(),
   };
 
   describe('availableResources', () => {
-    it('stop running if script does not exist', () => {
-      ns.fileExists.mockReturnValue(false);
-
-      // @ts-expect-error wrong ns type
-      const result = availableResources(ns, script, scriptRam);
-
-      expect(ns.fileExists).toHaveBeenCalledWith(script);
-      expect(result).toEqual([]);
-    });
-
     it('returns correct set of hosts', () => {
       jest
         .spyOn(discoverHostsLib, 'discoverHosts')
@@ -45,7 +40,7 @@ describe('lib-allocate-resources', () => {
       ns.getPurchasedServers.mockReturnValue(['own-host-1', 'own-host-2']);
 
       // @ts-expect-error wrong ns type
-      const resources = availableResources(ns, script, scriptRam);
+      const resources = availableResources(ns, scriptRam);
 
       expect(ns.getPurchasedServers).toHaveBeenCalled();
       expect(ns.getServerMaxRam).toHaveBeenCalled();
@@ -77,7 +72,7 @@ describe('lib-allocate-resources', () => {
       ns.getPurchasedServers.mockReturnValue(['own-host-1', 'own-host-2']);
 
       // @ts-expect-error wrong ns type
-      const resources = availableResources(ns, script, scriptRam, true);
+      const resources = availableResources(ns, scriptRam, true);
 
       expect(resources).toEqual({
         home: 1,
@@ -90,7 +85,27 @@ describe('lib-allocate-resources', () => {
   });
 
   describe('allocateResources', () => {
-    it('returns expected resources', () => {
+    it('returns empty resource - lock is active', async () => {
+      ns.fileExists.mockReturnValue(true);
+      // @ts-expect-error ns type miss match
+      const result = await allocateResources(ns, scriptRam, 10);
+      expect(result).toEqual([{}, 0]);
+    });
+
+    it('exists abruptly - unable to get a lock', async () => {
+      ns.fileExists.mockReturnValueOnce(false).mockReturnValueOnce(true);
+      ns.exit.mockImplementation(() => {
+        return undefined;
+      });
+      // @ts-expect-error ns type miss match
+      const result = await allocateResources(ns, scriptRam, 10);
+      expect(result).toBeUndefined();
+      expect(ns.exit).toHaveBeenCalled();
+    });
+
+    it('returns expected resources', async () => {
+      ns.fileExists.mockReturnValue(false);
+
       jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
       ns.getPurchasedServers.mockReturnValue(['c']);
       ns.getServerMaxRam
@@ -99,11 +114,11 @@ describe('lib-allocate-resources', () => {
         .mockReturnValueOnce(28);
 
       ns.getServerUsedRam.mockReturnValue(0);
-      ns.fileExists.mockReturnValue(true);
       ns.hasRootAccess.mockReturnValue(true);
 
       // @ts-expect-error ns type miss match
-      expect(allocateResources(ns, script, scriptRam, 10)).toEqual([
+      const result = await allocateResources(ns, scriptRam, 10);
+      expect(result).toEqual([
         {
           a: 1,
           b: 2,
@@ -111,9 +126,11 @@ describe('lib-allocate-resources', () => {
         },
         10,
       ]);
+      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
     });
 
-    it('returns expected resources including home', () => {
+    it('returns expected resources including home', async () => {
+      ns.fileExists.mockReturnValue(false);
       jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
       ns.getPurchasedServers.mockReturnValue(['c']);
       ns.getServerMaxRam
@@ -123,11 +140,10 @@ describe('lib-allocate-resources', () => {
         .mockReturnValueOnce(4);
 
       ns.getServerUsedRam.mockReturnValue(0);
-      ns.fileExists.mockReturnValue(true);
       ns.hasRootAccess.mockReturnValue(true);
 
       // @ts-expect-error ns type miss match
-      expect(allocateResources(ns, script, scriptRam, 11, true)).toEqual([
+      expect(await allocateResources(ns, scriptRam, 11, true)).toEqual([
         {
           a: 1,
           b: 2,
@@ -138,17 +154,17 @@ describe('lib-allocate-resources', () => {
       ]);
     });
 
-    it('requests more threads than those available', () => {
+    it('requests more threads than those available', async () => {
+      ns.fileExists.mockReturnValue(false);
       jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
       ns.getPurchasedServers.mockReturnValue(['c']);
       ns.getServerMaxRam.mockReturnValueOnce(4).mockReturnValueOnce(4);
 
       ns.getServerUsedRam.mockReturnValue(0);
-      ns.fileExists.mockReturnValue(true);
       ns.hasRootAccess.mockReturnValue(true);
 
       // @ts-expect-error ns type miss match
-      expect(allocateResources(ns, script, scriptRam, 100, true)).toEqual([
+      expect(await allocateResources(ns, scriptRam, 100, true)).toEqual([
         {
           a: 1,
           b: 1,
@@ -157,7 +173,9 @@ describe('lib-allocate-resources', () => {
       ]);
     });
 
-    it('requests no threads', () => {
+    it('requests no threads', async () => {
+      ns.fileExists.mockReturnValue(false);
+
       jest.spyOn(discoverHostsLib, 'discoverHosts').mockReturnValue(['a', 'b']);
       ns.getPurchasedServers.mockReturnValue(['c']);
       ns.getServerMaxRam
@@ -167,11 +185,10 @@ describe('lib-allocate-resources', () => {
         .mockReturnValueOnce(4);
 
       ns.getServerUsedRam.mockReturnValue(0);
-      ns.fileExists.mockReturnValue(true);
       ns.hasRootAccess.mockReturnValue(true);
 
       // @ts-expect-error ns type miss match
-      expect(allocateResources(ns, script, scriptRam, 0, true)).toEqual([
+      expect(await allocateResources(ns, script, scriptRam, 0, true)).toEqual([
         {},
         0,
       ]);
