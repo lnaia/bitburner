@@ -56,38 +56,30 @@ export const hackPercent = async (
   const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
   const hackScriptRam = ns.getScriptRam(HACK_SCRIPT);
 
-  const scriptRam = hackScriptRam + weakenScriptRam;
-  const threads = hackThreads + weakenThreads;
-
-  let [resources, totalThreadsAvailable] = await allocateResources(
+  let [hackResources, weakenResources] = await allocateResources(
     ns,
-    scriptRam,
-    threads,
+    [
+      [hackScriptRam, hackThreads],
+      [weakenScriptRam, weakenThreads],
+    ],
     useHome
   );
 
   // wait for at least two threads: one for each script
-  while (totalThreadsAvailable < 2) {
-    [resources, totalThreadsAvailable] = await allocateResources(
+  while (hackResources[1] < 1 && weakenResources[1] < 1) {
+    [hackResources, weakenResources] = await allocateResources(
       ns,
-      scriptRam,
-      threads,
+      [
+        [hackScriptRam, hackThreads],
+        [weakenScriptRam, weakenThreads],
+      ],
       useHome
     );
     await ns.sleep(1000);
   }
 
-  if (totalThreadsAvailable === threads) {
-    // \o/ peak performance!
-    dispatchScriptToResources(ns, resources, HACK_SCRIPT, host, false);
-    dispatchScriptToResources(ns, resources, WEAKEN_SCRIPT, host, false);
-    log(
-      ns,
-      `${host}@hackPercent: all thread requirements fulfilled - optimal performance`
-    );
-  } else {
-    // at least two threads are available, and we want a 1:1 ratio
-  }
+  dispatchScriptToResources(ns, hackResources[0], HACK_SCRIPT, host, false);
+  dispatchScriptToResources(ns, weakenResources[0], WEAKEN_SCRIPT, host, false);
 
   const weakenTime = ns.getWeakenTime(host);
   const hackTime = ns.getHackTime(host);

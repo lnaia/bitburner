@@ -80,38 +80,44 @@ export const growToPercent = async (
     ns.exit();
   }
 
-  const scriptRam = growScriptRam + weakenScriptRam;
-  const threads = growThreads + weakenThreads;
-  let [resources, totalThreadsAvailable] = await allocateResources(
+  let [growResources, weakenResources] = await allocateResources(
     ns,
-    scriptRam,
-    threads,
+    [
+      [growScriptRam, growThreads],
+      [weakenScriptRam, weakenThreads],
+    ],
     useHome
   );
   // wait for at least two threads: one for each script
   // resources might be locked for another concurrent execution
   // this is a compounded problem, because we are trying to do two operations in one go.
-  while (totalThreadsAvailable < 2) {
-    [resources, totalThreadsAvailable] = await allocateResources(
+  while (growResources[1] < 1 && weakenResources[1] < 1) {
+    [growResources, weakenResources] = await allocateResources(
       ns,
-      scriptRam,
-      threads,
+      [
+        [growScriptRam, growThreads],
+        [weakenScriptRam, weakenThreads],
+      ],
       useHome
     );
     await ns.sleep(1000);
   }
 
-  if (totalThreadsAvailable === threads) {
-    // \o/ peak performance!
-    dispatchScriptToResources(ns, resources, GROW_SCRIPT, targetHost, false);
-    dispatchScriptToResources(ns, resources, WEAKEN_SCRIPT, targetHost, false);
-    log(
-      ns,
-      `${targetHost}@growToPercent: all thread requirements fulfilled - optimal performance`
-    );
-  } else {
-    // at least two threads are available, and we want a 1:1 ratio
-  }
+  dispatchScriptToResources(
+    ns,
+    growResources[0],
+    GROW_SCRIPT,
+    targetHost,
+    false
+  );
+
+  dispatchScriptToResources(
+    ns,
+    weakenResources[0],
+    WEAKEN_SCRIPT,
+    targetHost,
+    false
+  );
 
   const weakenTime = ns.getWeakenTime(targetHost);
   const growTime = ns.getGrowTime(targetHost);
