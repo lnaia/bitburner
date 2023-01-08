@@ -4,7 +4,7 @@ import {getActionTimeDuration} from './lib-time';
 import {calculateThreadsWeaken, WEAKEN_SCRIPT} from './lib-weaken';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
 
-export const HACK_SCRIPT = 'hack-weaken.js';
+export const HACK_SCRIPT = 'hack-hack.js';
 
 // decimal form, 0.1 === 10%
 // represents the percentage of money to hack from current money
