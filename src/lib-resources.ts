@@ -139,14 +139,14 @@ export const allocateResources = async (
     for (let i = 0; i < scriptRamThreads.length; i += 1) {
       const [scriptRam] = scriptRamThreads[i];
       for (const resourceAvailable of Object.entries(resourcesAvailable)) {
-        const [host, serverRamAvailable] = resourceAvailable;
+        const [host, hostRamAvailable] = resourceAvailable;
         const currentThreadsRemaining = threadsRemaining[i];
 
         if (currentThreadsRemaining <= 0) {
           continue;
         }
 
-        if (serverRamAvailable < scriptRam) {
+        if (hostRamAvailable < scriptRam) {
           continue;
         }
 
@@ -154,7 +154,7 @@ export const allocateResources = async (
         threadsRemaining.splice(i, 1, currentThreadsRemaining - 1);
 
         // update remaining ram for this host
-        resourcesAvailable[host] = serverRamAvailable - scriptRam;
+        resourcesAvailable[host] = hostRamAvailable - scriptRam;
 
         // updates host map for this scriptRamThread
         const hostThreadMap = allocatedResourceList[i][0];

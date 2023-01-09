@@ -25,3 +25,10 @@ export type ActionMap = {
     calculateActionTime: CalculateActionTime;
   };
 };
+
+export type Job = {
+  targetHost: string;
+  script: string;
+  threads: number;
+  duration?: number;
+};
