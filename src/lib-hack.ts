@@ -28,17 +28,17 @@ export const calculateThreadsHack = (
   ns: NS,
   host: string,
   maxMoneyPercent = MAX_HACK_PERCENT
-) => {
+): [number, number] => {
   ns.disableLog('ALL');
   const currMoney = ns.getServerMoneyAvailable(host) * maxMoneyPercent;
   const requiredThreads = Math.ceil(ns.hackAnalyzeThreads(host, currMoney));
 
   if (requiredThreads === -1) {
-    return 0;
+    return [0, 0];
   }
 
   // ns.print(`${host}@calculateThreadsHack: requiredThreads=${requiredThreads}`);
-  return requiredThreads;
+  return [requiredThreads, currMoney];
 };
 
 //. launch one hack. that's it. no more.
@@ -54,7 +54,9 @@ export const hackPercent = async (
     return false;
   }
 
-  const hackThreads = calculateThreadsHack(ns, host, percent);
+  const [hackThreads, moneyToHack] = calculateThreadsHack(ns, host, percent);
+
+  // hack and weaken
   const securityIncrease = ns.hackAnalyzeSecurity(hackThreads, host);
   const weakenThreads = calculateThreadsWeaken(ns, host, securityIncrease);
   const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
@@ -95,7 +97,6 @@ export const hackPercent = async (
 
   const safetyMargin = 5000;
   await ns.sleep(singleThreadActionTime + safetyMargin);
-
   return true;
 };
 

@@ -44,6 +44,29 @@ export const calculateThreadsGrow = (
   return Math.ceil(ns.growthAnalyze(host, factor));
 };
 
+export const calculateThreadsGrowRelativeToValue = (
+  ns: NS,
+  host: string,
+  moneyStolen: number
+) => {
+  let currMoney = ns.getServerMoneyAvailable(host);
+  if (currMoney <= 0) {
+    currMoney = 1;
+  }
+
+  const moneyStolenDecimalForm = moneyStolen / currMoney;
+
+  let factor = 1;
+  try {
+    factor = currMoney + moneyStolenDecimalForm;
+  } catch (e) {
+    // ignore
+    factor = 1;
+  }
+
+  return Math.ceil(ns.growthAnalyze(host, factor));
+};
+
 export const growToPercent = async (
   ns: NS,
   targetHost: string,
@@ -133,4 +156,61 @@ export const growToPercent = async (
   const safetyMargin = 5000;
   await ns.sleep(singleThreadActionTime + safetyMargin);
   return growToPercent(ns, targetHost, percentLimit, useHome, currentLoop + 1);
+};
+
+export const growToValue = async (
+  ns: NS,
+  host: string,
+  valueToGrow: number,
+  useHome: boolean,
+  currentLoop = 0
+) => {
+  ns.disableLog('ALL');
+
+  const growThreads = calculateThreadsGrowRelativeToValue(
+    ns,
+    host,
+    valueToGrow
+  );
+  const securityIncrease = ns.growthAnalyzeSecurity(growThreads, host);
+  const weakenThreads = calculateThreadsWeaken(ns, host, securityIncrease);
+  const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
+  const growScriptRam = ns.getScriptRam(GROW_SCRIPT);
+
+  let [growResources, weakenResources] = await allocateResources(
+    ns,
+    [
+      [growScriptRam, growThreads],
+      [weakenScriptRam, weakenThreads],
+    ],
+    useHome
+  );
+  // wait for at least two threads: one for each script
+  // resources might be locked for another concurrent execution
+  // this is a compounded problem, because we are trying to do two operations in one go.
+  while (growResources[1] < 1 && weakenResources[1] < 1) {
+    await ns.sleep(1000);
+    [growResources, weakenResources] = await allocateResources(
+      ns,
+      [
+        [growScriptRam, growThreads],
+        [weakenScriptRam, weakenThreads],
+      ],
+      useHome
+    );
+  }
+
+  dispatchScriptToResources(ns, growResources[0], GROW_SCRIPT, host, false);
+  dispatchScriptToResources(ns, weakenResources[0], WEAKEN_SCRIPT, host, false);
+
+  const weakenTime = ns.getWeakenTime(host);
+  const growTime = ns.getGrowTime(host);
+  // wait for the longest, they are executed concurrently.
+  const singleThreadActionTime = weakenTime > growTime ? weakenTime : growTime;
+
+  const {s, m, h} = getActionTimeDuration(singleThreadActionTime);
+  log(ns, `${host}@growToPercent: waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
+
+  const safetyMargin = 5000;
+  await ns.sleep(singleThreadActionTime + safetyMargin);
 };
