@@ -127,7 +127,7 @@ export const growToPercent = async (
   const {s, m, h} = getActionTimeDuration(singleThreadActionTime);
   log(
     ns,
-    `${targetHost}@lowerToMinSecurity: waking up in ${s}(s) or ${m}(m) or ${h}(h)`
+    `${targetHost}@growToPercent: waking up in ${s}(s) or ${m}(m) or ${h}(h)`
   );
 
   const safetyMargin = 5000;

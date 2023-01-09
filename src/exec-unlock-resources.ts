@@ -4,7 +4,7 @@ import {log} from './lib-log';
 
 export async function main(ns: NS) {
   ns.disableLog('ALL');
-  await ns.sleep(5000);
+  await ns.sleep(3000);
   if (!unlockResources(ns)) {
     log(ns, 'exec-unlock-resources: warning - unable to unlock resources?');
   } else {

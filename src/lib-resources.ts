@@ -181,7 +181,7 @@ export const allocateResources = async (
     );
   }
 
-  ns.exec('exec-unlock-resources', 'home');
+  ns.exec('exec-unlock-resources.js', 'home');
   return allocatedResourceList;
 };
 
