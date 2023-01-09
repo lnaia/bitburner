@@ -113,7 +113,7 @@ describe('lib-allocate-resources', () => {
         [{a: 1}, 1],
         [{b: 1}, 1],
       ]);
-      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
+      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources.js', 'home');
     });
 
     it('returns expected resources including home', async () => {
