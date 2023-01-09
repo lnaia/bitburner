@@ -62,12 +62,12 @@ export const lowerToMinSecurity = async (
   // wait for at least one thread available
   // resources might be locked for another concurrent execution
   while (totalThreadsAvailable === 0) {
+    await ns.sleep(1000);
     [[resources, totalThreadsAvailable]] = await allocateResources(
       ns,
       [[scriptRam, threads]],
       useHome
     );
-    await ns.sleep(1000);
   }
 
   dispatchScriptToResources(ns, resources, script, targetHost, false);

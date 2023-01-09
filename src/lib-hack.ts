@@ -67,6 +67,7 @@ export const hackPercent = async (
 
   // wait for at least two threads: one for each script
   while (hackResources[1] < 1 && weakenResources[1] < 1) {
+    await ns.sleep(1000);
     [hackResources, weakenResources] = await allocateResources(
       ns,
       [
@@ -75,7 +76,6 @@ export const hackPercent = async (
       ],
       useHome
     );
-    await ns.sleep(1000);
   }
 
   dispatchScriptToResources(ns, hackResources[0], HACK_SCRIPT, host, false);
