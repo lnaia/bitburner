@@ -140,7 +140,7 @@ describe('lib-allocate-resources', () => {
         [{a: 1, home: 1}, 2],
         [{b: 1, home: 1}, 2],
       ]);
-      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources', 'home');
+      expect(ns.exec).toHaveBeenCalledWith('exec-unlock-resources.js', 'home');
     });
 
     it('requests more threads than those available', async () => {
