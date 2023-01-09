@@ -43,7 +43,7 @@ export async function main(ns: NS) {
           return b.mm - a.mm;
         })
         .map(hostDetails => {
-          const {host, hmm, hcm, diff, rh, ms, cs} = hostDetails;
+          const {host, hmm, hcm, diff, rh, ms, cs, hc} = hostDetails;
           return {
             host,
             hmm,
@@ -52,6 +52,7 @@ export async function main(ns: NS) {
             ms,
             cs,
             rh,
+            hc,
           };
         });
     })();

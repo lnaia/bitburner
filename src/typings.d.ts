@@ -9,8 +9,8 @@ export interface HostDetails {
   rh: number;
   ms: number;
   cs: number;
+  hc: number;
 }
-
 export type StatusReport = [boolean, string?];
 
 export type AllocatedResources = [{[key: string]: number}, number];
