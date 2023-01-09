@@ -49,9 +49,9 @@ export const hackManager = async (
     await ns.sleep(1000);
   }
 
-  while (!stopConditionHack(ns, targetHost)) {
-    log(ns, `${targetHost}@hackManager: not hacked enough`);
-    await hackPercent(ns, targetHost, MAX_HACK_PERCENT, useHome);
-    await ns.sleep(1000);
-  }
+  // while (!stopConditionHack(ns, targetHost)) {
+  log(ns, `${targetHost}@hackManager: not hacked enough`);
+  await hackPercent(ns, targetHost, MAX_HACK_PERCENT, useHome);
+  await ns.sleep(1000);
+  // }
 };
