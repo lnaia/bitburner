@@ -1,6 +1,11 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
-import {HACK_SCRIPT, stopConditionHack, hackPercent} from './lib-hack';
+import {
+  HACK_SCRIPT,
+  stopConditionHack,
+  hackPercent,
+  isHackChanceTooHigh,
+} from './lib-hack';
 import {stopConditionGrow, growToPercent, GROW_SCRIPT} from './lib-grow';
 import {
   stopConditionWeaken,
@@ -31,6 +36,11 @@ export const hackManager = async (
     log(ns, `${targetHost}@hackManager: not weak enough`);
     await lowerToMinSecurity(ns, targetHost, useHome);
     await ns.sleep(1000);
+  }
+
+  if (isHackChanceTooHigh(ns, targetHost)) {
+    log(ns, 'hack chance too high w/ min security - host is no-op');
+    ns.exit();
   }
 
   while (!stopConditionGrow(ns, targetHost, LIMIT_MAX_MONEY_PERCENT)) {

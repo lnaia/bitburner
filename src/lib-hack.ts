@@ -1,14 +1,18 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
 import {getActionTimeDuration} from './lib-time';
-import {calculateThreadsWeaken, WEAKEN_SCRIPT} from './lib-weaken';
+import {
+  calculateThreadsWeaken,
+  WEAKEN_SCRIPT,
+  stopConditionWeaken,
+} from './lib-weaken';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
-
-export const HACK_SCRIPT = 'hack-hack.js';
 
 // decimal form, 0.1 === 10%
 // represents the percentage of money to hack from current money
-const MAX_HACK_PERCENT = 0.1;
+export const MAX_HACK_PERCENT = 0.1;
+export const HACK_SCRIPT = 'hack-hack.js';
+export const HACK_CHANCE_THRESHOLD = 95;
 
 export const stopConditionHack = (ns: NS, targetHost: string) => {
   ns.disableLog('ALL');
@@ -45,7 +49,7 @@ export const hackPercent = async (
   useHome: boolean
 ) => {
   const chance = ns.hackAnalyzeChance(host) * 100;
-  if (chance <= 95) {
+  if (chance <= HACK_CHANCE_THRESHOLD) {
     log(ns, `hackPercent: chance too low, chance=${chance}`);
     return false;
   }
@@ -93,4 +97,16 @@ export const hackPercent = async (
   await ns.sleep(singleThreadActionTime + safetyMargin);
 
   return true;
+};
+
+// we'll never hack a server that has security at a minimum
+// and hack chance is below the threshold
+// might as well log and exit.
+export const isHackChanceTooHigh = (ns: NS, host: string) => {
+  if (stopConditionWeaken(ns, host)) {
+    return false;
+  }
+
+  const chance = ns.hackAnalyzeChance(host) * 100;
+  return chance < HACK_CHANCE_THRESHOLD;
 };
