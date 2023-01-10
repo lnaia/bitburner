@@ -34,6 +34,8 @@ describe('lib-resource-scheduler', () => {
           targetHost: '[targetHost]',
           script: '[script]',
           threads: 4,
+          timeToRun: 1,
+          timeToWait: 0,
         },
       ];
 
@@ -55,6 +57,8 @@ describe('lib-resource-scheduler', () => {
           targetHost: '[targetHost]',
           script: '[script]',
           threads: 5,
+          timeToRun: 1,
+          timeToWait: 0,
         },
       ];
 
@@ -76,6 +80,8 @@ describe('lib-resource-scheduler', () => {
           targetHost: '[targetHost]',
           script: '[script]',
           threads: 4,
+          timeToRun: 1,
+          timeToWait: 0,
         },
       ];
 
@@ -93,11 +99,41 @@ describe('lib-resource-scheduler', () => {
       ns.getScriptRam.mockReturnValue(1);
 
       const jobs: Job[] = [
-        {targetHost: '[th1]', script: '[s1]', threads: 5},
-        {targetHost: '[th2]', script: '[s1]', threads: 2},
-        {targetHost: '[th3]', script: '[s1]', threads: 3},
-        {targetHost: '[th4]', script: '[s1]', threads: 5},
-        {targetHost: '[th5]', script: '[s1]', threads: 5},
+        {
+          targetHost: '[th1]',
+          script: '[s1]',
+          threads: 5,
+          timeToRun: 1,
+          timeToWait: 0,
+        },
+        {
+          targetHost: '[th2]',
+          script: '[s1]',
+          threads: 2,
+          timeToRun: 1,
+          timeToWait: 0,
+        },
+        {
+          targetHost: '[th3]',
+          script: '[s1]',
+          threads: 3,
+          timeToRun: 1,
+          timeToWait: 0,
+        },
+        {
+          targetHost: '[th4]',
+          script: '[s1]',
+          threads: 5,
+          timeToRun: 1,
+          timeToWait: 0,
+        },
+        {
+          targetHost: '[th5]',
+          script: '[s1]',
+          threads: 5,
+          timeToRun: 1,
+          timeToWait: 0,
+        },
       ];
 
       // @ts-expect-error wrong ns type

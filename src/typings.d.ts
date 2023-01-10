@@ -30,5 +30,6 @@ export type Job = {
   targetHost: string;
   script: string;
   threads: number;
-  duration?: number;
+  timeToWait: number;
+  timeToRun: number;
 };
