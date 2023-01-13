@@ -6,9 +6,9 @@ import {
   WEAKEN_SCRIPT,
   stopConditionWeaken,
 } from './lib-weaken';
-import {calculateThreadsGrowRelativeToValue} from './lib-grow';
+import {calculateThreadsGrowRelativeToValue, GROW_SCRIPT} from './lib-grow';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
-import type {HackJob} from './typings';
+import type {AllocatedResources, HackJob} from './typings';
 
 // decimal form, 0.1 === 10%
 // represents the percentage of money to hack from current money
@@ -119,14 +119,6 @@ export const sortAndWaitJobs = (jobList: HackJob[]) => {
     return b.runTime - a.runTime;
   });
 
-  /**
-   * [
-   *    {waitTime: 0, runTime: 4, threads: 1, type: 'grow-weaken'},
-   *    {waitTime: 0, runTime: 3, threads: 1, type: 'hack-weaken'},
-   *    {waitTime: 0, runTime: 2, threads: 1, type: 'grow'},
-   *    {waitTime: 0, runTime: 1, threads: 1, type: 'hack'},
-   * ]
-   */
   return jobs.reduce((acc: [], job, currentIndex) => {
     if (acc.length === 0) {
       return [
@@ -138,13 +130,12 @@ export const sortAndWaitJobs = (jobList: HackJob[]) => {
     }
 
     const diff = jobs[currentIndex - 1].runTime - job.runTime;
-    const timeMargin = 1_000;
 
     return [
       ...acc,
       {
         ...job,
-        waitTime: diff + timeMargin,
+        waitTime: diff,
       },
     ];
   }, []);
@@ -171,40 +162,115 @@ export const batchHack = (ns: NS, host: string) => {
   const weakenTime = ns.getWeakenTime(host);
   const growTime = ns.getGrowTime(host);
 
-  // finish order:
-  // hack, hackWeaken, grow, growWeaken
-  // what's the starting time and order?
-  //
-
   const hackWeakenPair = sortAndWaitJobs([
-    {waitTime: 0, runTime: hackTime, threads: hackThreads, type: 'hack'},
-    {
-      waitTime: 0,
-      runTime: weakenTime,
-      threads: hackWeakenThreads,
-      type: 'hack-weaken',
-    },
+    {waitTime: 0, runTime: hackTime, threads: hackThreads, type: 'h'},
+    {waitTime: 0, runTime: weakenTime, threads: hackWeakenThreads, type: 'hw'},
   ]);
 
   const growWeakenPair = sortAndWaitJobs([
-    {waitTime: 0, runTime: growTime, threads: growThreads, type: 'grow'},
-    {
-      waitTime: 0,
-      runTime: weakenTime,
-      threads: growWeakenThreads,
-      type: 'grow-weaken',
-    },
+    {waitTime: 0, runTime: growTime, threads: growThreads, type: 'g'},
+    {waitTime: 0, runTime: weakenTime, threads: growWeakenThreads, type: 'gw'},
   ]);
 
-  const inBetweenJobs = sortAndWaitJobs([hackWeakenPair[1], growWeakenPair[2]]);
+  const inBetweenJobs = sortAndWaitJobs([hackWeakenPair[1], growWeakenPair[1]]);
 
-  return inBetweenJobs;
+  return [hackWeakenPair[0], ...inBetweenJobs, growWeakenPair[0]].map(
+    (item, index) => {
+      return {
+        ...item,
+        waitTime: item.waitTime + 1_000 * index,
+      };
+    }
+  );
+};
+
+export const execBatchHack = async (ns: NS, host: string) => {
+  const growScriptRam = ns.getScriptRam(GROW_SCRIPT);
+  const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
+  const hackScriptRam = ns.getScriptRam(HACK_SCRIPT);
+
+  const calculatedResources = batchHack(ns, host);
   /**
-   * [
-   *    {waitTime: 0, runTime: 4, threads: 1, type: 'grow-weaken'},
-   *    {waitTime: 1, runTime: 3, threads: 1, type: 'hack-weaken'},
-   *    {waitTime: 2, runTime: 2, threads: 1, type: 'grow'},
-   *    {waitTime: 3, runTime: 1, threads: 1, type: 'hack'},
-   * ]
+   {
+    "waitTime": 8438.496923447306,
+    "runTime": 25753.987693789237,
+    "threads": 87,
+    "type": "g"
+  },
    */
+
+  const resourcesRequest: [number, number][] = calculatedResources.map(item => {
+    let scriptRam = null;
+
+    if (item.type === 'h') {
+      scriptRam = hackScriptRam;
+    } else if (item.type === 'hw') {
+      scriptRam = weakenScriptRam;
+    } else if (item.type === 'g') {
+      scriptRam = growScriptRam;
+    } else if (item.type === 'gw') {
+      scriptRam = weakenScriptRam;
+    } else {
+      log(ns, `unknown type received: ${item.type}`);
+      ns.exit();
+    }
+
+    return [scriptRam, item.threads];
+  });
+
+  let [hr, hwr, g, gwr] = await allocateResources(
+    ns,
+    resourcesRequest,
+    true // use home in the calculations
+  );
+
+  // wait for at least two threads: one for each script
+  const haveRequiredThreads = (existing: AllocatedResources[]) => {
+    return existing.every((item, index) => {
+      return resourcesRequest[index][1] === item[1];
+    });
+  };
+
+  while (haveRequiredThreads([hr, hwr, g, gwr])) {
+    await ns.sleep(1000);
+    [hr, hwr, g, gwr] = await allocateResources(
+      ns,
+      resourcesRequest,
+      true // use home in the calculations
+    );
+  }
+
+  // all threads available!
+  dispatchScriptToResources(
+    ns,
+    hr[0],
+    HACK_SCRIPT,
+    host,
+    false,
+    calculatedResources[0].waitTime
+  );
+  dispatchScriptToResources(
+    ns,
+    hwr[0],
+    WEAKEN_SCRIPT,
+    host,
+    false,
+    calculatedResources[1].waitTime
+  );
+  dispatchScriptToResources(
+    ns,
+    g[0],
+    GROW_SCRIPT,
+    host,
+    false,
+    calculatedResources[2].waitTime
+  );
+  dispatchScriptToResources(
+    ns,
+    gwr[0],
+    WEAKEN_SCRIPT,
+    host,
+    false,
+    calculatedResources[3].waitTime
+  );
 };

@@ -1,11 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
-import {
-  HACK_SCRIPT,
-  stopConditionHack,
-  hackPercent,
-  isHackChanceTooHigh,
-} from './lib-hack';
+import {HACK_SCRIPT, isHackChanceTooHigh, execBatchHack} from './lib-hack';
 import {stopConditionGrow, growToPercent, GROW_SCRIPT} from './lib-grow';
 import {
   stopConditionWeaken,
@@ -37,9 +32,9 @@ export const prepareHackBatch = async (
     await ns.sleep(1000);
   }
 
-  if (isHackChanceTooHigh(ns, targetHost)) {
+  while (isHackChanceTooHigh(ns, targetHost)) {
     log(ns, 'hack chance too high w/ min security - host is no-op');
-    return;
+    await ns.sleep(60_000); // sleep 1m
   }
 
   while (!stopConditionGrow(ns, targetHost, LIMIT_MAX_MONEY_PERCENT)) {
@@ -47,4 +42,13 @@ export const prepareHackBatch = async (
     await growToPercent(ns, targetHost, LIMIT_MAX_MONEY_PERCENT, useHome);
     await ns.sleep(1000);
   }
+
+  log(ns, `${targetHost}: batch hacking starting.`);
+  execBatchHack(ns, targetHost);
 };
+
+export async function main(ns: NS) {
+  const host = ns.args[0].toString();
+
+  prepareHackBatch(ns, host, true);
+}

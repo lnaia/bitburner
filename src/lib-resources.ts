@@ -190,19 +190,26 @@ export const dispatchScriptToResources = (
   resources: AllocatedResources[0],
   script: string,
   targetHost: string,
-  isDryRun: boolean
+  isDryRun: boolean,
+  waitTime?: number
 ) => {
   ns.disableLog('ALL');
   Object.entries(resources).forEach(([host, threads]) => {
     ensureScriptIsPresent(ns, host, script);
-    const execArgs: [string, string, number, string, number] = [
-      script,
-      host,
-      threads,
-      // args:
-      targetHost,
-      threads,
-    ];
+    const execArgs: [string, string, number, string, number, number, number?] =
+      [
+        script,
+        host,
+        threads,
+        // args:
+        targetHost,
+        threads,
+        0, // affect stock
+      ];
+
+    if (waitTime > 0) {
+      execArgs.push(waitTime);
+    }
 
     if (isDryRun) {
       log(ns, `dispatchScriptToResources@dryRun: ${JSON.stringify(execArgs)}`);
