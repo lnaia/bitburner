@@ -10,7 +10,9 @@ export async function main(ns: NS) {
   ns.clearLog();
   ns.print(`started@${new Date()}`);
 
-  // ns.exec('exec-hack-all.js', 'home', 1);
+  ns.exec('exec-hack-all.js', 'home', 1);
+  ns.exec('exec-monitor-fleet.js', 'home', 1);
+  ns.exec('exec-monitor-host.js', 'home', 1);
 
   let tick = 0;
   const TEN_MINUTES = 600;
