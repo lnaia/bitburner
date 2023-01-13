@@ -43,12 +43,20 @@ export const prepareHackBatch = async (
     await ns.sleep(1000);
   }
 
-  log(ns, `${targetHost}: batch hacking starting.`);
-  execBatchHack(ns, targetHost);
+  let tick = 0;
+  while (tick < 3) {
+    log(ns, `${targetHost}@tick-${tick}: batch hacking starting.`);
+    await execBatchHack(ns, targetHost);
+
+    tick += 1;
+    await ns.sleep(1000);
+  }
 };
 
 export async function main(ns: NS) {
+  ns.clearLog();
+  ns.tail();
   const host = ns.args[0].toString();
 
-  prepareHackBatch(ns, host, true);
+  await prepareHackBatch(ns, host, true);
 }
