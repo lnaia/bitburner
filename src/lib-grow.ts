@@ -47,18 +47,18 @@ export const calculateThreadsGrow = (
 export const calculateThreadsGrowRelativeToValue = (
   ns: NS,
   host: string,
-  moneyStolen: number
+  valueToGrow: number
 ) => {
   let currMoney = ns.getServerMoneyAvailable(host);
   if (currMoney <= 0) {
     currMoney = 1;
   }
 
-  const moneyStolenDecimalForm = moneyStolen / currMoney;
+  const valueToGrowDecimalForm = valueToGrow / currMoney;
 
   let factor = 1;
   try {
-    factor = currMoney + moneyStolenDecimalForm;
+    factor = currMoney + valueToGrowDecimalForm;
   } catch (e) {
     // ignore
     factor = 1;

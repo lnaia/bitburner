@@ -6,7 +6,9 @@ import {
   WEAKEN_SCRIPT,
   stopConditionWeaken,
 } from './lib-weaken';
+import {calculateThreadsGrowRelativeToValue} from './lib-grow';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
+import type {HackJob} from './typings';
 
 // decimal form, 0.1 === 10%
 // represents the percentage of money to hack from current money
@@ -110,4 +112,86 @@ export const isHackChanceTooHigh = (ns: NS, host: string) => {
 
   const chance = ns.hackAnalyzeChance(host) * 100;
   return chance < HACK_CHANCE_THRESHOLD;
+};
+
+export const batchHack = (ns: NS, host: string) => {
+  const [hackThreads, hackMoney] = calculateThreadsHack(ns, host);
+  const hackSecurityIncrease = ns.hackAnalyzeSecurity(hackThreads, host);
+  const hackWeakenThreads = calculateThreadsWeaken(
+    ns,
+    host,
+    hackSecurityIncrease
+  );
+
+  const growThreads = calculateThreadsGrowRelativeToValue(ns, host, hackMoney);
+  const growSecurityIncrease = ns.growthAnalyzeSecurity(growThreads, host);
+  const growWeakenThreads = calculateThreadsWeaken(
+    ns,
+    host,
+    growSecurityIncrease
+  );
+
+  const hackTime = ns.getWeakenTime(host);
+  const weakenTime = ns.getWeakenTime(host);
+  const growTime = ns.getGrowTime(host);
+
+  // finish order:
+  // hack, hackWeaken, grow, growWeaken
+  // what's the starting time and order?
+  //
+
+  const jobs: HackJob[] = [
+    {waitTime: 0, runTime: hackTime, threads: hackThreads, type: 'hack'},
+    {
+      waitTime: 0,
+      runTime: weakenTime,
+      threads: hackWeakenThreads,
+      type: 'hack-weaken',
+    },
+    {waitTime: 0, runTime: growTime, threads: growThreads, type: 'grow'},
+    {
+      waitTime: 0,
+      runTime: weakenTime,
+      threads: growWeakenThreads,
+      type: 'grow-weaken',
+    },
+  ].sort((a, b) => {
+    return a.runTime - b.runTime;
+  });
+
+  /**
+   * [
+   *    {waitTime: 0, runTime: 4, threads: 1, type: 'grow-weaken'},
+   *    {waitTime: 0, runTime: 3, threads: 1, type: 'hack-weaken'},
+   *    {waitTime: 0, runTime: 2, threads: 1, type: 'grow'},
+   *    {waitTime: 0, runTime: 1, threads: 1, type: 'hack'},
+   * ]
+   */
+  return jobs.reduce((acc: [], job, currentIndex) => {
+    if (acc.length === 0) {
+      return [
+        {
+          ...job,
+          waitTime: 0,
+        },
+      ];
+    }
+
+    return [
+      ...acc,
+      {
+        ...job,
+        waitTime: jobs[currentIndex - 1].runTime,
+      },
+    ];
+  }, []);
+
+  /**
+   * [
+   *    {waitTime: 0, runTime: 4, threads: 1, type: 'grow-weaken'},
+   *    {waitTime: 1, runTime: 3, threads: 1, type: 'hack-weaken'},
+   *    {waitTime: 2, runTime: 2, threads: 1, type: 'grow'},
+   *    {waitTime: 3, runTime: 1, threads: 1, type: 'hack'},
+   * ]
+   */
 };

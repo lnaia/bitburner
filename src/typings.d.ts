@@ -33,3 +33,10 @@ export type Job = {
   timeToWait: number;
   timeToRun: number;
 };
+
+export type HackJob = {
+  runTime: number;
+  waitTime: number;
+  threads: number;
+  type: string;
+};
