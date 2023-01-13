@@ -178,6 +178,7 @@ export const batchHack = (ns: NS, host: string) => {
     (item, index) => {
       return {
         ...item,
+        threads: item.threads > 0 ? item.threads : 1,
         waitTime: item.waitTime + 1_000 * index,
       };
     }

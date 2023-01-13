@@ -51,6 +51,13 @@ export const prepareHackBatch = async (
     tick += 1;
     await ns.sleep(1000);
   }
+
+  let timeLeft = 120;
+  while (timeLeft > 0) {
+    log(ns, `we are done, going away in ${timeLeft} seconds`);
+    timeLeft -= 1;
+    await ns.sleep(1000);
+  }
 };
 
 export async function main(ns: NS) {
