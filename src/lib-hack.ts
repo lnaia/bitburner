@@ -141,7 +141,8 @@ export const sortAndWaitJobs = (jobList: HackJob[]) => {
   }, []);
 };
 
-export const batchHack = (ns: NS, host: string) => {
+export const batchHack = (ns: NS, host: string, requestedDelay?: number) => {
+  const delay = requestedDelay ? requestedDelay : 0;
   const [hackThreads, hackMoney] = calculateThreadsHack(ns, host);
   const hackSecurityIncrease = ns.hackAnalyzeSecurity(hackThreads, host);
   const hackWeakenThreads = calculateThreadsWeaken(
@@ -179,18 +180,18 @@ export const batchHack = (ns: NS, host: string) => {
       return {
         ...item,
         threads: item.threads > 0 ? item.threads : 1,
-        waitTime: item.waitTime + 1_000 * index,
+        waitTime: item.waitTime + 1_000 * (index + delay),
       };
     }
   );
 };
 
-export const execBatchHack = async (ns: NS, host: string) => {
+export const execBatchHack = async (ns: NS, host: string, delay?: number) => {
   const growScriptRam = ns.getScriptRam(GROW_SCRIPT);
   const weakenScriptRam = ns.getScriptRam(WEAKEN_SCRIPT);
   const hackScriptRam = ns.getScriptRam(HACK_SCRIPT);
 
-  const calculatedResources = batchHack(ns, host);
+  const calculatedResources = batchHack(ns, host, delay);
   /**
    {
     "waitTime": 8438.496923447306,
