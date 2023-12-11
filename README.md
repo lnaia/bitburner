@@ -9,7 +9,7 @@ https://bitburner.readthedocs.io/en/latest/
 Each file that needs to be downloaded has to be:
 
 - added to the in game exec that downloads a list of files
-- added to the deploy job, to ensure it gets uploaded
+- added to the deploy job, to ensure it gets uploaded, these can be auto generated if you run `$ node .\bin\generate-workflow-job.js`
 
 ## Type definitions
 
