@@ -1,4 +1,4 @@
-import {REMOTE_SERVER_PREFIX} from './constants';
+import {REMOTE_SERVER_PREFIX, HOME_SERVER} from './constants';
 import type {NS} from './NetscriptDefinitions';
 import type {StatusReport} from './typings';
 
@@ -10,22 +10,22 @@ export const buyServer = (ns: NS): StatusReport => {
 
   const purchaseServerRam = 2;
   const cost = ns.getPurchasedServerCost(purchaseServerRam);
-  if (ns.getServerMoneyAvailable('home') > cost) {
-    const serverId = ownServers.length + 1;
-    const newHostname = `${REMOTE_SERVER_PREFIX}-${serverId}`;
-    const confirmedHostname = ns.purchaseServer(newHostname, purchaseServerRam);
-
-    if (confirmedHostname.length) {
-      return [
-        true,
-        `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`,
-      ];
-    } else {
-      return [false, 'buyServer: failed'];
-    }
+  if (ns.getServerMoneyAvailable(HOME_SERVER) < cost) {
+    return [false, 'buyServer: failed, not enough funds'];
   }
 
-  return [false, 'buyServer: failed, not enough funds'];
+  const serverId = ownServers.length + 1;
+  const newHostname = `${REMOTE_SERVER_PREFIX}-${serverId}`;
+  const confirmedHostname = ns.purchaseServer(newHostname, purchaseServerRam);
+
+  if (confirmedHostname.length) {
+    return [
+      true,
+      `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`,
+    ];
+  } else {
+    return [false, 'buyServer: failed'];
+  }
 };
 
 export const upgradeServer = (ns: NS, host: string): StatusReport => {
@@ -35,7 +35,7 @@ export const upgradeServer = (ns: NS, host: string): StatusReport => {
     ns.getPurchasedServerUpgradeCost(host, newRamValue)
   );
 
-  if (ns.getServerMoneyAvailable('home') >= upgradeCost) {
+  if (ns.getServerMoneyAvailable(HOME_SERVER) >= upgradeCost) {
     ns.upgradePurchasedServer(host, newRamValue);
     return [true, `upgradeServer: success, ${host} upgraded to ${newRamValue}`];
   }

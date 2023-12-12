@@ -1,6 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 
-import {log} from './lib-log';
+import {log} from '../lib-log';
 import {getActionTimeDuration} from './lib-time';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
 import {calculateThreadsWeaken, WEAKEN_SCRIPT} from './lib-weaken';

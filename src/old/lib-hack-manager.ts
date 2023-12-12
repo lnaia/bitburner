@@ -1,5 +1,5 @@
 import type {NS} from './NetscriptDefinitions';
-import {log} from './lib-log';
+import {log} from '../lib-log';
 import {
   HACK_SCRIPT,
   stopConditionHack,

@@ -1,6 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 import type {AllocatedResources} from './typings';
-import {log} from './lib-log';
+import {log} from '../lib-log';
 
 import {ensureScriptIsPresent} from './lib-script';
 import {discoverHosts} from './lib-discover-hosts';

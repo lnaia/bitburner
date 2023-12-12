@@ -1,6 +1,6 @@
 // eslint-ignore-next-line node/no-unpublished-import
 import {it, describe, expect, jest} from '@jest/globals';
-import {buyServer, upgradeServer} from '../lib-servers';
+import {buyServer, upgradeServer} from '../lib-shop-servers';
 
 describe('lib', () => {
   const ns = {

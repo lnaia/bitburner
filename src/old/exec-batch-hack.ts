@@ -1,5 +1,5 @@
 import type {NS} from './NetscriptDefinitions';
-import {log} from './lib-log';
+import {log} from '../lib-log';
 import {HACK_SCRIPT, isHackChanceTooHigh, execBatchHack} from './lib-hack';
 import {stopConditionGrow, growToPercent, GROW_SCRIPT} from './lib-grow';
 import {

@@ -1,6 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 import {unlockResources} from './lib-resources';
-import {log} from './lib-log';
+import {log} from '../lib-log';
 
 export async function main(ns: NS) {
   ns.disableLog('ALL');

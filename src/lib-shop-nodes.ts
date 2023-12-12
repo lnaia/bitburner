@@ -1,9 +1,10 @@
 import type {NS} from './NetscriptDefinitions';
 import type {StatusReport} from './typings';
+import {HOME_SERVER} from './constants';
 
 export const buyNode = (ns: NS): StatusReport => {
   const cost = ns.hacknet.getPurchaseNodeCost();
-  const availableFunds = ns.getServerMoneyAvailable('home');
+  const availableFunds = ns.getServerMoneyAvailable(HOME_SERVER);
   if (availableFunds >= cost) {
     ns.hacknet.purchaseNode();
     return [true, 'buyNode: success'];
@@ -14,7 +15,8 @@ export const buyNode = (ns: NS): StatusReport => {
 
 const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
   const upgradeType: string[] = [];
-  const availableFunds = () => ns.getServerMoneyAvailable('home');
+  const availableFunds = () => ns.getServerMoneyAvailable(HOME_SERVER);
+
   const upgradeRam = () => {
     const costs = ns.hacknet.getRamUpgradeCost(nodeIndex, 1);
     if (availableFunds() >= costs) {
