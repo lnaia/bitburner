@@ -8,9 +8,6 @@ import type {StatusReport} from './typings';
 export async function main(ns: NS) {
   ns.disableLog('ALL');
   ns.clearLog();
-  ns.print(`started@${new Date()}`);
-
-  const ONE_SECOND = 1000;
 
   const logPositiveStatus = (status: StatusReport) => {
     if (status[0]) {
@@ -18,6 +15,9 @@ export async function main(ns: NS) {
     }
   };
 
+  log(ns, 'started');
+
+  const ONE_SECOND = 1000;
   while (true) {
     autoRootHosts(ns);
 

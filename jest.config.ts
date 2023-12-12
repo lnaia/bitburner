@@ -9,8 +9,8 @@ const config: Config = {
   coverageReporters: ['lcov', ['text', {skipFull: true}]],
   coverageDirectory: './coverage',
   collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
+    'src/*.ts',
+    '!src/*.d.ts',
     '!**/node_modules/**',
     '!**/vendor/**',
   ],

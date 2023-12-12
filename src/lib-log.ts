@@ -1,12 +1,13 @@
 import type {NS} from './NetscriptDefinitions';
 
 const getFormattedDate = () => {
-  function addLeadingZeros(n: number) {
+  const addLeadingZeros = (n: number) => {
     if (n <= 9) {
       return '0' + n;
     }
     return n;
-  }
+  };
+
   const currentDateTime = new Date();
   return (
     currentDateTime.getFullYear() +
