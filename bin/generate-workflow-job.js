@@ -22,6 +22,8 @@ jobs:
       - run: yarn run build
 `;
 
+const filesToImportTemplate = `export const files = `;
+
 const generateFileTem = file => {
   const fileToJs = `${path.parse(file).name}.js`;
   const __GIST_ID__ = '2ca322ffbde25a80c39afb0c1e5cf731';
@@ -64,8 +66,12 @@ const init = () => {
   );
 
   fs.writeFileSync(
-    `${path.resolve(__dirname, '..', 'manual-copy')}/files-to-download.json`,
-    JSON.stringify(files)
+    `${path.resolve(__dirname, '..', 'manual-copy')}/files-to-download.js`,
+    `${filesToImportTemplate} ${JSON.stringify(
+      files.map(f => {
+        return `${path.parse(f).name}.js`;
+      })
+    )};`
   );
 };
 
