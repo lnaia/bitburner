@@ -38,9 +38,10 @@ const generateFileTem = file => {
 };
 const selectFiles = () => {
   const filesFound = [];
+  const excludeFiles = ['NetscriptDefinitions.d.ts', 'typings.d.ts'];
   const dirname = path.resolve(__dirname, '..', 'src');
   fs.readdirSync(dirname).forEach(file => {
-    if (path.extname(file) === '.ts' && file !== 'typings.d.ts') {
+    if (path.extname(file) === '.ts' && !excludeFiles.includes(file)) {
       filesFound.push(file);
     }
   });

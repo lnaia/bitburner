@@ -74,10 +74,3 @@ jobs:
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/lib-shop-servers.js
   
-      - name: Deploy NetscriptDefinitions.d.js
-        uses: exuanbo/actions-deploy-gist@v1
-        with:
-          TOKEN: ${{ secrets.TOKEN }}
-          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
-          file_path: ./build/src/NetscriptDefinitions.d.js
-  
