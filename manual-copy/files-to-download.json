@@ -1,0 +1,10 @@
+[
+  "constants.ts",
+  "exec-coordinator.ts",
+  "lib-auto-root-hosts.ts",
+  "lib-discover-hosts.ts",
+  "lib-log.ts",
+  "lib-provision-script.ts",
+  "lib-shop-nodes.ts",
+  "lib-shop-servers.ts"
+]

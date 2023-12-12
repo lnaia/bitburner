@@ -62,6 +62,11 @@ const init = () => {
     `${path.resolve(__dirname, '..', '.github', 'workflows')}/deploy-gist.yml`,
     tpl
   );
+
+  fs.writeFileSync(
+    `${path.resolve(__dirname, '..', 'manual-copy')}/files-to-download.json`,
+    JSON.stringify(files)
+  );
 };
 
 init();
