@@ -1,3 +1,4 @@
+// eslint-ignore-next-line node/no-unpublished-import
 import {it, describe, expect, jest} from '@jest/globals';
 import {buyNode} from '../lib-shop-nodes';
 

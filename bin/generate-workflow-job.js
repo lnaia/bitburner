@@ -40,7 +40,7 @@ const selectFiles = () => {
   const filesFound = [];
   const dirname = path.resolve(__dirname, '..', 'src');
   fs.readdirSync(dirname).forEach(file => {
-    if (path.extname(file) == '.ts' && file !== 'typings.d.ts') {
+    if (path.extname(file) === '.ts' && file !== 'typings.d.ts') {
       filesFound.push(file);
     }
   });
@@ -57,7 +57,10 @@ const init = () => {
     tpl += fileTpl;
   });
 
-  fs.writeFileSync(`${path.resolve(__dirname, '..', '.github', 'workflows')}/deploy-gist.yml`, tpl);
+  fs.writeFileSync(
+    `${path.resolve(__dirname, '..', '.github', 'workflows')}/deploy-gist.yml`,
+    tpl
+  );
 };
 
 init();

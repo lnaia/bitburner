@@ -13,7 +13,7 @@ const openPorts = (ns: NS, host: string): StatusReport => {
 
   const countPortEnforcers = () => {
     return Object.keys(portEnforcers).reduce((total, portEnforcer) => {
-      if ((ns.fileExists(portEnforcer), 'home')) {
+      if (ns.fileExists(portEnforcer, 'home')) {
         return total + 1;
       }
       return total;
