@@ -1,7 +1,12 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
+import {printObjList} from './lib-print-obj-list';
 
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
+
+const toSeconds = (input: number): number => {
+  return input / 1000;
+};
 
 const calculateThreadsGrow = (
   ns: NS,
@@ -56,20 +61,18 @@ export const coordinator = (
 
   (() => {
     const requiredWeakenThreads = calcWeakenThreads(ns, host);
-    const totalWeakenTime = ns.getWeakenTime(host) * requiredWeakenThreads;
     jobPlan.push({
       type: 'weaken',
       threads: requiredWeakenThreads,
-      time: totalWeakenTime,
+      time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
     });
   })();
 
   const requiredThreadsGrow = calculateThreadsGrow(ns, host);
-  const totalGrowTime = ns.getGrowTime(host);
   jobPlan.push({
     type: 'grow',
     threads: requiredThreadsGrow,
-    time: totalGrowTime,
+    time: toSeconds(ns.getGrowTime(host)),
   });
 
   (() => {
@@ -86,7 +89,7 @@ export const coordinator = (
     jobPlan.push({
       type: 'weaken',
       threads: requiredWeakenThreads,
-      time: ns.getWeakenTime(host) * requiredWeakenThreads,
+      time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
     });
   })();
 
@@ -99,7 +102,7 @@ export const coordinator = (
   jobPlan.push({
     type: 'hack',
     threads: requiredHackThreads,
-    time: ns.getHackTime(host) * requiredHackThreads,
+    time: toSeconds(ns.getHackTime(host) * requiredHackThreads),
   });
 
   (() => {
@@ -116,9 +119,11 @@ export const coordinator = (
     jobPlan.push({
       type: 'weaken',
       threads: requiredWeakenThreads,
-      time: ns.getWeakenTime(host) * requiredWeakenThreads,
+      time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
     });
   })();
 
+  const tprint = ns.tprint.bind(ns);
+  printObjList(jobPlan, tprint);
   return true;
 };

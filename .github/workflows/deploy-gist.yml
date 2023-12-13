@@ -102,6 +102,13 @@ jobs:
           gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
           file_path: ./build/src/lib-log.js
   
+      - name: Deploy lib-print-obj-list.js
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          TOKEN: ${{ secrets.TOKEN }}
+          gist_id: 2ca322ffbde25a80c39afb0c1e5cf731
+          file_path: ./build/src/lib-print-obj-list.js
+  
       - name: Deploy lib-provision-script.js
         uses: exuanbo/actions-deploy-gist@v1
         with:
