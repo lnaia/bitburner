@@ -5,7 +5,7 @@ import {printObjList} from './lib-print-obj-list';
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
 
 const toSeconds = (input: number): number => {
-  return input / 1000;
+  return Math.ceil(input / 1000);
 };
 
 const calculateThreadsGrow = (
