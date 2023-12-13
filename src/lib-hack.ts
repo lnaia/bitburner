@@ -1,10 +1,7 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
-import {getActionTimeDuration} from './lib-time';
 
-const HACK_CHANCE_THRESHOLD = 95;
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
-const ONE_SECOND = 1000;
 
 const calculateThreadsGrow = (
   ns: NS,
@@ -28,9 +25,15 @@ const calculateThreadsGrow = (
   return Math.ceil(ns.growthAnalyze(host, factor));
 };
 
-const calcWeakenThreads = (ns: NS, host: string) => {
+/** Calculates threads required to weaken a host to the min security possible
+ * @param securityIncrease - override current security, useful when trying to calculate future security levels
+ * @returns number of threads
+ * */
+const calcWeakenThreads = (ns: NS, host: string, securityIncrease?: number) => {
   const minSecurity = ns.getServerMinSecurityLevel(host);
-  const currSec = ns.getServerSecurityLevel(host);
+  const currSec = securityIncrease
+    ? minSecurity + securityIncrease
+    : ns.getServerSecurityLevel(host);
   const weakenAmountPerThread = ns.weakenAnalyze(1);
   const securityToBeReduced = currSec - minSecurity;
 
@@ -49,14 +52,43 @@ export const coordinator = (
   host: string,
   maxMoneyPercent = 0.9
 ): boolean => {
-  const requiredWeakenThreads = calcWeakenThreads(ns, host);
-  const totalWeakenTime = ns.getWeakenTime(host) * requiredWeakenThreads;
+  const jobPlan = [];
 
-  const chance = ns.hackAnalyzeChance(host) * 100;
-  if (chance <= HACK_CHANCE_THRESHOLD) {
-    log(ns, `hackPercent: chance too low, chance=${chance}`);
-    return false;
-  }
+  (() => {
+    const requiredWeakenThreads = calcWeakenThreads(ns, host);
+    const totalWeakenTime = ns.getWeakenTime(host) * requiredWeakenThreads;
+    jobPlan.push({
+      type: 'weaken',
+      threads: requiredWeakenThreads,
+      time: totalWeakenTime,
+    });
+  })();
+
+  const requiredThreadsGrow = calculateThreadsGrow(ns, host);
+  const totalGrowTime = ns.getGrowTime(host);
+  jobPlan.push({
+    type: 'grow',
+    threads: requiredThreadsGrow,
+    time: totalGrowTime,
+  });
+
+  (() => {
+    const securityIncreaseAfterGrow = ns.growthAnalyzeSecurity(
+      requiredThreadsGrow,
+      host
+    );
+    const requiredWeakenThreads = calcWeakenThreads(
+      ns,
+      host,
+      securityIncreaseAfterGrow
+    );
+
+    jobPlan.push({
+      type: 'weaken',
+      threads: requiredWeakenThreads,
+      time: ns.getWeakenTime(host) * requiredWeakenThreads,
+    });
+  })();
 
   const currMoney = ns.getServerMoneyAvailable(host) * maxMoneyPercent;
   const requiredHackThreads = Math.ceil(ns.hackAnalyzeThreads(host, currMoney));
@@ -64,19 +96,29 @@ export const coordinator = (
     log(ns, `requiredThreads: -1`);
     return false;
   }
-  const totalHackTime = ns.getHackTime(host);
+  jobPlan.push({
+    type: 'hack',
+    threads: requiredHackThreads,
+    time: ns.getHackTime(host) * requiredHackThreads,
+  });
 
-  const securityIncreaseAfterHack = ns.hackAnalyzeSecurity(
-    requiredHackThreads,
-    host
-  );
+  (() => {
+    const securityIncreaseAfterHack = ns.hackAnalyzeSecurity(
+      requiredHackThreads,
+      host
+    );
+    const requiredWeakenThreads = calcWeakenThreads(
+      ns,
+      host,
+      securityIncreaseAfterHack
+    );
 
-  const requiredThreadsGrow = calculateThreadsGrow(ns, host);
-  const securityIncreaseAfterGrow = ns.growthAnalyzeSecurity(
-    requiredThreadsGrow,
-    host
-  );
-  const totalGrowTime = ns.getGrowTime(host);
+    jobPlan.push({
+      type: 'weaken',
+      threads: requiredWeakenThreads,
+      time: ns.getWeakenTime(host) * requiredWeakenThreads,
+    });
+  })();
 
   return true;
 };
