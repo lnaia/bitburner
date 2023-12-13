@@ -1,7 +1,7 @@
 import type {NS} from './NetscriptDefinitions';
 import {allocateResources, dispatchScriptToResources} from './lib-resources';
 import {log} from '../lib-log';
-import {getActionTimeDuration} from './lib-time';
+import {getActionTimeDuration} from '../src/lib-time';
 
 export const WEAKEN_SCRIPT = 'hack-weaken.js';
 

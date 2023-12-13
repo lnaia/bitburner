@@ -1,6 +1,6 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from '../lib-log';
-import {getActionTimeDuration} from './lib-time';
+import {getActionTimeDuration} from '../src/lib-time';
 import {
   calculateThreadsWeaken,
   WEAKEN_SCRIPT,
