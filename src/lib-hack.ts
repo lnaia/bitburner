@@ -65,6 +65,7 @@ export const coordinator = (
       type: 'weaken',
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
+      description: 'initial',
     });
   })();
 
@@ -73,6 +74,7 @@ export const coordinator = (
     type: 'grow',
     threads: requiredThreadsGrow,
     time: toSeconds(ns.getGrowTime(host)),
+    description: 'grow currency',
   });
 
   (() => {
@@ -90,6 +92,7 @@ export const coordinator = (
       type: 'weaken',
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
+      description: 'after sec inc due to growth ',
     });
   })();
 
@@ -103,6 +106,7 @@ export const coordinator = (
     type: 'hack',
     threads: requiredHackThreads,
     time: toSeconds(ns.getHackTime(host) * requiredHackThreads),
+    description: 'steal currency',
   });
 
   (() => {
@@ -120,6 +124,7 @@ export const coordinator = (
       type: 'weaken',
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
+      description: 'after security inc due to hack',
     });
   })();
 
