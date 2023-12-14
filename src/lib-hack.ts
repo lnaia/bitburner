@@ -52,11 +52,7 @@ const calcWeakenThreads = (ns: NS, host: string, securityIncrease?: number) => {
   return requiredWeakenThreads;
 };
 
-export const coordinator = (
-  ns: NS,
-  host: string,
-  maxMoneyPercent = 0.9
-): boolean => {
+export const coordinator = (ns: NS, host: string): boolean => {
   const jobPlan = [];
 
   (() => {
@@ -96,7 +92,7 @@ export const coordinator = (
     });
   })();
 
-  const currMoney = ns.getServerMoneyAvailable(host) * maxMoneyPercent;
+  const currMoney = ns.getServerMoneyAvailable(host) * 0.1; // only take 10% of current money, less threads, no need to be greedy.
   const requiredHackThreads = Math.ceil(ns.hackAnalyzeThreads(host, currMoney));
   if (requiredHackThreads === -1) {
     log(ns, `requiredThreads: -1`);
