@@ -11,4 +11,5 @@ export async function main(ns: NS) {
   }
 
   await ns.grow(host, {threads, stock});
+  ns.tprint('finished hack-grow');
 }

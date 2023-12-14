@@ -11,4 +11,5 @@ export async function main(ns: NS) {
   }
 
   await ns.hack(host, {threads, stock});
+  ns.tprint('finished hack-hack');
 }
