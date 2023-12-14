@@ -5,6 +5,7 @@ import {discoverHosts} from './lib-discover-hosts';
 import {log} from './lib-log';
 import {getActionTimeDuration} from './lib-time';
 import {generateJobPlan} from './lib-hack';
+import {printObjList} from './lib-print-obj-list';
 
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
   const resources: {[key: string]: number} = {};
@@ -41,13 +42,39 @@ const getScriptToRun = (type: string) => {
   return '';
 };
 
-const execJob = (
-  ns: NS,
-  execHost: string,
-  targetHost: string,
-  scriptName: string,
-  threads: number
-) => {
+const pauseForSeconds = async (ns: NS, seconds: number) => {
+  const ONE_SECOND = 1000;
+  let tick = 0;
+
+  if (seconds <= 0) {
+    return;
+  }
+
+  const {s, m, h} = getActionTimeDuration(seconds * 1000);
+  log(ns, `waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
+
+  while (tick < s) {
+    tick += 1;
+    await ns.sleep(ONE_SECOND);
+  }
+};
+
+type ExecJobProps = {
+  ns: NS;
+  execHost: string;
+  targetHost: string;
+  scriptName: string;
+  threads: number;
+  waitTime?: number;
+};
+const execJob = async ({
+  ns,
+  execHost,
+  targetHost,
+  scriptName,
+  threads,
+  waitTime = -1,
+}: ExecJobProps) => {
   const scriptMemory = ns.getScriptRam(scriptName, targetHost);
   const maxThreads = calculateThreads(ns, scriptMemory, targetHost);
 
@@ -65,66 +92,70 @@ const execJob = (
       log(ns, 'exec failed - pid is 0');
     }
   }
-};
 
-const waitTime = async (ns: NS, seconds: number) => {
-  const ONE_SECOND = 1000;
-  let tick = 0;
-
-  if (seconds <= 0) {
-    return;
-  }
-
-  const {s, m, h} = getActionTimeDuration(seconds * 1000);
-  log(ns, `waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
-
-  while (tick < s) {
-    tick += 1;
-    log(ns, `${s - tick}`);
-    await ns.sleep(ONE_SECOND);
+  if (waitTime !== -1) {
+    await pauseForSeconds(ns, waitTime);
   }
 };
 
 export const resourceManager = async (ns: NS) => {
   const targetHost = 'n00dles';
   const execHost = 'home';
-  const jobPlan = generateJobPlan(ns, targetHost);
-
   const timeMargin = 5;
-  const [initialWeaken, growCash, growWeaken] = jobPlan;
 
-  execJob(
+  const jobPlan = generateJobPlan(ns, targetHost);
+  const [initialWeaken, growCash, growWeaken, hack, hackWeaken] = jobPlan;
+
+  // for now, wait until the initial weaken is accomplished.
+  await execJob({
     ns,
     execHost,
     targetHost,
-    getScriptToRun(initialWeaken.type),
-    initialWeaken.threads
+    scriptName: getScriptToRun(initialWeaken.type),
+    threads: initialWeaken.threads,
+    waitTime: initialWeaken.time,
+  });
+
+  const sortedJobPlan = [growCash, growWeaken, hack, hackWeaken].sort(
+    (a, b) => b.time - a.time
   );
-  await waitTime(ns, initialWeaken.time);
 
-  let firstJob = growCash;
-  let secondJob = growWeaken;
-  if (growCash.time < growWeaken.time) {
-    firstJob = growWeaken;
-    secondJob = growCash;
-  }
+  const print = ns.print.bind(ns);
+  printObjList(sortedJobPlan, print);
 
-  execJob(
+  // don't wait to spawn the longest running job
+  await execJob({
     ns,
     execHost,
     targetHost,
-    getScriptToRun(firstJob.type),
-    firstJob.threads
-  );
-  const timeDiff = timeMargin + (firstJob.time - secondJob.time);
+    scriptName: getScriptToRun(sortedJobPlan[0].type),
+    threads: sortedJobPlan[0].threads,
+  });
 
-  await waitTime(ns, timeDiff);
-
-  execJob(
+  await execJob({
     ns,
     execHost,
     targetHost,
-    getScriptToRun(secondJob.type),
-    secondJob.threads
-  );
+    scriptName: getScriptToRun(sortedJobPlan[1].type),
+    threads: sortedJobPlan[1].threads,
+    waitTime: timeMargin + (sortedJobPlan[0].time - sortedJobPlan[1].time),
+  });
+
+  await execJob({
+    ns,
+    execHost,
+    targetHost,
+    scriptName: getScriptToRun(sortedJobPlan[2].type),
+    threads: sortedJobPlan[2].threads,
+    waitTime: timeMargin + (sortedJobPlan[1].time - sortedJobPlan[2].time),
+  });
+
+  await execJob({
+    ns,
+    execHost,
+    targetHost,
+    scriptName: getScriptToRun(sortedJobPlan[3].type),
+    threads: sortedJobPlan[3].threads,
+    waitTime: timeMargin + (sortedJobPlan[2].time - sortedJobPlan[3].time),
+  });
 };
