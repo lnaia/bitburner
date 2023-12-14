@@ -46,6 +46,7 @@ const getScriptToRun = (type: string) => {
 
 const execJob = (
   ns: NS,
+  execHost: string,
   targetHost: string,
   scriptName: string,
   threads: number
@@ -57,9 +58,9 @@ const execJob = (
     log(ns, 'exec failed - not enough threads');
   } else {
     const pid = 1;
-    // const pid = ns.exec(scriptName, targetHost, threads);
+    // const pid = ns.exec(scriptName, execHost, threads, targetHost);
     if (pid) {
-      log(ns, `exec: ${scriptName}@${targetHost} t${threads}`);
+      log(ns, `exec: ${scriptName}@${targetHost} t${threads} from${execHost} `);
     } else {
       log(ns, 'exec failed - pid is 0');
     }
@@ -98,12 +99,12 @@ export const resourceManager = async (ns: NS) => {
     secondJob = job1;
   }
 
-  const timeDiff = timeMargin + (firstJob.time - secondJob.time);
-  const targetHost = 'home';
-  const scriptName = getScriptToRun(firstJob.type);
+  const execHost = 'home';
 
-  execJob(ns, targetHost, scriptName, firstJob.threads);
+  execJob(ns, execHost, getScriptToRun(firstJob.type), firstJob.threads);
+  const timeDiff = timeMargin + (firstJob.time - secondJob.time);
+
   await waitTime(ns, timeDiff);
 
-  execJob(ns, targetHost, scriptName, secondJob.threads);
+  execJob(ns, execHost, getScriptToRun(secondJob.type), secondJob.threads);
 };
