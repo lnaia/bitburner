@@ -4,13 +4,40 @@ import {printObjList} from './lib-print-obj-list.js';
 import {log} from './lib-log';
 import type {NS} from './NetscriptDefinitions';
 
+export const monitorHost = async (ns: NS, host: string) => {
+  const maxRows = 20;
+  const print = ns.print.bind(ns);
+
+  const {hmm, rh, ms} = hostInfo(ns, host);
+  log(ns, JSON.stringify({hmm, rh, ms}));
+
+  const dataPoints: {hcm: string; diff: string; cs: number; hc: number}[] = [];
+  let tick = 0;
+
+  while (true) {
+    const {hcm, diff, cs, hc} = hostInfo(ns, host);
+    dataPoints.push({hcm, diff, cs, hc});
+
+    if (tick === 5) {
+      printObjList(dataPoints, print);
+      tick = 0;
+    }
+
+    if (dataPoints.length > maxRows) {
+      dataPoints.splice(0, 1);
+    }
+
+    tick += 1;
+    await ns.sleep(1000);
+  }
+};
+
 type Props = {
   ns: NS;
   maxHosts?: number;
   sortOrder?: string;
   invert?: boolean;
   name?: string;
-  clearLog?: boolean;
 };
 export const monitorHosts = ({
   ns,
@@ -18,7 +45,6 @@ export const monitorHosts = ({
   sortOrder,
   invert,
   name,
-  clearLog = true,
 }: Props) => {
   let hosts = discoverHosts(ns)
     .map(host => hostInfo(ns, host))
@@ -62,7 +88,7 @@ export const monitorHosts = ({
       };
     });
 
-  if (clearLog) ns.clearLog();
+  ns.clearLog();
   log(ns, 'monitor-hosts');
   const print = ns.print.bind(ns);
   printObjList(list, print);

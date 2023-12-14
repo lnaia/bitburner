@@ -4,6 +4,7 @@ export const files = [
   'exec-coordinator-hacknet.js',
   'exec-coordinator-resources.js',
   'exec-coordinator.js',
+  'exec-monitor-host.js',
   'exec-monitor-hosts.js',
   'hack-grow.js',
   'hack-hack.js',
