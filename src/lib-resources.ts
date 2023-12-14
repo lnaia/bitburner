@@ -75,14 +75,17 @@ const execJob = async ({
   threads,
   waitTime = -1,
 }: ExecJobProps) => {
+  if (threads === 0) {
+    return;
+  }
+
   const scriptMemory = ns.getScriptRam(scriptName, targetHost);
   const maxThreads = calculateThreads(ns, scriptMemory, targetHost);
 
   if (threads > maxThreads) {
     log(ns, 'exec failed - not enough threads');
   } else {
-    const pid = 1;
-    // const pid = ns.exec(scriptName, execHost, threads, targetHost);
+    const pid = ns.exec(scriptName, execHost, threads, targetHost);
     if (pid) {
       log(
         ns,
@@ -132,30 +135,33 @@ export const resourceManager = async (ns: NS) => {
     threads: sortedJobPlan[0].threads,
   });
 
+  const job2Time = sortedJobPlan[0].time - sortedJobPlan[1].time;
   await execJob({
     ns,
     execHost,
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[1].type),
     threads: sortedJobPlan[1].threads,
-    waitTime: timeMargin + (sortedJobPlan[0].time - sortedJobPlan[1].time),
+    waitTime: timeMargin + job2Time,
   });
 
+  const job3Time = job2Time + (sortedJobPlan[1].time - sortedJobPlan[2].time);
   await execJob({
     ns,
     execHost,
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[2].type),
     threads: sortedJobPlan[2].threads,
-    waitTime: timeMargin + (sortedJobPlan[1].time - sortedJobPlan[2].time),
+    waitTime: timeMargin + job3Time,
   });
 
+  const job4Time = job3Time + (sortedJobPlan[2].time - sortedJobPlan[3].time);
   await execJob({
     ns,
     execHost,
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[3].type),
     threads: sortedJobPlan[3].threads,
-    waitTime: timeMargin + (sortedJobPlan[2].time - sortedJobPlan[3].time),
+    waitTime: timeMargin + job4Time,
   });
 };

@@ -8,24 +8,19 @@ export const monitorHost = async (ns: NS, host: string) => {
   const maxRows = 40;
   const print = ns.print.bind(ns);
   const dataPoints: {hcm: string; diff: string; cs: number; hc: number}[] = [];
-  let tick = 0;
 
   while (true) {
     const {hcm, diff, cs, hc, hmm, rh, ms} = hostInfo(ns, host);
     dataPoints.push({hcm, diff, cs, hc});
 
-    if (tick === 5) {
-      ns.clearLog();
-      log(ns, JSON.stringify({hmm, rh, ms}));
-      printObjList(dataPoints, print);
-      tick = 0;
-    }
+    ns.clearLog();
+    log(ns, JSON.stringify({hmm, rh, ms}));
+    printObjList(dataPoints, print);
 
     if (dataPoints.length > maxRows) {
       dataPoints.splice(0, 1);
     }
 
-    tick += 1;
     await ns.sleep(1000);
   }
 };

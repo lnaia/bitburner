@@ -11,5 +11,4 @@ export async function main(ns: NS) {
   }
 
   await ns.weaken(host, {threads, stock});
-  ns.tprint('finished hack-weaken');
 }

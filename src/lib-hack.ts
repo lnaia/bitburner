@@ -1,7 +1,7 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
 
-const LIMIT_MAX_MONEY_PERCENT = 0.75;
+const LIMIT_MAX_MONEY_PERCENT = 0.99;
 
 const toSeconds = (input: number): number => {
   return Math.ceil(input / 1000);
