@@ -5,20 +5,18 @@ import {log} from './lib-log';
 import type {NS} from './NetscriptDefinitions';
 
 export const monitorHost = async (ns: NS, host: string) => {
-  const maxRows = 20;
+  const maxRows = 40;
   const print = ns.print.bind(ns);
-
-  const {hmm, rh, ms} = hostInfo(ns, host);
-  log(ns, JSON.stringify({hmm, rh, ms}));
-
   const dataPoints: {hcm: string; diff: string; cs: number; hc: number}[] = [];
   let tick = 0;
 
   while (true) {
-    const {hcm, diff, cs, hc} = hostInfo(ns, host);
+    const {hcm, diff, cs, hc, hmm, rh, ms} = hostInfo(ns, host);
     dataPoints.push({hcm, diff, cs, hc});
 
     if (tick === 5) {
+      ns.clearLog();
+      log(ns, JSON.stringify({hmm, rh, ms}));
       printObjList(dataPoints, print);
       tick = 0;
     }
