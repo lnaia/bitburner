@@ -1,4 +1,5 @@
 import type {NS} from './NetscriptDefinitions';
+import {HOME_SERVER, SCRIPT_HACK} from './constants';
 import {log} from './lib-log';
 
 export const previsions = async (ns: NS) => {
@@ -16,9 +17,12 @@ export const previsions = async (ns: NS) => {
   };
 
   const beforeHack = new Date();
-  await ns.hack(targetHost, {threads: hackTreads});
-  const afterHack = new Date();
+  const pid = ns.exec(SCRIPT_HACK, HOME_SERVER, {threads: hackTreads});
+  while (ns.isRunning(pid)) {
+    await ns.sleep(100);
+  }
 
+  const afterHack = new Date();
   data.realHackTime = afterHack.getTime() - beforeHack.getTime();
 
   log(ns, JSON.stringify(data));
