@@ -7,6 +7,7 @@ export const files = [
   'exec-monitor-host.js',
   'exec-monitor-hosts.js',
   'exec-previsions.js',
+  'exec-weaken-grow.js',
   'hack-grow.js',
   'hack-hack.js',
   'hack-weaken.js',
