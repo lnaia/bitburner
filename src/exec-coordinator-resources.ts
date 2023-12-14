@@ -6,5 +6,5 @@ export async function main(ns: NS) {
   ns.clearLog();
   ns.tail();
 
-  resourceManager(ns);
+  await resourceManager(ns);
 }

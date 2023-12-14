@@ -22,7 +22,7 @@ jobs:
       - run: yarn run build
 `;
 
-const filesToImportTemplate = `export const files = `;
+const filesToImportTemplate = 'export const files = ';
 
 const generateFileTem = file => {
   const fileToJs = `${path.parse(file).name}.js`;

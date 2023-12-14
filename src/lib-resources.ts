@@ -4,11 +4,8 @@ import {calculateThreads} from './lib-calculate-threads';
 import {discoverHosts} from './lib-discover-hosts';
 import {log} from './lib-log';
 import {getActionTimeDuration} from './lib-time';
+import {generateJobPlan} from './lib-hack';
 
-// {
-//     'n00dles': 10,
-//     'home': 512
-// }
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
   const resources: {[key: string]: number} = {};
   const rootedServers = discoverHosts(ns).filter(host =>
@@ -60,7 +57,10 @@ const execJob = (
     const pid = 1;
     // const pid = ns.exec(scriptName, execHost, threads, targetHost);
     if (pid) {
-      log(ns, `exec: ${scriptName}@${targetHost} t${threads} from${execHost} `);
+      log(
+        ns,
+        `exec script:${scriptName} host:${targetHost} threads:${threads} from:${execHost}`
+      );
     } else {
       log(ns, 'exec failed - pid is 0');
     }
@@ -86,21 +86,28 @@ const waitTime = async (ns: NS, seconds: number) => {
 };
 
 export const resourceManager = async (ns: NS) => {
-  const timeMargin = 5;
   const targetHost = 'n00dles';
-  const [job1, job2] = [
-    {type: 'grow', threads: 29, time: 44},
-    {type: 'weaken', threads: 3, time: 164},
-  ];
-
-  let firstJob = job1;
-  let secondJob = job2;
-  if (job1.time < job2.time) {
-    firstJob = job2;
-    secondJob = job1;
-  }
-
   const execHost = 'home';
+  const jobPlan = generateJobPlan(ns, targetHost);
+
+  const timeMargin = 5;
+  const [initialWeaken, growCash, growWeaken] = jobPlan;
+
+  execJob(
+    ns,
+    execHost,
+    targetHost,
+    getScriptToRun(initialWeaken.type),
+    initialWeaken.threads
+  );
+  await waitTime(ns, initialWeaken.time);
+
+  let firstJob = growCash;
+  let secondJob = growWeaken;
+  if (growCash.time < growWeaken.time) {
+    firstJob = growWeaken;
+    secondJob = growCash;
+  }
 
   execJob(
     ns,

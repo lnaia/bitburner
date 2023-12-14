@@ -10,6 +10,7 @@ type Props = {
   sortOrder?: string;
   invert?: boolean;
   name?: string;
+  clearLog?: boolean;
 };
 export const monitorHosts = ({
   ns,
@@ -17,6 +18,7 @@ export const monitorHosts = ({
   sortOrder,
   invert,
   name,
+  clearLog = true,
 }: Props) => {
   let hosts = discoverHosts(ns)
     .map(host => hostInfo(ns, host))
@@ -60,7 +62,7 @@ export const monitorHosts = ({
       };
     });
 
-  ns.clearLog();
+  if (clearLog) ns.clearLog();
   log(ns, 'monitor-hosts');
   const print = ns.print.bind(ns);
   printObjList(list, print);

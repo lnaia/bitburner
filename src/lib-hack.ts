@@ -1,6 +1,5 @@
 import type {NS} from './NetscriptDefinitions';
 import {log} from './lib-log';
-import {printObjList} from './lib-print-obj-list';
 
 const LIMIT_MAX_MONEY_PERCENT = 0.75;
 
@@ -52,8 +51,14 @@ const calcWeakenThreads = (ns: NS, host: string, securityIncrease?: number) => {
   return requiredWeakenThreads;
 };
 
-export const coordinator = (ns: NS, host: string): boolean => {
-  const jobPlan = [];
+type JobPlan = {
+  type: 'weaken' | 'grow' | 'hack';
+  threads: number;
+  time: number;
+  description?: string;
+};
+export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
+  const jobPlan: JobPlan[] = [];
 
   (() => {
     const requiredWeakenThreads = calcWeakenThreads(ns, host);
@@ -95,15 +100,18 @@ export const coordinator = (ns: NS, host: string): boolean => {
   const currMoney = ns.getServerMoneyAvailable(host) * 0.1; // only take 10% of current money, less threads, no need to be greedy.
   const requiredHackThreads = Math.ceil(ns.hackAnalyzeThreads(host, currMoney));
   if (requiredHackThreads === -1) {
-    log(ns, `requiredThreads: -1`);
-    return false;
+    log(
+      ns,
+      'hack threads, hackAmount is less than zero or greater than the amount of money available on the server'
+    );
+  } else {
+    jobPlan.push({
+      type: 'hack',
+      threads: requiredHackThreads,
+      time: toSeconds(ns.getHackTime(host) * requiredHackThreads),
+      description: 'steal currency',
+    });
   }
-  jobPlan.push({
-    type: 'hack',
-    threads: requiredHackThreads,
-    time: toSeconds(ns.getHackTime(host) * requiredHackThreads),
-    description: 'steal currency',
-  });
 
   (() => {
     const securityIncreaseAfterHack = ns.hackAnalyzeSecurity(
@@ -123,9 +131,8 @@ export const coordinator = (ns: NS, host: string): boolean => {
       description: 'after security inc due to hack',
     });
   })();
-  const tprint = ns.tprint.bind(ns);
-  printObjList(jobPlan, tprint);
-  return true;
+
+  return jobPlan;
 };
 
 /*
