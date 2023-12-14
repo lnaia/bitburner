@@ -127,8 +127,33 @@ export const coordinator = (
       description: 'after security inc due to hack',
     });
   })();
-
   const tprint = ns.tprint.bind(ns);
   printObjList(jobPlan, tprint);
   return true;
 };
+
+/*
+[
+  {type: 'weaken', threads: 0,   time: 0,    description: 'initial'},
+  {type: 'grow',   threads: 29,  time: 44,   description: 'grow currency'},
+  {type: 'weaken', threads: 3,   time: 164,  description: 'after sec inc due to growth '},
+  {type: 'hack',   threads: 219, time: 2991, description: 'steal currency'},
+  {type: 'weaken', threads: 9,   time: 492,  description: 'after security inc due to hack'},
+];
+
+1, spawn hack, que demora 3875s
+2, spawn weaken, q demora 637s, qd faltar 640s no hack, 3s de margem
+3, spawn weaken, q demora 213 segundos, qd faltar 216s no 1 e no 2
+4, spawn grow, q demora 57 segundos, qd faltar 60s nos anteriores
+
+resultado:
+
+primeiro bate o 4, dps bate o 3, dps bate o 2, dps bate o 1
+
+resource usage:
+
+durante 3875-640s, esta bloqueado com 219 threads a fazer o hack
+durante 640-216, esta bloquead com 219 + 9
+durante 216-213, esta bloqueado com 219 + 9 + 3
+durante 60-57, esta bloqueado com 219 + 9 + 3 + 29
+*/
