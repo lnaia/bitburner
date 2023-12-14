@@ -56,7 +56,8 @@ const execJob = (
   if (threads > maxThreads) {
     log(ns, 'exec failed - not enough threads');
   } else {
-    const pid = ns.exec(scriptName, targetHost, threads);
+    const pid = 1;
+    // const pid = ns.exec(scriptName, targetHost, threads);
     if (pid) {
       log(ns, `exec: ${scriptName}@${targetHost} t${threads}`);
     } else {
@@ -65,19 +66,20 @@ const execJob = (
   }
 };
 
-const waitTime = async (ns: NS, miliseconds: number) => {
+const waitTime = async (ns: NS, seconds: number) => {
   const ONE_SECOND = 1000;
   let tick = 0;
 
-  if (miliseconds <= 0) {
+  if (seconds <= 0) {
     return;
   }
 
-  const {s, m, h} = getActionTimeDuration(miliseconds);
+  const {s, m, h} = getActionTimeDuration(seconds * 1000);
   log(ns, `waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
 
   while (tick < s) {
     tick += 1;
+    log(ns, `${s - tick}`);
     await ns.sleep(ONE_SECOND);
   }
 };
