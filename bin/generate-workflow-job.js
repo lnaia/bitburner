@@ -66,7 +66,7 @@ const init = () => {
   );
 
   fs.writeFileSync(
-    `${path.resolve(__dirname, '..', 'manual-copy')}/files-to-download.js`,
+    `${path.resolve(__dirname, '..', 'manual-copy')}/data-files-to-download.js`,
     `${filesToImportTemplate} ${JSON.stringify(
       files.map(f => {
         return `${path.parse(f).name}.js`;

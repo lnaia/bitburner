@@ -1,4 +1,4 @@
-import {files} from './files-to-download.js';
+import {files} from './lib-files-to-download.js';
 
 /** @param {NS} ns */
 export async function main(ns) {

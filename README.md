@@ -28,3 +28,4 @@ https://github.com/moriakaice/bitburner
 Prefixed with `exe-` means it's a direct executable
 Prefixed with `lib-` means it's a library, no executable
 Prefixed with `hack-` means it's a hacking script
+Prefixed with `data-` means it exports a single data structure
