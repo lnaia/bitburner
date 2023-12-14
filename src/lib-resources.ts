@@ -87,6 +87,7 @@ const waitTime = async (ns: NS, seconds: number) => {
 
 export const resourceManager = async (ns: NS) => {
   const timeMargin = 5;
+  const targetHost = 'n00dles';
   const [job1, job2] = [
     {type: 'grow', threads: 29, time: 44},
     {type: 'weaken', threads: 3, time: 164},
@@ -101,10 +102,22 @@ export const resourceManager = async (ns: NS) => {
 
   const execHost = 'home';
 
-  execJob(ns, execHost, getScriptToRun(firstJob.type), firstJob.threads);
+  execJob(
+    ns,
+    execHost,
+    targetHost,
+    getScriptToRun(firstJob.type),
+    firstJob.threads
+  );
   const timeDiff = timeMargin + (firstJob.time - secondJob.time);
 
   await waitTime(ns, timeDiff);
 
-  execJob(ns, execHost, getScriptToRun(secondJob.type), secondJob.threads);
+  execJob(
+    ns,
+    execHost,
+    targetHost,
+    getScriptToRun(secondJob.type),
+    secondJob.threads
+  );
 };
