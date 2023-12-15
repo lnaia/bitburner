@@ -1,6 +1,6 @@
-import {humanReadableMoney} from './lib-human-readable-money';
-import type {NS} from './NetscriptDefinitions';
-import type {HostDetails} from './typings';
+import { humanReadableMoney } from "./lib-human-readable-money";
+import { NS } from "@ns";
+import type { HostDetails } from "../typings";
 
 export const hostInfo = (ns: NS, host: string): HostDetails => {
   const moneyMax = ns.getServerMaxMoney(host);

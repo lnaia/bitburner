@@ -1,8 +1,8 @@
-import type {NS} from './NetscriptDefinitions';
-import {monitorHost} from './lib-monitor-hosts';
+import { NS } from "@ns";
+import { monitorHost } from "lib/lib-monitor-hosts";
 
 export async function main(ns: NS) {
-  ns.disableLog('ALL');
+  ns.disableLog("ALL");
   ns.clearLog();
   ns.tail();
 

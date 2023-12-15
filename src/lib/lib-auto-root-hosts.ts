@@ -1,21 +1,21 @@
-import type {NS} from './NetscriptDefinitions';
-import type {StatusReport} from './typings';
-import {discoverHosts} from './lib-discover-hosts';
-import {provision} from './lib-provision-script';
-import {SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN} from './constants';
+import { NS } from "@ns";
+import type { StatusReport } from "../typings";
+import { discoverHosts } from "./lib-discover-hosts";
+import { provision } from "./lib-provision-script";
+import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "../constants";
 
 const openPorts = (ns: NS, host: string): StatusReport => {
   const portEnforcers = {
-    'BruteSSH.exe': (h: string) => ns.brutessh(h),
-    'FTPCrack.exe': (h: string) => ns.ftpcrack(h),
-    'relaySMTP.exe': (h: string) => ns.relaysmtp(h),
-    'HTTPWorm.exe': (h: string) => ns.httpworm(h),
-    'SQLInject.exe': (h: string) => ns.sqlinject(h),
+    "BruteSSH.exe": (h: string) => ns.brutessh(h),
+    "FTPCrack.exe": (h: string) => ns.ftpcrack(h),
+    "relaySMTP.exe": (h: string) => ns.relaysmtp(h),
+    "HTTPWorm.exe": (h: string) => ns.httpworm(h),
+    "SQLInject.exe": (h: string) => ns.sqlinject(h),
   };
 
   const countPortEnforcers = () => {
     return Object.keys(portEnforcers).reduce((total, portEnforcer) => {
-      if (ns.fileExists(portEnforcer, 'home')) {
+      if (ns.fileExists(portEnforcer, "home")) {
         return total + 1;
       }
       return total;
@@ -37,7 +37,7 @@ const openPorts = (ns: NS, host: string): StatusReport => {
   }
 
   for (const [app, cmd] of Object.entries(portEnforcers)) {
-    if (ns.fileExists(app, 'home')) {
+    if (ns.fileExists(app, "home")) {
       cmd(host);
       portsOpen += 1;
     }
@@ -73,5 +73,5 @@ export const getRoot = (ns: NS, host: string): StatusReport => {
   return [ns.hasRootAccess(host), `getRootAccess@${host} success`];
 };
 export const autoRootHosts = (ns: NS): StatusReport[] => {
-  return discoverHosts(ns).map(host => getRoot(ns, host));
+  return discoverHosts(ns).map((host) => getRoot(ns, host));
 };

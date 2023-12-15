@@ -1,20 +1,21 @@
-import {discoverHosts} from './lib-discover-hosts';
-import {hostInfo} from './lib-host-info';
-import {printObjList} from './lib-print-obj-list.js';
-import {log} from './lib-log';
-import type {NS} from './NetscriptDefinitions';
+import { discoverHosts } from "./lib-discover-hosts";
+import { hostInfo } from "./lib-host-info";
+import { printObjList } from "./lib-print-obj-list.js";
+import { log } from "./lib-log";
+import { NS } from "@ns";
 
 export const monitorHost = async (ns: NS, host: string) => {
   const maxRows = 40;
   const print = ns.print.bind(ns);
-  const dataPoints: {hcm: string; diff: string; cs: number; hc: number}[] = [];
+  const dataPoints: { hcm: string; diff: string; cs: number; hc: number }[] =
+    [];
 
   while (true) {
-    const {hcm, diff, cs, hc, hmm, rh, ms} = hostInfo(ns, host);
-    dataPoints.push({hcm, diff, cs, hc});
+    const { hcm, diff, cs, hc, hmm, rh, ms } = hostInfo(ns, host);
+    dataPoints.push({ hcm, diff, cs, hc });
 
     ns.clearLog();
-    log(ns, JSON.stringify({hmm, rh, ms}));
+    log(ns, JSON.stringify({ hmm, rh, ms }));
     printObjList(dataPoints, print);
 
     if (dataPoints.length > maxRows) {
@@ -40,8 +41,8 @@ export const monitorHosts = ({
   name,
 }: Props) => {
   let hosts = discoverHosts(ns)
-    .map(host => hostInfo(ns, host))
-    .filter(host => host.mm > 0);
+    .map((host) => hostInfo(ns, host))
+    .filter((host) => host.mm > 0);
 
   if (maxHosts > 0) {
     hosts = hosts.slice(0, maxHosts);
@@ -51,24 +52,24 @@ export const monitorHosts = ({
     hosts = hosts.reverse();
   }
 
-  if (typeof name === 'string' && name.length) {
-    hosts = hosts.filter(host => new RegExp(name).test(host.host));
+  if (typeof name === "string" && name.length) {
+    hosts = hosts.filter((host) => new RegExp(name).test(host.host));
   }
 
   const list = hosts
     .sort((a, b) => {
-      if (sortOrder === 'cm') {
+      if (sortOrder === "cm") {
         return b.cm - a.cm;
-      } else if (sortOrder === 'rh') {
+      } else if (sortOrder === "rh") {
         return b.rh - a.rh;
-      } else if (sortOrder === 'ms') {
+      } else if (sortOrder === "ms") {
         return b.ms - a.ms;
       }
 
       return b.mm - a.mm;
     })
-    .map(hostDetails => {
-      const {host, hmm, hcm, diff, rh, ms, cs, hc} = hostDetails;
+    .map((hostDetails) => {
+      const { host, hmm, hcm, diff, rh, ms, cs, hc } = hostDetails;
       return {
         host,
         hmm,
@@ -82,7 +83,7 @@ export const monitorHosts = ({
     });
 
   ns.clearLog();
-  log(ns, 'monitor-hosts');
+  log(ns, "monitor-hosts");
   const print = ns.print.bind(ns);
   printObjList(list, print);
 };

@@ -1,4 +1,4 @@
-import type {NS} from './NetscriptDefinitions';
+import type { NS } from "../old2/NetscriptDefinitions";
 export interface HostDetails {
   mm: number;
   hmm: string;
@@ -13,7 +13,7 @@ export interface HostDetails {
 }
 export type StatusReport = [boolean, string?];
 
-export type AllocatedResources = [{[key: string]: number}, number];
+export type AllocatedResources = [{ [key: string]: number }, number];
 
 export type CalculateActionTime = (host: string) => number;
 

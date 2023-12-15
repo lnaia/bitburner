@@ -1,5 +1,5 @@
-import type {NS} from './NetscriptDefinitions';
-import {REMOTE_SERVER_PREFIX, HOME_SERVER} from './constants';
+import { NS } from "@ns";
+import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "../constants";
 
 export const isAllowedHost = (host: string) => {
   const regex = new RegExp(`${REMOTE_SERVER_PREFIX}|${HOME_SERVER}|darkweb`);
@@ -17,7 +17,7 @@ export const discoverHosts = (ns: NS, onlyHackable = true): string[] => {
       visitedHosts.push(baseHost);
     }
 
-    connectedHosts(baseHost).forEach(host => visitHost(host));
+    connectedHosts(baseHost).forEach((host) => visitHost(host));
   };
 
   visitHost(HOME_SERVER);
@@ -29,11 +29,11 @@ export const discoverHosts = (ns: NS, onlyHackable = true): string[] => {
   const playerHackingLevel = ns.getHackingLevel();
 
   // only return hosts that are hackable
-  return visitedHosts.filter(host => {
+  return visitedHosts.filter((host) => {
     try {
       return playerHackingLevel >= ns.getServerRequiredHackingLevel(host);
     } catch (e) {
-      ns.print('unable to get host req hacking level: ', e.message);
+      ns.print("unable to get host req hacking level: ", e.message);
       return false;
     }
   });

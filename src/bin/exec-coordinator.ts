@@ -1,12 +1,12 @@
-import type {NS} from './NetscriptDefinitions';
-import {buyServer, upgradeServers} from './lib-shop-servers';
-import {buyNode, upgradeNodes} from './lib-shop-nodes';
-import {autoRootHosts} from './lib-auto-root-hosts';
-import {log} from './lib-log';
-import type {StatusReport} from './typings';
+import { NS } from "@ns";
+import { buyServer, upgradeServers } from "lib/lib-shop-servers";
+import { buyNode, upgradeNodes } from "lib/lib-shop-nodes";
+import { autoRootHosts } from "lib/lib-auto-root-hosts";
+import { log } from "lib/lib-log";
+import type { StatusReport } from "../typings";
 
 export async function main(ns: NS) {
-  ns.disableLog('ALL');
+  ns.disableLog("ALL");
   ns.clearLog();
 
   const logPositiveStatus = (status: StatusReport) => {
@@ -15,7 +15,7 @@ export async function main(ns: NS) {
     }
   };
 
-  log(ns, 'started');
+  log(ns, "started");
 
   const ONE_SECOND = 1000;
   while (true) {
@@ -25,10 +25,10 @@ export async function main(ns: NS) {
     // Servers are more powerfull in the long term
     // with significant ram upgrades and powerful scripts running.
     logPositiveStatus(buyNode(ns));
-    upgradeNodes(ns).forEach(status => logPositiveStatus(status));
+    upgradeNodes(ns).forEach((status) => logPositiveStatus(status));
 
     logPositiveStatus(buyServer(ns));
-    upgradeServers(ns).forEach(status => logPositiveStatus(status));
+    upgradeServers(ns).forEach((status) => logPositiveStatus(status));
 
     await ns.sleep(ONE_SECOND);
   }

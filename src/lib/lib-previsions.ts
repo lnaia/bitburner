@@ -1,10 +1,10 @@
-import type {NS} from './NetscriptDefinitions';
-import {HOME_SERVER, SCRIPT_HACK} from './constants';
-import {log} from './lib-log';
-import {humanReadableMoney} from './lib-human-readable-money';
+import { NS } from "@ns";
+import { HOME_SERVER, SCRIPT_HACK } from "../constants";
+import { log } from "./lib-log";
+import { humanReadableMoney } from "./lib-human-readable-money";
 
 export const previsions = async (ns: NS) => {
-  const targetHost = 'n00dles';
+  const targetHost = "n00dles";
   const hackAmount = ns.getServerMoneyAvailable(targetHost) * 0.1;
 
   const hackTreads = Math.ceil(ns.hackAnalyzeThreads(targetHost, hackAmount));
@@ -13,8 +13,8 @@ export const previsions = async (ns: NS) => {
 
   const data = {
     beforeMoney: humanReadableMoney(beforeMoney),
-    afterMoney: '',
-    diffMoney: '',
+    afterMoney: "",
+    diffMoney: "",
     hackAmount: humanReadableMoney(hackAmount),
     hackTreads,
     hackTime,

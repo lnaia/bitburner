@@ -1,8 +1,8 @@
-import type {NS} from './NetscriptDefinitions';
-import type {StatusReport} from './typings';
+import { NS } from "@ns";
+import type { StatusReport } from "../typings";
 
 const uploadScript = (ns: NS, host: string, script: string) => {
-  if (host === 'home') {
+  if (host === "home") {
     return;
   }
 
@@ -10,13 +10,13 @@ const uploadScript = (ns: NS, host: string, script: string) => {
     ns.rm(script, host);
   }
 
-  ns.scp(script, host, 'home');
+  ns.scp(script, host, "home");
 };
 
 const stopScript = (ns: NS, host: string, script: string) => {
   const foundScript = ns
     .ps(host)
-    .find(foundScript => foundScript.filename === script);
+    .find((foundScript) => foundScript.filename === script);
 
   if (foundScript) {
     ns.kill(foundScript.pid);

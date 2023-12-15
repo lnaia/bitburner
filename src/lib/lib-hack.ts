@@ -1,5 +1,5 @@
-import type {NS} from './NetscriptDefinitions';
-import {log} from './lib-log';
+import { NS } from "@ns";
+import { log } from "./lib-log";
 
 const LIMIT_MAX_MONEY_PERCENT = 0.99;
 
@@ -52,7 +52,7 @@ const calcWeakenThreads = (ns: NS, host: string, securityIncrease?: number) => {
 };
 
 type JobPlan = {
-  type: 'weaken' | 'grow' | 'hack';
+  type: "weaken" | "grow" | "hack";
   threads: number;
   time: number;
   description?: string;
@@ -63,19 +63,19 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
   (() => {
     const requiredWeakenThreads = calcWeakenThreads(ns, host);
     jobPlan.push({
-      type: 'weaken',
+      type: "weaken",
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
-      description: 'initial',
+      description: "initial",
     });
   })();
 
   const requiredThreadsGrow = calculateThreadsGrow(ns, host);
   jobPlan.push({
-    type: 'grow',
+    type: "grow",
     threads: requiredThreadsGrow,
     time: toSeconds(ns.getGrowTime(host)),
-    description: 'grow currency',
+    description: "grow currency",
   });
 
   (() => {
@@ -90,10 +90,10 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
     );
 
     jobPlan.push({
-      type: 'weaken',
+      type: "weaken",
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
-      description: 'after sec inc due to growth ',
+      description: "after sec inc due to growth ",
     });
   })();
 
@@ -102,14 +102,14 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
   if (requiredHackThreads === -1) {
     log(
       ns,
-      'hack threads, hackAmount is less than zero or greater than the amount of money available on the server'
+      "hack threads, hackAmount is less than zero or greater than the amount of money available on the server"
     );
   } else {
     jobPlan.push({
-      type: 'hack',
+      type: "hack",
       threads: requiredHackThreads,
       time: toSeconds(ns.getHackTime(host) * requiredHackThreads),
-      description: 'steal currency',
+      description: "steal currency",
     });
   }
 
@@ -125,10 +125,10 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
     );
 
     jobPlan.push({
-      type: 'weaken',
+      type: "weaken",
       threads: requiredWeakenThreads,
       time: toSeconds(ns.getWeakenTime(host) * requiredWeakenThreads),
-      description: 'after security inc due to hack',
+      description: "after security inc due to hack",
     });
   })();
 

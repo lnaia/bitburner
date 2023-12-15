@@ -1,7 +1,7 @@
-import type {NS} from './NetscriptDefinitions';
+import { NS } from "@ns";
 
 export const calculateThreadsGrow = (ns: NS, host: string) => {
-  ns.disableLog('ALL');
+  ns.disableLog("ALL");
   const maxMoney = ns.getServerMaxMoney(host);
   let currMoney = ns.getServerMoneyAvailable(host);
   if (currMoney <= 0) {

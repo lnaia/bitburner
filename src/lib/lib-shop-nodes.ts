@@ -1,16 +1,16 @@
-import type {NS} from './NetscriptDefinitions';
-import type {StatusReport} from './typings';
-import {HOME_SERVER} from './constants';
+import { NS } from "@ns";
+import type { StatusReport } from "../typings";
+import { HOME_SERVER } from "../constants";
 
 export const buyNode = (ns: NS): StatusReport => {
   const cost = ns.hacknet.getPurchaseNodeCost();
   const availableFunds = ns.getServerMoneyAvailable(HOME_SERVER);
   if (availableFunds >= cost) {
     ns.hacknet.purchaseNode();
-    return [true, 'buyNode: success'];
+    return [true, "buyNode: success"];
   }
 
-  return [false, 'buyNode: failed, not enough funds'];
+  return [false, "buyNode: failed, not enough funds"];
 };
 
 const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
@@ -21,7 +21,7 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
     const costs = ns.hacknet.getRamUpgradeCost(nodeIndex, 1);
     if (availableFunds() >= costs) {
       ns.hacknet.upgradeRam(nodeIndex, 1);
-      upgradeType.push('ram');
+      upgradeType.push("ram");
     }
   };
 
@@ -29,7 +29,7 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
     const costs = ns.hacknet.getLevelUpgradeCost(nodeIndex, 1);
     if (availableFunds() >= costs) {
       ns.hacknet.upgradeLevel(nodeIndex, 1);
-      upgradeType.push('level');
+      upgradeType.push("level");
     }
   };
 
@@ -37,7 +37,7 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
     const costs = ns.hacknet.getCoreUpgradeCost(nodeIndex, 1);
     if (availableFunds() >= costs) {
       ns.hacknet.upgradeCore(nodeIndex, 1);
-      upgradeType.push('core');
+      upgradeType.push("core");
     }
   };
 
@@ -45,7 +45,7 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
   upgradeLevel();
   upgradeCore();
 
-  return [upgradeType.length > 0, `${nodeIndex}:${upgradeType.join(', ')}`];
+  return [upgradeType.length > 0, `${nodeIndex}:${upgradeType.join(", ")}`];
 };
 
 export const upgradeNodes = (ns: NS): StatusReport[] => {

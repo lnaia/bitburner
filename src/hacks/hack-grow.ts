@@ -1,4 +1,4 @@
-import type {NS} from './NetscriptDefinitions';
+import { NS } from "@ns";
 
 export async function main(ns: NS) {
   const host = ns.args[0].toString();
@@ -10,5 +10,5 @@ export async function main(ns: NS) {
     await ns.sleep(delay);
   }
 
-  await ns.grow(host, {threads, stock});
+  await ns.grow(host, { threads, stock });
 }

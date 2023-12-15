@@ -1,22 +1,22 @@
-import type {NS} from './NetscriptDefinitions';
-import {SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN} from './constants';
-import {calculateThreads} from './lib-calculate-threads';
-import {discoverHosts} from './lib-discover-hosts';
-import {log} from './lib-log';
-import {getActionTimeDuration} from './lib-time';
-import {generateJobPlan} from './lib-hack';
-import {printObjList} from './lib-print-obj-list';
+import { NS } from "@ns";
+import { SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN } from "../constants";
+import { calculateThreads } from "./lib-calculate-threads";
+import { discoverHosts } from "./lib-discover-hosts";
+import { log } from "./lib-log";
+import { getActionTimeDuration } from "./lib-time";
+import { generateJobPlan } from "./lib-hack";
+import { printObjList } from "./lib-print-obj-list";
 
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
-  const resources: {[key: string]: number} = {};
-  const rootedServers = discoverHosts(ns).filter(host =>
+  const resources: { [key: string]: number } = {};
+  const rootedServers = discoverHosts(ns).filter((host) =>
     ns.hasRootAccess(host)
   );
   const ownedServers = ns.getPurchasedServers();
   const hosts = [...rootedServers, ...ownedServers];
 
   if (useHome) {
-    hosts.push('home');
+    hosts.push("home");
   }
 
   for (const host of hosts) {
@@ -31,15 +31,15 @@ export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
 };
 
 const getScriptToRun = (type: string) => {
-  if (type === 'grow') {
+  if (type === "grow") {
     return SCRIPT_GROW;
-  } else if (type === 'weaken') {
+  } else if (type === "weaken") {
     return SCRIPT_WEAKEN;
-  } else if (type === 'hack') {
+  } else if (type === "hack") {
     return SCRIPT_HACK;
   }
 
-  return '';
+  return "";
 };
 
 const pauseForSeconds = async (ns: NS, seconds: number) => {
@@ -50,7 +50,7 @@ const pauseForSeconds = async (ns: NS, seconds: number) => {
     return;
   }
 
-  const {s, m, h} = getActionTimeDuration(seconds * 1000);
+  const { s, m, h } = getActionTimeDuration(seconds * 1000);
   log(ns, `waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
 
   while (tick < s) {
@@ -83,7 +83,7 @@ const execJob = async ({
   const maxThreads = calculateThreads(ns, scriptMemory, targetHost);
 
   if (threads > maxThreads) {
-    log(ns, 'exec failed - not enough threads');
+    log(ns, "exec failed - not enough threads");
   } else {
     const pid = ns.exec(scriptName, execHost, threads, targetHost);
     if (pid) {
@@ -92,7 +92,7 @@ const execJob = async ({
         `exec script:${scriptName} host:${targetHost} threads:${threads} from:${execHost}`
       );
     } else {
-      log(ns, 'exec failed - pid is 0');
+      log(ns, "exec failed - pid is 0");
     }
   }
 
@@ -102,8 +102,8 @@ const execJob = async ({
 };
 
 export const resourceManager = async (ns: NS) => {
-  const targetHost = 'n00dles';
-  const execHost = 'home';
+  const targetHost = "n00dles";
+  const execHost = "home";
   const timeMargin = 5;
 
   const jobPlan = generateJobPlan(ns, targetHost);

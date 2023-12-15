@@ -1,4 +1,4 @@
-import type {NS} from './NetscriptDefinitions';
+import { NS } from "@ns";
 
 export const calculateThreads = (
   ns: NS,

@@ -1,17 +1,17 @@
-import {REMOTE_SERVER_PREFIX, HOME_SERVER} from './constants';
-import type {NS} from './NetscriptDefinitions';
-import type {StatusReport} from './typings';
+import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "../constants";
+import { NS } from "@ns";
+import type { StatusReport } from "../typings";
 
 export const buyServer = (ns: NS): StatusReport => {
   const ownServers = ns.getPurchasedServers();
   if (ownServers.length >= ns.getPurchasedServerLimit()) {
-    return [false, 'buyServer: failed, purchase limit reached'];
+    return [false, "buyServer: failed, purchase limit reached"];
   }
 
   const purchaseServerRam = 2;
   const cost = ns.getPurchasedServerCost(purchaseServerRam);
   if (ns.getServerMoneyAvailable(HOME_SERVER) < cost) {
-    return [false, 'buyServer: failed, not enough funds'];
+    return [false, "buyServer: failed, not enough funds"];
   }
 
   const serverId = ownServers.length + 1;
@@ -24,7 +24,7 @@ export const buyServer = (ns: NS): StatusReport => {
       `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`,
     ];
   } else {
-    return [false, 'buyServer: failed'];
+    return [false, "buyServer: failed"];
   }
 };
 
@@ -44,5 +44,5 @@ export const upgradeServer = (ns: NS, host: string): StatusReport => {
 };
 
 export const upgradeServers = (ns: NS): StatusReport[] => {
-  return ns.getPurchasedServers().map(host => upgradeServer(ns, host));
+  return ns.getPurchasedServers().map((host) => upgradeServer(ns, host));
 };
