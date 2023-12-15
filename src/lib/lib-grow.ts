@@ -1,27 +1,25 @@
 import { NS } from "@ns";
-const LIMIT_MAX_MONEY_PERCENT = 0.95;
 
-export const stopConditionGrow = (
-  ns: NS,
-  host: string,
-  maxPercent = LIMIT_MAX_MONEY_PERCENT
-) => {
+export const stopConditionGrow = (ns: NS, host: string) => {
   ns.disableLog("ALL");
   const moneyAvailable = ns.getServerMoneyAvailable(host);
-  const maxMoney = ns.getServerMaxMoney(host) * maxPercent;
+  const maxMoney = ns.getServerMaxMoney(host);
   const isMoneyMaxed = moneyAvailable >= maxMoney;
 
   return isMoneyMaxed;
 };
 
-export const calculateThreadsGrow = (
-  ns: NS,
-  host: string,
-  maxPercent = LIMIT_MAX_MONEY_PERCENT,
-  moneyThatWillBeStolen = 0
-) => {
-  ns.disableLog("ALL");
-  const maxMoney = ns.getServerMaxMoney(host) * maxPercent;
+type Props = {
+  ns: NS;
+  host: string;
+  moneyThatWillBeStolen?: number;
+};
+export const calculateThreadsGrow = ({
+  ns,
+  host,
+  moneyThatWillBeStolen = 0,
+}: Props) => {
+  const maxMoney = ns.getServerMaxMoney(host);
   let currMoney = ns.getServerMoneyAvailable(host) - moneyThatWillBeStolen;
   if (currMoney <= 0) {
     currMoney = 1;

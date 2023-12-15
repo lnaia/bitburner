@@ -16,7 +16,10 @@ const weakenServer = async (ns: NS, targetHost: string, execHost: string) => {
 
 const growServer = async (ns: NS, targetHost: string, execHost: string) => {
   while (!stopConditionGrow(ns, targetHost)) {
-    const threads = calculateThreadsGrow(ns, targetHost);
+    const threads = calculateThreadsGrow({
+      ns,
+      host: targetHost,
+    });
     const pid = ns.exec(SCRIPT_GROW, execHost, threads, targetHost);
     while (ns.isRunning(pid)) {
       await ns.sleep(1000);
