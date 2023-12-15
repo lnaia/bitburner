@@ -6,9 +6,8 @@ import { humanReadableMoney } from "helper";
 export const previsions = async (ns: NS) => {
   const targetHost = "n00dles";
   const hackAmount = ns.getServerMoneyAvailable(targetHost) * 0.1;
-
   const hackTreads = Math.ceil(ns.hackAnalyzeThreads(targetHost, hackAmount));
-  const hackTime = Math.ceil((ns.getHackTime(targetHost) * hackTreads) / 1000);
+  const hackTime = ns.getHackTime(targetHost) / 1000;
   const beforeMoney = ns.getServerMoneyAvailable(targetHost);
 
   const data = {

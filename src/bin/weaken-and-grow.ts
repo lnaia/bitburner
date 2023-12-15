@@ -27,10 +27,10 @@ const growServer = async (ns: NS, targetHost: string, execHost: string) => {
 
 export async function main(ns: NS) {
   ns.clearLog();
-  ns.tail();
   const execHost = HOME_SERVER;
   const targetHost = ns.args[0].toString();
 
   await weakenServer(ns, targetHost, execHost);
   await growServer(ns, targetHost, execHost);
+  await weakenServer(ns, targetHost, execHost);
 }

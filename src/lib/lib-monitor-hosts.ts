@@ -5,7 +5,7 @@ import { log } from "lib/lib-log";
 import { NS } from "@ns";
 
 export const monitorHost = async (ns: NS, host: string) => {
-  const maxRows = 40;
+  const maxRows = 30;
   const print = ns.print.bind(ns);
   const dataPoints: { hcm: string; diff: string; cs: number; hc: number }[] =
     [];
