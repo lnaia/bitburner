@@ -4,7 +4,7 @@ import { calculateThreads } from "lib/lib-calculate-threads";
 import { discoverHosts } from "lib/lib-discover-hosts";
 import { log } from "lib/lib-log";
 import { printObjList, getActionTimeDuration } from "helper";
-import { generateJobPlan } from "lib/lib-hack";
+import { generateJobPlan, JobPlan } from "lib/lib-hack";
 
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
   const resources: { [key: string]: number } = {};
@@ -75,6 +75,7 @@ const execJob = async ({
   waitTime = -1,
 }: ExecJobProps) => {
   if (threads === 0) {
+    log(ns, `exec 0 threads given - script:${scriptName} host:${targetHost}`);
     return;
   }
 
@@ -101,13 +102,23 @@ const execJob = async ({
   }
 };
 
-export const resourceManager = async (ns: NS) => {
+export const resourceManager = (ns: NS) => {
   const targetHost = "n00dles";
+  const jobPlan = generateJobPlan(ns, targetHost);
+  batchJobs(ns, jobPlan, targetHost);
+};
+
+export const batchJobs = async (
+  ns: NS,
+  jobPlan: JobPlan[],
+  targetHost: string
+) => {
   const execHost = "home";
   const timeMargin = 5;
+  const startDate = new Date();
 
-  const jobPlan = generateJobPlan(ns, targetHost);
   const [initialWeaken, growCash, growWeaken, hack, hackWeaken] = jobPlan;
+  log(ns, "full batch start");
 
   // for now, wait until the initial weaken is accomplished.
   await execJob({
@@ -122,6 +133,7 @@ export const resourceManager = async (ns: NS) => {
   const sortedJobPlan = [growCash, growWeaken, hack, hackWeaken].sort(
     (a, b) => b.time - a.time
   );
+
   // @ts-expect-error
   const print = (...args) => ns.print(...args);
   // @ts-expect-error
@@ -163,6 +175,15 @@ export const resourceManager = async (ns: NS) => {
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[3].type),
     threads: sortedJobPlan[3].threads,
-    waitTime: sortedJobPlan[2].threads > 0 ? timeMargin + job4Time : -1,
+    waitTime: sortedJobPlan[3].threads > 0 ? timeMargin + job4Time : -1,
   });
+
+  const endDate = new Date();
+
+  log(
+    ns,
+    `full batch finish, total run time: ${
+      (endDate.getTime() - startDate.getTime()) / 1000
+    } seconds`
+  );
 };

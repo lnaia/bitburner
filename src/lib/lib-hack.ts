@@ -1,5 +1,4 @@
 import { NS } from "@ns";
-import { log } from "lib/lib-log";
 import { calcWeakenThreads } from "lib/lib-weaken";
 import { calculateThreadsGrow } from "lib/lib-grow";
 
@@ -7,7 +6,7 @@ const toSeconds = (input: number): number => {
   return Math.ceil(input / 1000);
 };
 
-type JobPlan = {
+export type JobPlan = {
   type: "weaken" | "grow" | "hack";
   threads: number;
   time: number;
