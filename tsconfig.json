@@ -1,16 +1,25 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
+  "include": ["NetscriptDefinitions.d.ts", "src/**/*"],
+  "exclude": ["src/lib/react.ts"],
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
-    "module": "ES6",
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ESNext",
-    "noImplicitAny": true,
-    "sourceMap": false,
-    "strict": false,
-    "moduleResolution": "node"
-  },
-  "include": ["old2/**/*.ts", "test/**/*.ts"]
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "strict": true,
+    "rootDir": "src/",
+    "outDir": "dist/",
+    "baseUrl": "src/",
+    "allowJs": true,
+    "jsx": "react",
+    "paths": {
+      "/*": ["*"],
+      "@ns": ["../NetscriptDefinitions.d.ts"],
+      "@react": ["lib/react.ts"]
+    }
+  }
 }
