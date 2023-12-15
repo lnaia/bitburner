@@ -1,7 +1,7 @@
 import { NS } from "@ns";
 import { HOME_SERVER, SCRIPT_HACK } from "../constants";
 import { log } from "./lib-log";
-import { humanReadableMoney } from "./lib-human-readable-money";
+import { humanReadableMoney } from "helper";
 
 export const previsions = async (ns: NS) => {
   const targetHost = "n00dles";

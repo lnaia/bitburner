@@ -1,4 +1,4 @@
-import { humanReadableMoney } from "./lib-human-readable-money";
+import { humanReadableMoney } from "helper";
 import { NS } from "@ns";
 import type { HostDetails } from "../typings";
 

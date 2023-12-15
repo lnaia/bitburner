@@ -1,5 +1,6 @@
 import { NS } from "@ns";
 import { log } from "./lib-log";
+import { calcWeakenThreads } from "./lib-weaken";
 
 const LIMIT_MAX_MONEY_PERCENT = 0.99;
 
@@ -27,28 +28,6 @@ const calculateThreadsGrow = (
   }
 
   return Math.ceil(ns.growthAnalyze(host, factor));
-};
-
-/** Calculates threads required to weaken a host to the min security possible
- * @param securityIncrease - override current security, useful when trying to calculate future security levels
- * @returns number of threads
- * */
-const calcWeakenThreads = (ns: NS, host: string, securityIncrease?: number) => {
-  const minSecurity = ns.getServerMinSecurityLevel(host);
-  const currSec = securityIncrease
-    ? minSecurity + securityIncrease
-    : ns.getServerSecurityLevel(host);
-  const weakenAmountPerThread = ns.weakenAnalyze(1);
-  const securityToBeReduced = currSec - minSecurity;
-
-  let requiredWeakenThreads = 0;
-  if (securityToBeReduced > 0) {
-    requiredWeakenThreads = Math.ceil(
-      securityToBeReduced / weakenAmountPerThread
-    );
-  }
-
-  return requiredWeakenThreads;
 };
 
 type JobPlan = {

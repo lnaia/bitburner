@@ -11,7 +11,7 @@ export async function main(ns: NS) {
 
   const logPositiveStatus = (status: StatusReport) => {
     if (status[0]) {
-      log(ns, status[1]);
+      log(ns, `${status[1]}`);
     }
   };
 

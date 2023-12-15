@@ -3,9 +3,9 @@ import { SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN } from "../constants";
 import { calculateThreads } from "./lib-calculate-threads";
 import { discoverHosts } from "./lib-discover-hosts";
 import { log } from "./lib-log";
-import { getActionTimeDuration } from "./lib-time";
+import { getActionTimeDuration } from "helper";
 import { generateJobPlan } from "./lib-hack";
-import { printObjList } from "./lib-print-obj-list";
+import { printObjList } from "helper";
 
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
   const resources: { [key: string]: number } = {};
