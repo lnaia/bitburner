@@ -7,7 +7,7 @@ export interface HostDetails {
   diff: string;
   rh: number;
   ms: number;
-  cs: number;
+  cs: string;
   hc: number;
 }
 export type StatusReport = [boolean, string?];

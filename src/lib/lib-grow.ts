@@ -17,11 +17,12 @@ export const stopConditionGrow = (
 export const calculateThreadsGrow = (
   ns: NS,
   host: string,
-  maxPercent = LIMIT_MAX_MONEY_PERCENT
+  maxPercent = LIMIT_MAX_MONEY_PERCENT,
+  moneyThatWillBeStolen = 0
 ) => {
   ns.disableLog("ALL");
   const maxMoney = ns.getServerMaxMoney(host) * maxPercent;
-  let currMoney = ns.getServerMoneyAvailable(host);
+  let currMoney = ns.getServerMoneyAvailable(host) - moneyThatWillBeStolen;
   if (currMoney <= 0) {
     currMoney = 1;
   }

@@ -7,7 +7,7 @@ import { NS } from "@ns";
 export const monitorHost = async (ns: NS, host: string) => {
   const maxRows = 30;
   const print = ns.print.bind(ns);
-  const dataPoints: { hcm: string; diff: string; cs: number; hc: number }[] =
+  const dataPoints: { hcm: string; diff: string; cs: string; hc: number }[] =
     [];
 
   while (true) {

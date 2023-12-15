@@ -41,7 +41,7 @@ const getScriptToRun = (type: string) => {
   return "";
 };
 
-const pauseForSeconds = async (ns: NS, seconds: number) => {
+const pauseForSeconds = async (ns: NS, seconds: number, scriptName: string) => {
   const ONE_SECOND = 1000;
   let tick = 0;
 
@@ -50,7 +50,7 @@ const pauseForSeconds = async (ns: NS, seconds: number) => {
   }
 
   const { s, m, h } = getActionTimeDuration(seconds * 1000);
-  log(ns, `waking up in ${s}(s) or ${m}(m) or ${h}(h)`);
+  log(ns, `pause for ${s}(s) or ${m}(m) or ${h}(h) due to ${scriptName}`);
 
   while (tick < s) {
     tick += 1;
@@ -78,8 +78,8 @@ const execJob = async ({
     return;
   }
 
-  const scriptMemory = ns.getScriptRam(scriptName, targetHost);
-  const maxThreads = calculateThreads(ns, scriptMemory, targetHost);
+  const scriptMemory = ns.getScriptRam(scriptName, execHost);
+  const maxThreads = calculateThreads(ns, scriptMemory, execHost);
 
   if (threads > maxThreads) {
     log(ns, "exec failed - not enough threads");
@@ -88,15 +88,16 @@ const execJob = async ({
     if (pid) {
       log(
         ns,
-        `exec script:${scriptName} host:${targetHost} threads:${threads} from:${execHost}`
+        `exec pid:${pid} script:${scriptName} host:${targetHost} threads:${threads} from:${execHost}`
       );
+      ns.exec("bin/pid-duration.js", execHost, 1, pid);
     } else {
       log(ns, "exec failed - pid is 0");
     }
   }
 
   if (waitTime !== -1) {
-    await pauseForSeconds(ns, waitTime);
+    await pauseForSeconds(ns, waitTime, scriptName);
   }
 };
 
@@ -121,8 +122,8 @@ export const resourceManager = async (ns: NS) => {
   const sortedJobPlan = [growCash, growWeaken, hack, hackWeaken].sort(
     (a, b) => b.time - a.time
   );
-
-  const print = ns.print.bind(ns);
+  // @ts-expect-error
+  const print = (...args) => ns.print(...args);
   // @ts-expect-error
   printObjList(sortedJobPlan, print);
 
@@ -142,7 +143,7 @@ export const resourceManager = async (ns: NS) => {
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[1].type),
     threads: sortedJobPlan[1].threads,
-    waitTime: timeMargin + job2Time,
+    waitTime: sortedJobPlan[0].threads > 0 ? timeMargin + job2Time : -1,
   });
 
   const job3Time = job2Time + (sortedJobPlan[1].time - sortedJobPlan[2].time);
@@ -152,7 +153,7 @@ export const resourceManager = async (ns: NS) => {
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[2].type),
     threads: sortedJobPlan[2].threads,
-    waitTime: timeMargin + job3Time,
+    waitTime: sortedJobPlan[1].threads > 0 ? timeMargin + job3Time : -1,
   });
 
   const job4Time = job3Time + (sortedJobPlan[2].time - sortedJobPlan[3].time);
@@ -162,6 +163,6 @@ export const resourceManager = async (ns: NS) => {
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[3].type),
     threads: sortedJobPlan[3].threads,
-    waitTime: timeMargin + job4Time,
+    waitTime: sortedJobPlan[2].threads > 0 ? timeMargin + job4Time : -1,
   });
 };

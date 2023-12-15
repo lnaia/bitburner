@@ -15,7 +15,7 @@ export const hostInfo = (ns: NS, host: string): HostDetails => {
     hcm: humanReadableMoney(moneyCurrent),
     diff: percentDiff,
     ms: Math.round(ns.getServerMinSecurityLevel(host)),
-    cs: Math.round(ns.getServerSecurityLevel(host)),
+    cs: ns.getServerSecurityLevel(host).toFixed(2),
     rh: Math.round(ns.getServerRequiredHackingLevel(host)),
     hc: +(ns.hackAnalyzeChance(host) * 100).toFixed(2),
   };
