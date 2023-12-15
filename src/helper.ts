@@ -31,7 +31,9 @@ export const humanReadableMoney = (money: number) => {
 };
 
 export const printObjList = (
-  list: unknown[],
+  list: {
+    [key: string]: string;
+  }[],
   print: (...args: string[]) => void
 ) => {
   const genStr = (max: number, char = " ", curr = 0): string => {
@@ -73,7 +75,7 @@ export const printObjList = (
       try {
         return val.toString();
       } catch (e) {
-        print("toString failed on type:", typeof val, " with ", e);
+        print("toString failed on type:", typeof val, " with ", e as string);
         return `${val}`;
       }
     }

@@ -1,5 +1,5 @@
 import { NS } from "@ns";
-import type { StatusReport } from "../typings";
+import type { StatusReport } from "typings";
 
 const uploadScript = (ns: NS, host: string, script: string) => {
   if (host === "home") {

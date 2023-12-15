@@ -1,7 +1,7 @@
-import { discoverHosts } from "./lib-discover-hosts";
-import { hostInfo } from "./lib-host-info";
-import { printObjList } from "./lib-print-obj-list.js";
-import { log } from "./lib-log";
+import { discoverHosts } from "lib/lib-discover-hosts";
+import { hostInfo } from "lib/lib-host-info";
+import { printObjList } from "helper";
+import { log } from "lib/lib-log";
 import { NS } from "@ns";
 
 export const monitorHost = async (ns: NS, host: string) => {
@@ -16,6 +16,7 @@ export const monitorHost = async (ns: NS, host: string) => {
 
     ns.clearLog();
     log(ns, JSON.stringify({ hmm, rh, ms }));
+    // @ts-expect-error
     printObjList(dataPoints, print);
 
     if (dataPoints.length > maxRows) {
@@ -44,6 +45,7 @@ export const monitorHosts = ({
     .map((host) => hostInfo(ns, host))
     .filter((host) => host.mm > 0);
 
+  // @ts-expect-error
   if (maxHosts > 0) {
     hosts = hosts.slice(0, maxHosts);
   }
@@ -85,5 +87,6 @@ export const monitorHosts = ({
   ns.clearLog();
   log(ns, "monitor-hosts");
   const print = ns.print.bind(ns);
+  // @ts-expect-error
   printObjList(list, print);
 };

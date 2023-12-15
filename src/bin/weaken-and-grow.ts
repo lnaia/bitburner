@@ -1,7 +1,7 @@
 import { NS } from "@ns";
-import { calcWeakenThreads, stopConditionWeaken } from "/lib/lib-weaken";
-import { calculateThreadsGrow, stopConditionGrow } from "/lib/lib-grow";
-import { HOME_SERVER, SCRIPT_GROW, SCRIPT_WEAKEN } from "/constants";
+import { calcWeakenThreads, stopConditionWeaken } from "lib/lib-weaken";
+import { calculateThreadsGrow, stopConditionGrow } from "lib/lib-grow";
+import { HOME_SERVER, SCRIPT_GROW, SCRIPT_WEAKEN } from "constants";
 
 const weakenServer = async (ns: NS, targetHost: string, execHost: string) => {
   while (!stopConditionWeaken(ns, targetHost)) {

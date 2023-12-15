@@ -1,6 +1,6 @@
 import { humanReadableMoney } from "helper";
 import { NS } from "@ns";
-import type { HostDetails } from "../typings";
+import type { HostDetails } from "typings";
 
 export const hostInfo = (ns: NS, host: string): HostDetails => {
   const moneyMax = ns.getServerMaxMoney(host);

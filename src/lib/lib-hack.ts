@@ -1,6 +1,6 @@
 import { NS } from "@ns";
-import { log } from "./lib-log";
-import { calcWeakenThreads } from "./lib-weaken";
+import { log } from "lib/lib-log";
+import { calcWeakenThreads } from "lib/lib-weaken";
 
 const LIMIT_MAX_MONEY_PERCENT = 0.99;
 

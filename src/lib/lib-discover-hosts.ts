@@ -32,7 +32,7 @@ export const discoverHosts = (ns: NS, onlyHackable = true): string[] => {
   return visitedHosts.filter((host) => {
     try {
       return playerHackingLevel >= ns.getServerRequiredHackingLevel(host);
-    } catch (e) {
+    } catch (e: any) {
       ns.print("unable to get host req hacking level: ", e.message);
       return false;
     }

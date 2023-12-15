@@ -1,7 +1,7 @@
 import { NS } from "@ns";
 import { buyNode, upgradeNodes } from "lib/lib-shop-nodes";
 import { log } from "lib/lib-log";
-import type { StatusReport } from "../typings";
+import type { StatusReport } from "typings";
 
 export async function main(ns: NS) {
   ns.disableLog("ALL");

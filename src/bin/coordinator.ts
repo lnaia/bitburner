@@ -3,7 +3,7 @@ import { buyServer, upgradeServers } from "lib/lib-shop-servers";
 import { buyNode, upgradeNodes } from "lib/lib-shop-nodes";
 import { autoRootHosts } from "lib/lib-auto-root-hosts";
 import { log } from "lib/lib-log";
-import type { StatusReport } from "../typings";
+import type { StatusReport } from "typings";
 
 export async function main(ns: NS) {
   ns.disableLog("ALL");

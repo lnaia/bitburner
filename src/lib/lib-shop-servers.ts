@@ -1,6 +1,6 @@
-import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "../constants";
+import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "constants";
 import { NS } from "@ns";
-import type { StatusReport } from "../typings";
+import type { StatusReport } from "typings";
 
 export const buyServer = (ns: NS): StatusReport => {
   const ownServers = ns.getPurchasedServers();

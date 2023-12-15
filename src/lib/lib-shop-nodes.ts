@@ -1,6 +1,6 @@
 import { NS } from "@ns";
-import type { StatusReport } from "../typings";
-import { HOME_SERVER } from "../constants";
+import type { StatusReport } from "typings";
+import { HOME_SERVER } from "constants";
 
 export const buyNode = (ns: NS): StatusReport => {
   const cost = ns.hacknet.getPurchaseNodeCost();

@@ -1,6 +1,6 @@
 import { NS } from "@ns";
-import { HOME_SERVER, SCRIPT_HACK } from "../constants";
-import { log } from "./lib-log";
+import { HOME_SERVER, SCRIPT_HACK } from "constants";
+import { log } from "lib/lib-log";
 import { humanReadableMoney } from "helper";
 
 export const previsions = async (ns: NS) => {

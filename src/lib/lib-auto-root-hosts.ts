@@ -65,7 +65,7 @@ export const getRoot = (ns: NS, host: string): StatusReport => {
       provision(ns, host, SCRIPT_GROW);
       provision(ns, host, SCRIPT_HACK);
       provision(ns, host, SCRIPT_WEAKEN);
-    } catch (e) {
+    } catch (e: any) {
       return [false, `getRootAccess@${host}: unable to nuke ${e.message}`];
     }
   }

@@ -1,11 +1,10 @@
 import { NS } from "@ns";
-import { SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN } from "../constants";
-import { calculateThreads } from "./lib-calculate-threads";
-import { discoverHosts } from "./lib-discover-hosts";
-import { log } from "./lib-log";
-import { getActionTimeDuration } from "helper";
-import { generateJobPlan } from "./lib-hack";
-import { printObjList } from "helper";
+import { SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN } from "constants";
+import { calculateThreads } from "lib/lib-calculate-threads";
+import { discoverHosts } from "lib/lib-discover-hosts";
+import { log } from "lib/lib-log";
+import { printObjList, getActionTimeDuration } from "helper";
+import { generateJobPlan } from "lib/lib-hack";
 
 export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
   const resources: { [key: string]: number } = {};
@@ -124,6 +123,7 @@ export const resourceManager = async (ns: NS) => {
   );
 
   const print = ns.print.bind(ns);
+  // @ts-expect-error
   printObjList(sortedJobPlan, print);
 
   // don't wait to spawn the longest running job
