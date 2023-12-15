@@ -1,13 +1,32 @@
 import type {NS} from './NetscriptDefinitions';
 
-export async function main(ns: NS) {
+export const calculateThreadsGrow = (ns: NS, host: string) => {
   ns.disableLog('ALL');
+  const maxMoney = ns.getServerMaxMoney(host);
+  let currMoney = ns.getServerMoneyAvailable(host);
+  if (currMoney <= 0) {
+    currMoney = 1;
+  }
+
+  let factor = 1;
+  try {
+    factor = Math.ceil(maxMoney / currMoney);
+  } catch (e) {
+    // ignore
+    factor = 1;
+  }
+
+  return Math.ceil(ns.growthAnalyze(host, factor));
+};
+
+export async function main(ns: NS) {
   ns.clearLog();
-  const [host] = `${ns.args[0]}`;
+  ns.tail();
+  const host = ns.args[0].toString();
 
   const weakenServer = async () => {
     const minSecurity = ns.getServerMinSecurityLevel(host);
-    let currSecurity = ns.getServerSecurityLevel(host);
+    let currSecurity = Math.floor(ns.getServerSecurityLevel(host));
     while (currSecurity > minSecurity) {
       await ns.weaken(host);
       currSecurity = ns.getServerSecurityLevel(host);

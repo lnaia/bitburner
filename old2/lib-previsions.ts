@@ -33,5 +33,5 @@ export const previsions = async (ns: NS) => {
   data.realHackTime = (afterHack.getTime() - beforeHack.getTime()) / 1000;
   data.afterMoney = humanReadableMoney(afterMoney);
   data.diffMoney = humanReadableMoney(beforeMoney - afterMoney);
-  log(ns, JSON.stringify(data));
+  log(ns, JSON.stringify(data, null, 2));
 };
