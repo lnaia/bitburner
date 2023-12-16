@@ -1,8 +1,8 @@
 import { NS } from "@ns";
-import type { StatusReport } from "../typings";
-import { discoverHosts } from "./lib-discover-hosts";
-import { provision } from "./lib-provision-script";
-import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "../constants";
+import type { StatusReport } from "typings";
+import { discoverHosts } from "lib/lib-discover-hosts";
+import { provision } from "lib/lib-provision-script";
+import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "constants";
 
 const openPorts = (ns: NS, host: string): StatusReport => {
   const portEnforcers = {

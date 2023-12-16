@@ -1,39 +1,29 @@
 import { NS } from "@ns";
-import { calcWeakenThreads, stopConditionWeaken } from "lib/lib-weaken";
-import { calculateThreadsGrow, stopConditionGrow } from "lib/lib-grow";
-import { HOME_SERVER, SCRIPT_GROW, SCRIPT_WEAKEN } from "constants";
-
-const weakenServer = async (ns: NS, targetHost: string, execHost: string) => {
-  while (!stopConditionWeaken(ns, targetHost)) {
-    const threads = calcWeakenThreads(ns, targetHost);
-    const pid = ns.exec(SCRIPT_WEAKEN, execHost, threads, targetHost);
-    while (ns.isRunning(pid)) {
-      await ns.sleep(1000);
-    }
-    await ns.sleep(1000);
-  }
-};
-
-const growServer = async (ns: NS, targetHost: string, execHost: string) => {
-  while (!stopConditionGrow(ns, targetHost)) {
-    const threads = calculateThreadsGrow({
-      ns,
-      host: targetHost,
-    });
-    const pid = ns.exec(SCRIPT_GROW, execHost, threads, targetHost);
-    while (ns.isRunning(pid)) {
-      await ns.sleep(1000);
-    }
-    await ns.sleep(1000);
-  }
-};
+import { HOME_SERVER, SCRIPT_BATCH_JOB_WEAKEN_GROW } from "constants";
+import { discoverHosts } from "/lib/lib-discover-hosts";
+import { generateWeakenGrowJobPlan } from "/lib/lib-hack";
 
 export async function main(ns: NS) {
+  ns.disableLog("ALL");
   ns.clearLog();
-  const execHost = HOME_SERVER;
-  const targetHost = ns.args[0].toString();
+  const targetHost = ns.args[0] ?? "";
+  const sequence = (targetHost: string) => {
+    const jobPlan = generateWeakenGrowJobPlan(ns, targetHost, 100);
+    ns.exec(
+      SCRIPT_BATCH_JOB_WEAKEN_GROW,
+      HOME_SERVER,
+      1,
+      targetHost,
+      JSON.stringify(jobPlan)
+    );
+  };
 
-  await weakenServer(ns, targetHost, execHost);
-  await growServer(ns, targetHost, execHost);
-  await weakenServer(ns, targetHost, execHost);
+  if (targetHost) {
+    await sequence(`${targetHost}`);
+  } else {
+    const hosts = discoverHosts(ns).filter((host) => ns.hasRootAccess(host));
+    for (const host of hosts) {
+      await sequence(host);
+    }
+  }
 }

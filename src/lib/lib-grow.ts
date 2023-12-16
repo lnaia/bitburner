@@ -1,7 +1,6 @@
 import { NS } from "@ns";
 
 export const stopConditionGrow = (ns: NS, host: string) => {
-  ns.disableLog("ALL");
   const moneyAvailable = ns.getServerMoneyAvailable(host);
   const maxMoney = ns.getServerMaxMoney(host);
   const isMoneyMaxed = moneyAvailable >= maxMoney;

@@ -42,6 +42,7 @@ export const monitorHosts = ({
   name,
 }: Props) => {
   let hosts = discoverHosts(ns)
+    .filter((host) => ns.hasRootAccess(host))
     .map((host) => hostInfo(ns, host))
     .filter((host) => host.mm > 0);
 
