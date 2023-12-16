@@ -5,7 +5,6 @@ import {
   SCRIPT_WEAKEN,
   SCRIPT_BATCH_JOB,
   HOME_SERVER,
-  SCRIPT_PID_DURATION,
 } from "constants";
 import { calculateThreads } from "lib/lib-calculate-threads";
 import { discoverHosts } from "lib/lib-discover-hosts";
@@ -13,29 +12,7 @@ import { log } from "lib/lib-log";
 import { printObjList, getActionTimeDuration } from "helper";
 import { generateJobPlan, JobPlan } from "lib/lib-hack";
 import { hostInfo } from "lib/lib-host-info";
-
-export const totalAvailableRam = (ns: NS, useHome?: boolean) => {
-  const resources: { [key: string]: number } = {};
-  const rootedServers = discoverHosts(ns).filter((host) =>
-    ns.hasRootAccess(host)
-  );
-  const ownedServers = ns.getPurchasedServers();
-  const hosts = [...rootedServers, ...ownedServers];
-
-  if (useHome) {
-    hosts.push("home");
-  }
-
-  for (const host of hosts) {
-    const serverMaxRam = ns.getServerMaxRam(host);
-    const serverRamInUse = ns.getServerUsedRam(host);
-
-    const serverRamAvailable = serverMaxRam - serverRamInUse;
-    resources[host] = serverRamAvailable;
-  }
-
-  return resources;
-};
+import { stopConditionWeaken } from "lib/lib-weaken";
 
 const getScriptToRun = (type: string) => {
   if (type === "grow") {
@@ -165,21 +142,23 @@ export const resourceManager = async (ns: NS) => {
   const hosts = discoverHosts(ns).filter((host) => {
     const hasRoot = ns.hasRootAccess(host);
     const info = hostInfo(ns, host);
+    const isHostWeak = stopConditionWeaken(ns, host);
 
-    return hasRoot && info.hc >= 90 && info.diff === "0.0000";
+    return hasRoot && info.hc >= 85 && info.diff === "0.0000" && isHostWeak;
   });
 
   for (const host of hosts) {
     const estimatedRunTime = generateStats(ns, host);
     const jobPlan = generateJobPlan(ns, host);
-    // ns.exec(
-    //   SCRIPT_BATCH_JOB,
-    //   HOME_SERVER,
-    //   1,
-    //   host,
-    //   JSON.stringify(jobPlan),
-    //   estimatedRunTime
-    // );
+
+    ns.exec(
+      SCRIPT_BATCH_JOB,
+      HOME_SERVER,
+      1,
+      host,
+      JSON.stringify(jobPlan),
+      estimatedRunTime
+    );
   }
 };
 
@@ -253,64 +232,6 @@ export const batchJobs = async (
     threads: sortedJobPlan[3].threads,
     waitTime:
       sortedJobPlan[3].threads > 0 ? TIME_MARGIN_IN_SECONDS + job4Time : -1,
-  });
-
-  const endDate = new Date();
-
-  log(
-    ns,
-    `full batch finish, total run time: ${
-      (endDate.getTime() - startDate.getTime()) / 1000
-    } seconds`
-  );
-};
-
-export const batchJobsWeakenGrow = async (
-  ns: NS,
-  jobPlan: JobPlan[],
-  targetHost: string
-) => {
-  const execHost = "home";
-  const startDate = new Date();
-
-  const [initialWeaken, growCash, growWeaken] = jobPlan;
-  log(ns, "full batch start");
-
-  // for now, wait until the initial weaken is accomplished.
-  await execJob({
-    ns,
-    execHost,
-    targetHost,
-    scriptName: getScriptToRun(initialWeaken.type),
-    threads: initialWeaken.threads,
-    waitTime: initialWeaken.time,
-  });
-
-  const sortedJobPlan = [growCash, growWeaken].sort((a, b) => b.time - a.time);
-
-  // @ts-expect-error
-  const print = (...args) => ns.print(...args);
-  // @ts-expect-error
-  printObjList(sortedJobPlan, print);
-
-  // don't wait to spawn the longest running job
-  await execJob({
-    ns,
-    execHost,
-    targetHost,
-    scriptName: getScriptToRun(sortedJobPlan[0].type),
-    threads: sortedJobPlan[0].threads,
-  });
-
-  const job2Time = sortedJobPlan[0].time - sortedJobPlan[1].time;
-  await execJob({
-    ns,
-    execHost,
-    targetHost,
-    scriptName: getScriptToRun(sortedJobPlan[1].type),
-    threads: sortedJobPlan[1].threads,
-    waitTime:
-      sortedJobPlan[0].threads > 0 ? TIME_MARGIN_IN_SECONDS + job2Time : -1,
   });
 
   const endDate = new Date();

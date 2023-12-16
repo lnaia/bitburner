@@ -1,8 +1,6 @@
 import { NS } from "@ns";
 import type { StatusReport } from "typings";
 import { discoverHosts } from "lib/lib-discover-hosts";
-import { provision } from "lib/lib-provision-script";
-import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "constants";
 
 const openPorts = (ns: NS, host: string): StatusReport => {
   const portEnforcers = {
@@ -62,9 +60,6 @@ export const getRoot = (ns: NS, host: string): StatusReport => {
   if (!ns.hasRootAccess(host) && isHackable) {
     try {
       ns.nuke(host);
-      provision(ns, host, SCRIPT_GROW);
-      provision(ns, host, SCRIPT_HACK);
-      provision(ns, host, SCRIPT_WEAKEN);
     } catch (e: any) {
       return [false, `getRootAccess@${host}: unable to nuke ${e.message}`];
     }

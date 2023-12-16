@@ -5,7 +5,7 @@ export const stopConditionWeaken = (ns: NS, host: string) => {
   const minSecurity = ns.getServerMinSecurityLevel(host);
   const currSecurity = ns.getServerSecurityLevel(host);
 
-  return currSecurity <= minSecurity;
+  return currSecurity <= minSecurity + 0.1;
 };
 
 /** Calculates threads required to weaken a host to the min security possible

@@ -76,17 +76,3 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
 
   return [initialWeaken, growCash, weakenAfterGrow, hackCash, weakenAfterHack];
 };
-
-export const generateWeakenGrowJobPlan = (
-  ns: NS,
-  host: string,
-  maxThreads: number
-): JobPlan[] => {
-  const [initialWeaken, growCash, weakenAfterGrow] = generateJobPlan(ns, host);
-  return [initialWeaken, growCash, weakenAfterGrow].map((plan) => {
-    return {
-      ...plan,
-      threads: plan.threads > maxThreads ? maxThreads : plan.threads,
-    };
-  });
-};

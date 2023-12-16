@@ -1,15 +1,15 @@
-import type {NS} from './NetscriptDefinitions';
-import {discoverHosts} from './lib-discover-hosts';
-import {humanReadableMoney} from './lib-human-readable-money';
+import { NS } from "@ns";
+import { discoverHosts } from "/lib/lib-discover-hosts";
+import { humanReadableMoney } from "helper";
 
 export async function main(ns: NS) {
-  ns.disableLog('ALL');
+  ns.disableLog("ALL");
   ns.tail();
 
   const listUsableServers = () => {
     const ownedServers = ns.getPurchasedServers();
     const rootedServers = discoverHosts(ns, false).filter(
-      host => ns.hasRootAccess(host) && ns.getServerMaxRam(host) > 0
+      (host) => ns.hasRootAccess(host) && ns.getServerMaxRam(host) > 0
     );
     return [...ownedServers, ...rootedServers];
   };
@@ -20,7 +20,7 @@ export async function main(ns: NS) {
       date: Date;
       totalServers: number;
       totalMoneyAvailable: number;
-      ram: {available: number; free: number; percentFree: string};
+      ram: { available: number; free: number; percentFree: string };
       serversRam: {
         [key: string]: number;
       };
@@ -36,7 +36,7 @@ export async function main(ns: NS) {
       date: new Date(),
       totalServers: 0,
       totalMoneyAvailable: 0,
-      ram: {available: 0, free: 0, percentFree: `${0} %`},
+      ram: { available: 0, free: 0, percentFree: `${0} %` },
       serversRam: {}, // ram: count
       scripts: {}, //script: { totalThreads: count, args: { [name.join(',')]: threadCount }}
     };
@@ -66,13 +66,13 @@ export async function main(ns: NS) {
           report.scripts[runningScript.filename] = {
             totalThreads: runningScript.threads,
             args: {
-              [runningScript.args.join(',')]: runningScript.threads,
+              [runningScript.args.join(",")]: runningScript.threads,
             },
           };
         } else {
           report.scripts[runningScript.filename].totalThreads +=
             runningScript.threads;
-          const argsKey = runningScript.args.join(',');
+          const argsKey = runningScript.args.join(",");
           if (!(argsKey in report.scripts[runningScript.filename].args)) {
             report.scripts[runningScript.filename].args[argsKey] =
               runningScript.threads;
@@ -106,7 +106,7 @@ export async function main(ns: NS) {
 
     // keep last snapshot in file
     const jsonData = `${JSON.stringify(report)}\n`;
-    ns.write('monitor-fleet-report-log.txt', jsonData, 'w');
+    ns.write("monitor-fleet-report-log.txt", jsonData, "w");
 
     ns.clearLog();
     ns.print(JSON.stringify(report, null, 2));
