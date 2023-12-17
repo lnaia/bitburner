@@ -1,12 +1,12 @@
-import {printObjList} from './lib-print-obj-list';
-import {hostInfo} from './lib-host-info';
-import type {NS} from './NetscriptDefinitions';
+import { printObjList } from "helper";
+import { hostInfo } from "lib/lib-host-info";
+import { NS } from "@ns";
 
 /** @param {NS} ns */
 export async function main(ns: NS) {
   const targetHost = ns.args[0].toString();
   if (!targetHost) {
-    ns.tprint('no host given - nothing to do');
+    ns.tprint("no host given - nothing to do");
     ns.exit();
   }
 
@@ -51,11 +51,12 @@ export async function main(ns: NS) {
     return [];
   };
 
-  const path = findHost({baseHost: 'home'});
-  ns.tprint('path: ', path.join(' >> '));
+  const path = findHost({ baseHost: "home" });
+  ns.tprint("path: ", path.join(" >> "));
 
   // can we display pretty info on host remotely?
   if (path.length) {
+    // @ts-expect-error
     printObjList([hostInfo(ns, targetHost)], ns.tprint);
   } else {
     ns.tprint(`${targetHost} couldn't be found - nothing to do`);

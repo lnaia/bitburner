@@ -1,6 +1,8 @@
 import { NS } from "@ns";
 import { calcWeakenThreads } from "lib/lib-weaken";
 import { calculateThreadsGrow } from "lib/lib-grow";
+import { log } from "./lib-log";
+import { humanReadableMoney } from "/helper";
 
 const toSeconds = (input: number): number => {
   return Math.ceil(input / 1000);
@@ -50,6 +52,14 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
   const requiredHackThreads = Math.ceil(
     ns.hackAnalyzeThreads(host, moneyThatWillBeStolen)
   );
+
+  log(
+    ns,
+    `moneyThatWillBeStolen:${humanReadableMoney(
+      moneyThatWillBeStolen
+    )} requiredHackThreads:${requiredHackThreads}`
+  );
+
   const hackCash: JobPlan = {
     type: "hack",
     threads: requiredHackThreads,
