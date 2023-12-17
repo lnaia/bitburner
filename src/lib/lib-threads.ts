@@ -1,5 +1,6 @@
 import { NS } from "@ns";
 import { log } from "./lib-log";
+import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "/constants";
 
 export const totalAvailableRam = (ns: NS, useHome = false) => {
   const resources: { [key: string]: number } = {};
@@ -45,19 +46,19 @@ export const getThreadsAvailable = (
   return [totalThreads, threadMap];
 };
 
-type ScriptType = "hack" | "grow" | "weaken";
-const getScriptExecutionTime = (
-  ns: NS,
-  scriptType: ScriptType,
-  targetHost: string
-) => {
+const getScriptExecutionTime = (ns: NS, script: string, targetHost: string) => {
   let miliseconds = 0;
-  if (scriptType === "hack") {
+  if (script === SCRIPT_HACK) {
     miliseconds = ns.getHackTime(targetHost);
-  } else if (scriptType === "grow") {
+  } else if (script === SCRIPT_GROW) {
     miliseconds = ns.getGrowTime(targetHost);
-  } else {
+  } else if (script === SCRIPT_WEAKEN) {
     miliseconds = ns.getWeakenTime(targetHost);
+  } else {
+    const msg = `fatal - unexpected script given: ${script}`;
+    ns.tprint(msg);
+    ns.print(msg);
+    ns.exit();
   }
 
   return Math.ceil(miliseconds / 1000);
@@ -90,7 +91,6 @@ const execScript = ({
 
 export type MessagePayload = {
   script: string;
-  scriptType: ScriptType;
   threads: number;
   targetHost: string;
 };
@@ -99,13 +99,9 @@ export const requestExecScript = (
   message: MessagePayload,
   threadsAvailable: ThreadsAvailable
 ): [number, ExecPlan[]?] => {
-  const { script, scriptType, threads, targetHost } = message;
+  const { script, threads, targetHost } = message;
   const [totalThreads, threadMap] = threadsAvailable;
-  const scriptExecutionTime = getScriptExecutionTime(
-    ns,
-    scriptType,
-    targetHost
-  );
+  const scriptExecutionTime = getScriptExecutionTime(ns, script, targetHost);
 
   if (threads > totalThreads) {
     log(ns, "exec failed - not enough threads");
@@ -139,14 +135,10 @@ export const requestExecScript = (
 
   log(
     ns,
-    JSON.stringify(
-      {
-        scriptExecutionTime,
-        scriptExecPlan,
-      },
-      null,
-      2
-    )
+    JSON.stringify({
+      scriptExecutionTime,
+      scriptExecPlan,
+    })
   );
 
   execScript({

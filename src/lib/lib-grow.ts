@@ -32,5 +32,9 @@ export const calculateThreadsGrow = ({
     factor = 1;
   }
 
+  if (factor <= 0) {
+    factor = 1;
+  }
+
   return Math.ceil(ns.growthAnalyze(host, factor));
 };

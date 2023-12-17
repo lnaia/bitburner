@@ -12,7 +12,16 @@ export const monitorHost = async (ns: NS, host: string) => {
 
   while (true) {
     const { hcm, diff, cs, hc, hmm, rh, ms } = hostInfo(ns, host);
-    dataPoints.push({ hcm, diff, cs, hc });
+
+    if (dataPoints.length > 0) {
+      const lastElement = dataPoints[dataPoints.length - 1];
+      const { hcm: LE_hcm, diff: LE_diff, cs: LE_cs, hc: LE_hc } = lastElement;
+      if (LE_cs !== cs || LE_diff !== diff || LE_hc !== hc) {
+        dataPoints.push({ hcm, diff, cs, hc });
+      }
+    } else {
+      dataPoints.push({ hcm, diff, cs, hc });
+    }
 
     ns.clearLog();
     log(ns, JSON.stringify({ hmm, rh, ms }));

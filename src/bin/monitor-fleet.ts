@@ -1,5 +1,4 @@
 import { NS } from "@ns";
-import { discoverHosts } from "/lib/lib-discover-hosts";
 import { humanReadableMoney } from "helper";
 
 export async function main(ns: NS) {
@@ -8,10 +7,7 @@ export async function main(ns: NS) {
 
   const listUsableServers = () => {
     const ownedServers = ns.getPurchasedServers();
-    const rootedServers = discoverHosts(ns, false).filter(
-      (host) => ns.hasRootAccess(host) && ns.getServerMaxRam(host) > 0
-    );
-    return [...ownedServers, ...rootedServers];
+    return [...ownedServers];
   };
 
   const servers = listUsableServers();
@@ -19,7 +15,6 @@ export async function main(ns: NS) {
     const report: {
       date: Date;
       totalServers: number;
-      totalMoneyAvailable: number;
       ram: { available: number; free: number; percentFree: string };
       serversRam: {
         [key: string]: number;
@@ -35,7 +30,6 @@ export async function main(ns: NS) {
     } = {
       date: new Date(),
       totalServers: 0,
-      totalMoneyAvailable: 0,
       ram: { available: 0, free: 0, percentFree: `${0} %` },
       serversRam: {}, // ram: count
       scripts: {}, //script: { totalThreads: count, args: { [name.join(',')]: threadCount }}
@@ -46,7 +40,6 @@ export async function main(ns: NS) {
       const usedRam = ns.getServerUsedRam(host);
 
       report.totalServers += 1;
-      report.totalMoneyAvailable += ns.getServerMoneyAvailable(host);
 
       report.ram.available += maxRam;
       report.ram.free += Math.floor(maxRam - usedRam);
@@ -84,12 +77,7 @@ export async function main(ns: NS) {
       }
     }
 
-    return {
-      ...report,
-      totalMoneyAvailable: humanReadableMoney(
-        Math.round(report.totalMoneyAvailable)
-      ),
-    };
+    return report;
   };
 
   const WAIT_TIME = 500; // 500 ms

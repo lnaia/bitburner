@@ -15,7 +15,7 @@ export async function main(ns: NS) {
   ns.clearLog();
   ns.tail();
 
-  const portHandle = ns.getPortHandle(SCRIPT_EXEC_REQUEST_PORT);
+  const portHandleExecRequests = ns.getPortHandle(SCRIPT_EXEC_REQUEST_PORT);
   const reservedThreadsMap: {
     [key: string]: {
       threadsReserved: number;
@@ -52,11 +52,10 @@ export async function main(ns: NS) {
   };
 
   while (true) {
-    const portIsEmpty = portHandle.empty();
-    // log(ns, `portIsEmpty:${portIsEmpty}`);
-
-    if (!portIsEmpty) {
-      const message: MessagePayload = JSON.parse(portHandle.read().toString());
+    if (!portHandleExecRequests.empty()) {
+      const message: MessagePayload = JSON.parse(
+        portHandleExecRequests.read().toString()
+      );
       // log(ns, "msg received");
       // log(ns, JSON.stringify(message));
 
