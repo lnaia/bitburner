@@ -9,7 +9,7 @@ import { log } from "lib/lib-log";
 export async function main(ns: NS) {
   ns.disableLog("ALL");
   ns.clearLog();
-  ns.tail();
+  // ns.tail();
   const targetHost = ns.args[0].toString();
 
   await prepareServer(ns, targetHost);

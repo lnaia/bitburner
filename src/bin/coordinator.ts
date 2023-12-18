@@ -4,6 +4,7 @@ import { buyNode, upgradeNodes } from "lib/lib-shop-nodes";
 import { autoRootHosts } from "lib/lib-auto-root-hosts";
 import { log } from "lib/lib-log";
 import type { StatusReport } from "typings";
+import { provision } from "/lib/lib-provisioning";
 
 export async function main(ns: NS) {
   ns.disableLog("ALL");
@@ -20,6 +21,7 @@ export async function main(ns: NS) {
   const ONE_SECOND = 1000;
   while (true) {
     autoRootHosts(ns);
+    provision(ns);
 
     // Hacknet changes are good in the short term to generate passive income
     // Servers are more powerfull in the long term

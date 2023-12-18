@@ -1,10 +1,8 @@
 import { NS } from "@ns";
+import { extractArgs } from "./hack-helper";
 
 export async function main(ns: NS) {
-  const host = ns.args[0].toString();
-  const threads = +ns.args[1];
-  const stock = !!(ns.args[2] ?? false);
-  const delay = +ns.args[3] ?? 0;
+  const { host, threads, stock, delay } = extractArgs(ns);
 
   if (delay > 0) {
     await ns.sleep(delay);

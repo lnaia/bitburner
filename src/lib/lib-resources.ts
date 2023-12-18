@@ -122,27 +122,9 @@ const generateStats = (ns: NS, targetHost: string) => {
       return res + item.ram;
     }, 0);
 
-  // log(
-  //   ns,
-  //   JSON.stringify(
-  //     {
-  //       estimatedRunTime,
-  //       totalThreads,
-  //       totalScriptRam,
-  //     },
-  //     null,
-  //     2
-  //   )
-  // );
-
   // this is useful, as it limits the waiting time, for this host, for this job plan at maximum.
   // from this server.
   return estimatedRunTime;
-  //    {
-  //   "estimatedRunTime": 61,
-  //   "totalThreads": 34,
-  //   "totalScriptRam": 8.7,
-  // }
 };
 
 export const resourceManagerSingleHost = (ns: NS, host: string) => {

@@ -23,7 +23,7 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
   };
 
   // only take 10% of current money, less threads, no need to be greedy.
-  const moneyThatWillBeStolen = ns.getServerMoneyAvailable(host) * 0.1;
+  const moneyThatWillBeStolen = ns.getServerMoneyAvailable(host) * 0.2;
   const requiredThreadsGrow = calculateThreadsGrow({
     ns,
     host,
