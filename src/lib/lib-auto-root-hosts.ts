@@ -1,6 +1,7 @@
 import { NS } from "@ns";
 import type { StatusReport } from "typings";
 import { discoverHosts } from "lib/lib-discover-hosts";
+import { HOME_SERVER } from "/constants";
 
 const openPorts = (ns: NS, host: string): StatusReport => {
   const portEnforcers = {
@@ -13,7 +14,7 @@ const openPorts = (ns: NS, host: string): StatusReport => {
 
   const countPortEnforcers = () => {
     return Object.keys(portEnforcers).reduce((total, portEnforcer) => {
-      if (ns.fileExists(portEnforcer, "home")) {
+      if (ns.fileExists(portEnforcer, HOME_SERVER)) {
         return total + 1;
       }
       return total;
@@ -35,7 +36,7 @@ const openPorts = (ns: NS, host: string): StatusReport => {
   }
 
   for (const [app, cmd] of Object.entries(portEnforcers)) {
-    if (ns.fileExists(app, "home")) {
+    if (ns.fileExists(app, HOME_SERVER)) {
       cmd(host);
       portsOpen += 1;
     }

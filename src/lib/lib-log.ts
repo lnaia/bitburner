@@ -35,3 +35,7 @@ export const log = (ns: NS, msg: string, level?: ErrorLevel) => {
     ns.tprint(logMsg);
   }
 };
+
+export const logClient = (ns: NS) => {
+  return (msg: string) => log(ns, msg);
+};

@@ -1,8 +1,10 @@
 import { NS } from "@ns";
-import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "constants";
+import { REMOTE_SERVER_PREFIX, HOME_SERVER, DARKWEB_SERVER } from "constants";
 
 export const isAllowedHost = (host: string) => {
-  const regex = new RegExp(`${REMOTE_SERVER_PREFIX}|${HOME_SERVER}|darkweb`);
+  const regex = new RegExp(
+    `${REMOTE_SERVER_PREFIX}|${HOME_SERVER}|${DARKWEB_SERVER}`
+  );
   return !regex.test(host);
 };
 
