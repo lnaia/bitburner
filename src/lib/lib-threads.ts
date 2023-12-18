@@ -2,7 +2,7 @@ import { NS } from "@ns";
 import { log } from "./lib-log";
 import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "/constants";
 
-export const totalAvailableRam = (ns: NS, useHome = false) => {
+export const totalAvailableRam = (ns: NS, useHome = true) => {
   const resources: { [key: string]: number } = {};
   const hosts = ns.getPurchasedServers();
 

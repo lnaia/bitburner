@@ -7,7 +7,7 @@ export async function main(ns: NS) {
 
   const listUsableServers = () => {
     const ownedServers = ns.getPurchasedServers();
-    return [...ownedServers];
+    return [...ownedServers, "home"];
   };
 
   const servers = listUsableServers();

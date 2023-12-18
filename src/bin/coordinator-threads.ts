@@ -64,8 +64,8 @@ export async function main(ns: NS) {
       // log(ns, "threadsAvailable");
       // log(ns, JSON.stringify(threadsAvailable, null, 1));
 
-      // log(ns, "threadsData");
-      // log(ns, JSON.stringify(threadsData, null, 1));
+      log(ns, "threadsData");
+      log(ns, JSON.stringify(threadsData, null, 1));
 
       const [executionTime, executionPlan] = requestExecScript(
         ns,
