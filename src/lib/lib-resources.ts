@@ -12,8 +12,7 @@ import { log } from "lib/lib-log";
 import { printObjList, getActionTimeDuration } from "helper";
 import { generateJobPlan, JobPlan } from "lib/lib-hack";
 import { hostInfo } from "lib/lib-host-info";
-import { calcWeakenThreads, stopConditionWeaken } from "lib/lib-weaken";
-import { MessagePayload } from "lib/lib-threads";
+import { calcWeakenThreads } from "lib/lib-weaken";
 import { sendMessages } from "lib/lib-messages";
 import { calculateThreadsGrow } from "lib/lib-grow";
 

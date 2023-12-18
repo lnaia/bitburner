@@ -12,3 +12,4 @@ export async function main(ns: NS) {
 
   await ns.weaken(host, { threads, stock });
 }
+// 1

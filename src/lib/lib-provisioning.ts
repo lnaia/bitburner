@@ -8,10 +8,12 @@ export const provision = (ns: NS) => {
   const ownServers = ns.getPurchasedServers();
   for (const host of [...hosts, ...ownServers]) {
     for (const script of [SCRIPT_HACK, SCRIPT_GROW, SCRIPT_WEAKEN]) {
-      if (!ns.fileExists(script, host)) {
-        log(ns, `provisioning ${host} with ${script}`);
-        ns.scp(script, host, "home");
+      if (ns.fileExists(script, host)) {
+        ns.rm(script, host);
       }
+
+      log(ns, `provisioning ${host} with ${script}`, "fatal");
+      ns.scp(script, host, "home");
     }
   }
 };

@@ -5,7 +5,7 @@ import {
   SCRIPT_GROW,
   SCRIPT_HACK,
   SCRIPT_WEAKEN,
-} from "/constants";
+} from "constants";
 
 export type ThreadsReservedMap = {
   [key: string]: {
@@ -97,16 +97,16 @@ const execScript = ({
   targetHost: string;
   script: string;
 }) => {
-  scriptExecPlan.forEach(({ host, threadsUsed }) => {
+  return scriptExecPlan.map(({ host, threadsUsed }) => {
     const pid = ns.exec(script, host, threadsUsed, targetHost);
+    const msg = `pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
     if (pid) {
-      log(
-        ns,
-        `exec pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`
-      );
+      log(ns, `exec success ${msg}`);
     } else {
-      log(ns, "exec failed - pid is 0");
+      log(ns, `exec failed ${msg}`);
     }
+
+    return { host, threadsUsed: pid ? threadsUsed : 0 };
   });
 };
 
@@ -161,14 +161,15 @@ export const requestExecScript = ({
     }
   }
 
-  execScript({
+  const executedPlan = execScript({
     ns,
     scriptExecPlan,
     targetHost,
     script,
   });
 
-  return [scriptExecutionTime + 5, scriptExecPlan]; //  extra seconds of reserved time as a security margin
+  // extra seconds of reserved time as a security margin
+  return [scriptExecutionTime + 5, executedPlan];
 };
 
 export const filterReservedThreads = ({
@@ -225,10 +226,12 @@ const combineReservedThreads = ({
       reservedThreads[host] = [];
     }
 
-    reservedThreads[host].push({
-      threadsReserved: threadsUsed,
-      executionTime,
-    });
+    if (threadsUsed > 0) {
+      reservedThreads[host].push({
+        threadsReserved: threadsUsed,
+        executionTime,
+      });
+    }
   });
 
   return reservedThreads;
@@ -279,7 +282,7 @@ export const threadManager = ({
   });
 
   const message = { targetHost, script, threads };
-  const [executionTime, executionPlan] = requestExecScript({
+  const [executionTime, executedPlan] = requestExecScript({
     ns,
     message,
     totalThreads,
@@ -288,7 +291,7 @@ export const threadManager = ({
 
   return combineReservedThreads({
     executionTime,
-    executionPlan,
+    executionPlan: executedPlan,
     reservedThreads,
   });
 };

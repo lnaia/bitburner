@@ -12,3 +12,4 @@ export async function main(ns: NS) {
 
   await ns.hack(host, { threads, stock });
 }
+// 1
