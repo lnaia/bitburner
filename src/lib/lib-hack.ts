@@ -22,7 +22,7 @@ export const generateJobPlan = (ns: NS, host: string): JobPlan[] => {
     desc: "initialWeaken",
   };
 
-  // only take 10% of current money, less threads, no need to be greedy.
+  // only take XXX % of current money, less threads, no need to be greedy.
   const moneyThatWillBeStolen = ns.getServerMoneyAvailable(host) * 0.2;
   const requiredThreadsGrow = calculateThreadsGrow({
     ns,

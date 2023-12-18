@@ -1,7 +1,6 @@
 import { NS } from "@ns";
 
 export const stopConditionWeaken = (ns: NS, host: string) => {
-  // ns.disableLog("ALL");
   const minSecurity = ns.getServerMinSecurityLevel(host);
   const currSecurity = ns.getServerSecurityLevel(host);
 

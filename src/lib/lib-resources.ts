@@ -5,9 +5,8 @@ import {
   SCRIPT_WEAKEN,
   SCRIPT_BATCH_JOB,
   HOME_SERVER,
-  SCRIPT_EXEC_REQUEST_PORT,
+  MESSAGE_TYPE,
 } from "constants";
-import { calculateThreads } from "lib/lib-calculate-threads";
 import { discoverHosts } from "lib/lib-discover-hosts";
 import { log } from "lib/lib-log";
 import { printObjList, getActionTimeDuration } from "helper";
@@ -31,20 +30,13 @@ const getScriptToRun = (type: string) => {
 };
 
 const pauseForSeconds = async (ns: NS, seconds: number, scriptName: string) => {
-  const ONE_SECOND = 1000;
-  let tick = 0;
-
   if (seconds <= 0) {
     return;
   }
 
   const { s, m, h } = getActionTimeDuration(seconds * 1000);
   log(ns, `pause for ${s}(s) or ${m}(m) or ${h}(h) due to ${scriptName}`);
-
-  while (tick < s) {
-    tick += 1;
-    await ns.sleep(ONE_SECOND);
-  }
+  await ns.sleep(seconds);
 };
 
 type ExecJobProps = {
@@ -62,31 +54,17 @@ const execJob = async ({
   waitTime = -1,
 }: ExecJobProps) => {
   if (threads === 0) {
-    log(ns, `exec 0 threads given - script:${scriptName} host:${targetHost}`);
     return;
   }
 
-  const message: MessagePayload = {
-    targetHost,
-    script: scriptName,
-    threads,
-  };
-  await sendMessages(ns, message, SCRIPT_EXEC_REQUEST_PORT);
-
-  // if (threads > maxThreads) {
-  //   log(ns, "exec failed - not enough threads");
-  // } else {
-  //   const pid = ns.exec(scriptName, execHost, threads, targetHost);
-  //   if (pid) {
-  //     log(
-  //       ns,
-  //       `exec pid:${pid} script:${scriptName} host:${targetHost} threads:${threads} from:${execHost}`
-  //     );
-  //     // ns.exec(SCRIPT_PID_DURATION, execHost, 1, pid);
-  //   } else {
-  //     log(ns, "exec failed - pid is 0");
-  //   }
-  // }
+  await sendMessages(ns, {
+    type: MESSAGE_TYPE.MESSAGE_TYPE_EXEC_SCRIPT,
+    payload: {
+      targetHost,
+      script: scriptName,
+      threads,
+    },
+  });
 
   if (waitTime !== -1) {
     await pauseForSeconds(ns, waitTime, scriptName);

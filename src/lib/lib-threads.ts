@@ -1,14 +1,22 @@
 import { NS } from "@ns";
 import { log } from "./lib-log";
-import { SCRIPT_GROW, SCRIPT_HACK, SCRIPT_WEAKEN } from "/constants";
+import {
+  HOME_SERVER,
+  SCRIPT_GROW,
+  SCRIPT_HACK,
+  SCRIPT_WEAKEN,
+} from "/constants";
 
-export const totalAvailableRam = (ns: NS, useHome = true) => {
+export type ThreadsReservedMap = {
+  [key: string]: {
+    threadsReserved: number;
+    executionTime: number;
+  }[];
+};
+
+export const totalAvailableRam = (ns: NS) => {
   const resources: { [key: string]: number } = {};
-  const hosts = ns.getPurchasedServers();
-
-  if (useHome) {
-    hosts.push("home");
-  }
+  const hosts = [...ns.getPurchasedServers(), HOME_SERVER];
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
@@ -20,15 +28,19 @@ export const totalAvailableRam = (ns: NS, useHome = true) => {
 
   return resources;
 };
-export type ThreadsAvailable = [number, ThreadMap];
 
-export type ThreadMap = {
-  [key: string]: number;
-};
-export const getThreadsAvailable = (
-  ns: NS,
-  script: string
-): ThreadsAvailable => {
+export type ThreadMap = { [key: string]: number };
+export const getThreadsAvailable = ({
+  ns,
+  script,
+  threads,
+  reservedThreads,
+}: {
+  ns: NS;
+  script: string;
+  threads: number;
+  reservedThreads: ThreadsReservedMap;
+}) => {
   const scriptRam = ns.getScriptRam(script);
   const fleetFreeMemory = totalAvailableRam(ns);
 
@@ -43,7 +55,16 @@ export const getThreadsAvailable = (
     }
   });
 
-  return [totalThreads, threadMap];
+  const { parsedTotalThreads, parsedThreadMap } = filterReservedThreads({
+    totalThreads,
+    threadMap,
+    reservedThreads,
+  });
+
+  return {
+    totalThreads: parsedTotalThreads,
+    threadMap: parsedThreadMap,
+  };
 };
 
 const getScriptExecutionTime = (ns: NS, script: string, targetHost: string) => {
@@ -94,13 +115,20 @@ export type MessagePayload = {
   threads: number;
   targetHost: string;
 };
-export const requestExecScript = (
-  ns: NS,
-  message: MessagePayload,
-  threadsAvailable: ThreadsAvailable
-): [number, ExecPlan[]?] => {
+export type RequestExecProps = {
+  ns: NS;
+  message: MessagePayload;
+  totalThreads: number;
+  threadMap: ThreadMap;
+};
+
+export const requestExecScript = ({
+  ns,
+  message,
+  totalThreads,
+  threadMap,
+}: RequestExecProps): [number, ExecPlan[]?] => {
   const { script, threads, targetHost } = message;
-  const [totalThreads, threadMap] = threadsAvailable;
   const scriptExecutionTime = getScriptExecutionTime(ns, script, targetHost);
 
   if (threads > totalThreads) {
@@ -133,14 +161,6 @@ export const requestExecScript = (
     }
   }
 
-  log(
-    ns,
-    JSON.stringify({
-      scriptExecutionTime,
-      scriptExecPlan,
-    })
-  );
-
   execScript({
     ns,
     scriptExecPlan,
@@ -149,4 +169,126 @@ export const requestExecScript = (
   });
 
   return [scriptExecutionTime + 5, scriptExecPlan]; //  extra seconds of reserved time as a security margin
+};
+
+export const filterReservedThreads = ({
+  threadMap,
+  reservedThreads,
+}: {
+  totalThreads: number;
+  threadMap: ThreadMap;
+  reservedThreads: ThreadsReservedMap;
+}) => {
+  let parsedTotalThreads = 0;
+  const parsedThreadMap: ThreadMap = {};
+  const currentThreadMap = threadMap;
+
+  Object.entries(currentThreadMap).forEach(([host, hostAvailableThreads]) => {
+    let hostReservedThreads = 0;
+
+    // find threads already reserved in this host
+    if (host in reservedThreads) {
+      hostReservedThreads = reservedThreads[host].reduce(
+        (res, { threadsReserved }) => {
+          return res + threadsReserved;
+        },
+        0
+      );
+    }
+
+    const parsedAvailableThreads = hostAvailableThreads - hostReservedThreads;
+    parsedThreadMap[host] = parsedAvailableThreads;
+    parsedTotalThreads += parsedAvailableThreads;
+  });
+
+  return {
+    parsedTotalThreads,
+    parsedThreadMap,
+  };
+};
+
+type CombineProps = {
+  executionTime: number;
+  executionPlan?: ExecPlan[];
+  reservedThreads: ThreadsReservedMap;
+};
+const combineReservedThreads = ({
+  executionTime,
+  executionPlan,
+  reservedThreads,
+}: CombineProps) => {
+  // add execution plan, to reserved theadsMap
+  executionPlan?.forEach((execPlan: ExecPlan) => {
+    const { host, threadsUsed } = execPlan;
+
+    if (!(host in reservedThreads)) {
+      reservedThreads[host] = [];
+    }
+
+    reservedThreads[host].push({
+      threadsReserved: threadsUsed,
+      executionTime,
+    });
+  });
+
+  return reservedThreads;
+};
+
+type ManageProps = {
+  reservedThreads: ThreadsReservedMap;
+};
+export const manageThreadReservedTime = ({ reservedThreads }: ManageProps) => {
+  // cleanup reserved threads based on time.
+  Object.entries(reservedThreads).forEach(([host, list]) => {
+    list.every((value, index) => {
+      if (reservedThreads[host][index].executionTime > 0) {
+        reservedThreads[host][index].executionTime -= 1;
+      }
+    });
+
+    reservedThreads[host] = list.filter(
+      ({ executionTime }) => executionTime > 0
+    );
+
+    if (reservedThreads[host].length === 0) {
+      delete reservedThreads[host];
+    }
+  });
+
+  return reservedThreads;
+};
+
+export const threadManager = ({
+  ns,
+  targetHost,
+  script,
+  threads,
+  reservedThreads,
+}: {
+  ns: NS;
+  targetHost: string;
+  script: string;
+  threads: number;
+  reservedThreads: ThreadsReservedMap;
+}) => {
+  const { totalThreads, threadMap } = getThreadsAvailable({
+    ns,
+    script,
+    threads,
+    reservedThreads,
+  });
+
+  const message = { targetHost, script, threads };
+  const [executionTime, executionPlan] = requestExecScript({
+    ns,
+    message,
+    totalThreads,
+    threadMap,
+  });
+
+  return combineReservedThreads({
+    executionTime,
+    executionPlan,
+    reservedThreads,
+  });
 };

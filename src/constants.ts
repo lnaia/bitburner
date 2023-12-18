@@ -8,8 +8,11 @@ export const SCRIPT_GROW = "hacks/hack-grow.js";
 export const SCRIPT_HACK = "hacks/hack-hack.js";
 export const SCRIPT_WEAKEN = "hacks/hack-weaken.js";
 
-export const SCRIPT_EXEC_REQUEST_PORT = 1;
-export const SCRIPT_JOB_PLAN_REQUEST_PORT = 2;
+export const MESSAGE_TYPE = {
+  MESSAGE_TYPE_EXEC_SCRIPT: "MESSAGE_TYPE_EXEC_SCRIPT",
+} as const;
 
-export const MESSAGE_TYPE_REQUEST_JOB_PLAN = "requestJobPlan";
-export const MESSAGE_TYPE_SEND_JOB_PLAN = "sendJobPlan";
+export const MESSAGE_PORTS = {
+  [MESSAGE_TYPE.MESSAGE_TYPE_EXEC_SCRIPT]: 1,
+};
+export const NO_MESSAGE = "NULL PORT DATA";
