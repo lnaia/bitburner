@@ -33,12 +33,10 @@ export type ThreadMap = { [key: string]: number };
 export const getThreadsAvailable = ({
   ns,
   script,
-  threads,
   reservedThreads,
 }: {
   ns: NS;
   script: string;
-  threads: number;
   reservedThreads: ThreadsReservedMap;
 }) => {
   const scriptRam = ns.getScriptRam(script);
@@ -85,7 +83,7 @@ const getScriptExecutionTime = (ns: NS, script: string, targetHost: string) => {
   return Math.ceil(miliseconds / 1000);
 };
 
-export type ExecPlan = { host: string; threadsUsed: number };
+export type ExecPlan = { host: string; threadsUsed: number; pid?: number };
 const execScript = ({
   ns,
   scriptExecPlan,
@@ -96,17 +94,18 @@ const execScript = ({
   scriptExecPlan: ExecPlan[];
   targetHost: string;
   script: string;
-}) => {
+}): ExecPlan[] => {
   return scriptExecPlan.map(({ host, threadsUsed }) => {
     const pid = ns.exec(script, host, threadsUsed, targetHost);
-    const msg = `pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
-    if (pid) {
-      log(ns, `exec success ${msg}`);
-    } else {
-      log(ns, `exec failed ${msg}`);
-    }
 
-    return { host, threadsUsed: pid ? threadsUsed : 0 };
+    const msg = `exec pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
+    log(ns, msg);
+
+    return {
+      pid,
+      host,
+      threadsUsed,
+    };
   });
 };
 
@@ -114,6 +113,7 @@ export type MessagePayload = {
   script: string;
   threads: number;
   targetHost: string;
+  allThreads?: boolean;
 };
 export type RequestExecProps = {
   ns: NS;
@@ -128,10 +128,10 @@ export const requestExecScript = ({
   totalThreads,
   threadMap,
 }: RequestExecProps): [number, ExecPlan[]?] => {
-  const { script, threads, targetHost } = message;
+  const { script, threads, targetHost, allThreads } = message;
   const scriptExecutionTime = getScriptExecutionTime(ns, script, targetHost);
 
-  if (threads > totalThreads) {
+  if (allThreads && threads > totalThreads) {
     log(ns, "exec failed - not enough threads");
     return [0];
   }
@@ -220,13 +220,13 @@ const combineReservedThreads = ({
 }: CombineProps) => {
   // add execution plan, to reserved theadsMap
   executionPlan?.forEach((execPlan: ExecPlan) => {
-    const { host, threadsUsed } = execPlan;
+    const { host, threadsUsed, pid } = execPlan;
 
     if (!(host in reservedThreads)) {
       reservedThreads[host] = [];
     }
 
-    if (threadsUsed > 0) {
+    if (pid && threadsUsed > 0) {
       reservedThreads[host].push({
         threadsReserved: threadsUsed,
         executionTime,
@@ -267,21 +267,22 @@ export const threadManager = ({
   script,
   threads,
   reservedThreads,
+  allThreads,
 }: {
   ns: NS;
   targetHost: string;
   script: string;
   threads: number;
   reservedThreads: ThreadsReservedMap;
+  allThreads: boolean;
 }) => {
   const { totalThreads, threadMap } = getThreadsAvailable({
     ns,
     script,
-    threads,
     reservedThreads,
   });
 
-  const message = { targetHost, script, threads };
+  const message = { targetHost, script, threads, allThreads };
   const [executionTime, executedPlan] = requestExecScript({
     ns,
     message,

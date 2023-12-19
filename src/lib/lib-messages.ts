@@ -3,7 +3,7 @@ import { MESSAGE_TYPE, MESSAGE_PORTS, NO_MESSAGE } from "constants";
 
 type Message = {
   type: keyof typeof MESSAGE_TYPE;
-  payload: { [key: string]: string | number };
+  payload: { [key: string]: string | number | boolean };
 };
 export const sendMessages = async (ns: NS, message: Message) => {
   const portHandle = ns.getPortHandle(MESSAGE_PORTS[message.type]);

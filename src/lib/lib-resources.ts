@@ -49,6 +49,7 @@ type ExecJobProps = {
   scriptName: string;
   threads: number;
   waitTime?: number;
+  allThreads?: boolean;
 };
 const execJob = async ({
   ns,
@@ -56,6 +57,7 @@ const execJob = async ({
   scriptName,
   threads,
   waitTime = -1,
+  allThreads = true,
 }: ExecJobProps) => {
   if (threads === 0) {
     return;
@@ -67,6 +69,7 @@ const execJob = async ({
       targetHost,
       script: scriptName,
       threads,
+      allThreads,
     },
   });
 
