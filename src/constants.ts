@@ -7,6 +7,7 @@ export const SCRIPT_BATCH_JOB_WEAKEN_GROW = "bin/batch-job-weaken-grow.js";
 export const SCRIPT_GROW = "hacks/hack-grow.js";
 export const SCRIPT_HACK = "hacks/hack-hack.js";
 export const SCRIPT_WEAKEN = "hacks/hack-weaken.js";
+export const SCRIPT_MONITOR_HOST = "bin/monitor-host.js";
 
 export const MESSAGE_TYPE = {
   MESSAGE_TYPE_EXEC_SCRIPT: "MESSAGE_TYPE_EXEC_SCRIPT",

@@ -35,7 +35,12 @@ const pauseForSeconds = async (ns: NS, seconds: number, scriptName: string) => {
 
   const { s, m, h } = getActionTimeDuration(seconds * 1000);
   log(ns, `pause for ${s}(s) or ${m}(m) or ${h}(h) due to ${scriptName}`);
-  await ns.sleep(seconds);
+
+  let tick = 0;
+  while (tick < seconds) {
+    tick += 1;
+    await ns.sleep(1_000);
+  }
 };
 
 type ExecJobProps = {
@@ -72,9 +77,8 @@ const execJob = async ({
 
 const TIME_MARGIN_IN_SECONDS = 5;
 
-const generateStats = (ns: NS, targetHost: string) => {
-  const jobPlan = generateJobPlan(ns, targetHost);
-
+export const resourceManagerSingleHost = (ns: NS, host: string) => {
+  const jobPlan = generateJobPlan(ns, host);
   const jobsWithThreads = jobPlan
     .filter((jp) => jp.threads > 0)
     .sort((a, b) => b.time - a.time);
@@ -84,44 +88,36 @@ const generateStats = (ns: NS, targetHost: string) => {
     jobsWithThreads[0].time +
     (jobsWithThreads.length - 1) * TIME_MARGIN_IN_SECONDS;
 
-  const totalThreads = jobPlan.reduce((res, item) => {
-    return res + item.threads;
-  }, 0);
-
-  const totalScriptRam = jobPlan
-    .map((jp) => {
-      return {
-        ...jp,
-        ram: ns.getScriptRam(getScriptToRun(jp.type)),
-      };
-    })
-    .reduce((res, item) => {
-      return res + item.ram;
-    }, 0);
-
-  // this is useful, as it limits the waiting time, for this host, for this job plan at maximum.
-  // from this server.
-  return estimatedRunTime;
-};
-
-export const resourceManagerSingleHost = (ns: NS, host: string) => {
-  const estimatedRunTime = generateStats(ns, host);
-  const jobPlan = generateJobPlan(ns, host);
-
   return { jobPlan, estimatedRunTime };
 };
 
-export const resourceManager = async (ns: NS) => {
-  const hosts = discoverHosts(ns).filter((host) => {
+export const getHackingHosts = (ns: NS) => {
+  return discoverHosts(ns).filter((host) => {
     const hasRoot = ns.hasRootAccess(host);
     const info = hostInfo(ns, host);
 
     return hasRoot && info.hc >= 70;
   });
+};
+
+export const resourceManager = async (ns: NS) => {
+  const hosts = getHackingHosts(ns);
+
+  // get existing running batch jobs
+  const existingBatchScripts = ns
+    .ps(HOME_SERVER)
+    .reduce((result: string[], script) => {
+      if (script.filename === SCRIPT_BATCH_JOB) {
+        result.push(`${script.args[0]}`);
+      }
+      return result;
+    }, []);
 
   for (const host of hosts) {
-    ns.exec(SCRIPT_BATCH_JOB, HOME_SERVER, 1, host);
-    log(ns, `batch: host:${host}`);
+    if (!existingBatchScripts.includes(host)) {
+      ns.exec(SCRIPT_BATCH_JOB, HOME_SERVER, 1, host);
+      log(ns, `batch: host:${host}`);
+    }
   }
 };
 
@@ -231,4 +227,16 @@ export const prepareServer = async (ns: NS, host: string) => {
     log(ns, `weaknThreadsLeft:${weaknThreadsLeft}, starting a new loop`);
     await prepareServer(ns, host);
   }
+};
+
+export const maxHack = async (ns: NS, host: string) => {
+  const existingMoney = ns.getServerMoneyAvailable(host);
+  const hackThreads = Math.ceil(ns.hackAnalyzeThreads(host, existingMoney));
+  await execJob({
+    ns,
+    targetHost: host,
+    scriptName: getScriptToRun("hack"),
+    threads: hackThreads,
+    waitTime: Math.ceil(ns.getHackTime(host) / 1000),
+  });
 };

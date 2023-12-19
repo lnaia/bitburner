@@ -1,7 +1,13 @@
 import { NS } from "@ns";
 import { sendMessages } from "lib/lib-messages";
-import { MESSAGE_TYPE, SCRIPT_HACK, SCRIPT_WEAKEN } from "constants";
+import {
+  MESSAGE_TYPE,
+  SCRIPT_GROW,
+  SCRIPT_HACK,
+  SCRIPT_WEAKEN,
+} from "constants";
 import { calcWeakenThreads } from "lib/lib-weaken";
+import { calculateThreadsGrow } from "/lib/lib-grow";
 
 export async function main(ns: NS) {
   const targetHost = "n00dles";
@@ -14,11 +20,11 @@ export async function main(ns: NS) {
       script: SCRIPT_WEAKEN,
       threads: calcWeakenThreads(ns, targetHost),
 
-      // // grow everything
-      // script: SCRIPT_WEAKEN,
-      // threads: calcWeakenThreads(ns, targetHost),
+      // grow everything
+      // script: SCRIPT_GROW,
+      // threads: calculateThreadsGrow({ ns, host: targetHost }),
 
-      // // hack everything
+      // hack everything
       // script: SCRIPT_HACK,
       // threads: Math.ceil(
       //   ns.hackAnalyzeThreads(

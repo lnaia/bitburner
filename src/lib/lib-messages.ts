@@ -9,7 +9,7 @@ export const sendMessages = async (ns: NS, message: Message) => {
   const portHandle = ns.getPortHandle(MESSAGE_PORTS[message.type]);
 
   while (!portHandle.tryWrite(JSON.stringify(message))) {
-    await ns.sleep(1_000);
+    await ns.sleep(500);
   }
 };
 

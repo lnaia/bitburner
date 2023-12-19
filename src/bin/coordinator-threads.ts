@@ -33,14 +33,14 @@ export async function main(ns: NS) {
         reservedThreads: cheapClone(reservedThreads),
       });
 
-      log(ns, "newReservedThreads");
-      log(ns, JSON.stringify(newReservedThreads, null, 1));
+      // log(ns, "newReservedThreads");s
+      // log(ns, JSON.stringify(newReservedThreads, null, 1));
       reservedThreads = cheapClone(newReservedThreads);
     }
 
     reservedThreads = cheapClone(manageThreadReservedTime({ reservedThreads }));
-    log(ns, "reservedThreadsMap");
-    log(ns, JSON.stringify(reservedThreads, null, 1));
+    // log(ns, "reservedThreadsMap");
+    // log(ns, JSON.stringify(reservedThreads, null, 1));
 
     await ns.sleep(1_000);
   }
