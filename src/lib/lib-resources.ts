@@ -237,6 +237,6 @@ export const maxHack = async (ns: NS, host: string) => {
     targetHost: host,
     scriptName: getScriptToRun("hack"),
     threads: hackThreads,
-    waitTime: Math.ceil(ns.getHackTime(host) / 1000),
+    waitTime: Math.ceil(ns.getHackTime(host) / 1000) + TIME_MARGIN_IN_SECONDS,
   });
 };
