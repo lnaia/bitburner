@@ -131,8 +131,21 @@ export const requestExecScript = ({
   const { script, threads, targetHost, allThreads } = message;
   const scriptExecutionTime = getScriptExecutionTime(ns, script, targetHost);
 
+  if (threads <= 0) {
+    log(ns, `exec failed - no threads:${threads} requested`);
+    return [0];
+  }
+
+  if (totalThreads <= 0) {
+    log(ns, `exec failed - no threads available totalThreads:${totalThreads}`);
+    return [0];
+  }
+
   if (allThreads && threads > totalThreads) {
-    log(ns, "exec failed - not enough threads");
+    log(
+      ns,
+      `exec failed - not enough threads threads:${threads} totalThreads:${totalThreads}`
+    );
     return [0];
   }
 
@@ -197,7 +210,8 @@ export const filterReservedThreads = ({
       );
     }
 
-    const parsedAvailableThreads = hostAvailableThreads - hostReservedThreads;
+    const res = hostAvailableThreads - hostReservedThreads;
+    const parsedAvailableThreads = res > 0 ? res : 0;
     parsedThreadMap[host] = parsedAvailableThreads;
     parsedTotalThreads += parsedAvailableThreads;
   });
