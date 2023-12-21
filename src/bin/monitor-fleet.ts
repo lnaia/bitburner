@@ -11,6 +11,7 @@ export async function main(ns: NS) {
   };
 
   const servers = listUsableServers();
+
   const generateReport = () => {
     const report: {
       date: Date;
@@ -29,7 +30,7 @@ export async function main(ns: NS) {
       };
     } = {
       date: new Date(),
-      totalServers: 0,
+      totalServers: servers.length,
       ram: { available: 0, free: 0, percentFree: `${0} %` },
       serversRam: {}, // ram: count
       scripts: {}, //script: { totalThreads: count, args: { [name.join(',')]: threadCount }}
@@ -38,8 +39,6 @@ export async function main(ns: NS) {
     for (const host of servers) {
       const maxRam = ns.getServerMaxRam(host);
       const usedRam = ns.getServerUsedRam(host);
-
-      report.totalServers += 1;
 
       report.ram.available += maxRam;
       report.ram.free += Math.floor(maxRam - usedRam);
@@ -54,7 +53,11 @@ export async function main(ns: NS) {
         report.serversRam[serverRamKey] += 1;
       }
 
-      for (const runningScript of ns.ps(host)) {
+      const hostScripts = ns
+        .ps(host)
+        .filter((script) => /^hacks\//.test(script.filename));
+
+      for (const runningScript of hostScripts) {
         if (!(runningScript.filename in report.scripts)) {
           report.scripts[runningScript.filename] = {
             totalThreads: runningScript.threads,
@@ -92,13 +95,8 @@ export async function main(ns: NS) {
       },
     };
 
-    // keep last snapshot in file
-    const jsonData = `${JSON.stringify(report)}\n`;
-    ns.write("monitor-fleet-report-log.txt", jsonData, "w");
-
     ns.clearLog();
     ns.print(JSON.stringify(report, null, 2));
-
     await ns.sleep(WAIT_TIME);
   }
 }

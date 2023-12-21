@@ -141,7 +141,6 @@ export const batchJobs = async (
     scriptName: getScriptToRun(initialWeaken.type),
     threads: initialWeaken.threads,
     waitTime: initialWeaken.time,
-    allThreads: false,
   });
 
   const sortedJobPlan = [growCash, growWeaken, hack, hackWeaken].sort(
@@ -159,7 +158,6 @@ export const batchJobs = async (
     targetHost,
     scriptName: getScriptToRun(sortedJobPlan[0].type),
     threads: sortedJobPlan[0].threads,
-    allThreads: false,
   });
 
   const job2Time = sortedJobPlan[0].time - sortedJobPlan[1].time;
@@ -170,7 +168,6 @@ export const batchJobs = async (
     threads: sortedJobPlan[1].threads,
     waitTime:
       sortedJobPlan[0].threads > 0 ? TIME_MARGIN_IN_SECONDS + job2Time : -1,
-    allThreads: false,
   });
 
   const job3Time = job2Time + (sortedJobPlan[1].time - sortedJobPlan[2].time);
@@ -181,7 +178,6 @@ export const batchJobs = async (
     threads: sortedJobPlan[2].threads,
     waitTime:
       sortedJobPlan[1].threads > 0 ? TIME_MARGIN_IN_SECONDS + job3Time : -1,
-    allThreads: false,
   });
 
   const job4Time = job3Time + (sortedJobPlan[2].time - sortedJobPlan[3].time);
@@ -192,7 +188,6 @@ export const batchJobs = async (
     threads: sortedJobPlan[3].threads,
     waitTime:
       sortedJobPlan[3].threads > 0 ? TIME_MARGIN_IN_SECONDS + job4Time : -1,
-    allThreads: false,
   });
 
   const endDate = new Date();
@@ -205,7 +200,16 @@ export const batchJobs = async (
   );
 };
 
-export const prepareServer = async (ns: NS, host: string) => {
+type PrepareServerProps = {
+  ns: NS;
+  host: string;
+};
+/**
+ * Slowly increases the host money while keeping security to a minimum
+ * @param ns
+ * @param host
+ */
+export const prepareServer = async ({ ns, host }: PrepareServerProps) => {
   let weakenThreads = calcWeakenThreads(ns, host);
   while (weakenThreads) {
     const weakenTime = ns.getWeakenTime(host) / 1000;
@@ -217,6 +221,7 @@ export const prepareServer = async (ns: NS, host: string) => {
       waitTime: weakenTime + TIME_MARGIN_IN_SECONDS,
       allThreads: false,
     });
+
     weakenThreads = calcWeakenThreads(ns, host);
   }
 
@@ -229,26 +234,20 @@ export const prepareServer = async (ns: NS, host: string) => {
       scriptName: getScriptToRun("grow"),
       threads: growThreads,
       waitTime: growTime + TIME_MARGIN_IN_SECONDS,
-      allThreads: false,
     });
   }
 
   const weaknThreadsLeft = calcWeakenThreads(ns, host);
   if (weaknThreadsLeft) {
     log(ns, `weaknThreadsLeft:${weaknThreadsLeft}, starting a new loop`);
-    await prepareServer(ns, host);
+    await prepareServer({ ns, host });
   }
 };
 
-export const maxHack = async (ns: NS, host: string) => {
-  const existingMoney = ns.getServerMoneyAvailable(host);
-  const hackThreads = Math.ceil(ns.hackAnalyzeThreads(host, existingMoney));
-  await execJob({
-    ns,
-    targetHost: host,
-    scriptName: getScriptToRun("hack"),
-    threads: hackThreads,
-    waitTime: Math.ceil(ns.getHackTime(host) / 1000) + TIME_MARGIN_IN_SECONDS,
-    allThreads: false,
-  });
+/**
+ * Precision here is key.
+ * Fined tuned controlled hack
+ */
+export const batchHack = async ({ ns, host }: { ns: NS; host: string }) => {
+  await prepareServer({ ns, host });
 };
