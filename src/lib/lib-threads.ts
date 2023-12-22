@@ -4,6 +4,7 @@ import {
   HOME_SERVER,
   SCRIPT_GROW,
   SCRIPT_HACK,
+  SCRIPT_RAM_AVERAGE,
   SCRIPT_WEAKEN,
 } from "constants";
 
@@ -32,14 +33,12 @@ export const totalAvailableRam = (ns: NS) => {
 export type ThreadMap = { [key: string]: number };
 export const getThreadsAvailable = ({
   ns,
-  script,
   reservedThreads,
 }: {
   ns: NS;
-  script: string;
   reservedThreads: ThreadsReservedMap;
 }) => {
-  const scriptRam = ns.getScriptRam(script);
+  const scriptRam = SCRIPT_RAM_AVERAGE;
   const fleetFreeMemory = totalAvailableRam(ns);
 
   const threadMap: ThreadMap = {};
@@ -98,8 +97,8 @@ const execScript = ({
   return scriptExecPlan.map(({ host, threadsUsed }) => {
     const pid = ns.exec(script, host, threadsUsed, targetHost);
 
-    const msg = `exec pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
-    log(ns, msg);
+    // const msg = `exec pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
+    // log(ns, msg);
 
     return {
       pid,
@@ -257,7 +256,7 @@ type ManageProps = {
 export const manageThreadReservedTime = ({ reservedThreads }: ManageProps) => {
   // cleanup reserved threads based on time.
   Object.entries(reservedThreads).forEach(([host, list]) => {
-    list.every((value, index) => {
+    list.forEach((value, index) => {
       if (reservedThreads[host][index].executionTime > 0) {
         reservedThreads[host][index].executionTime -= 1;
       }
@@ -292,7 +291,6 @@ export const threadManager = ({
 }) => {
   const { totalThreads, threadMap } = getThreadsAvailable({
     ns,
-    script,
     reservedThreads,
   });
 

@@ -36,6 +36,10 @@ export const printObjList = (
   }[],
   print: (...args: string[]) => void
 ) => {
+  if (!Array.isArray(list) || !list.length) {
+    return;
+  }
+
   const genStr = (max: number, char = " ", curr = 0): string => {
     if (curr === max) {
       return char;

@@ -1,6 +1,7 @@
 import { REMOTE_SERVER_PREFIX, HOME_SERVER } from "constants";
 import { NS } from "@ns";
 import type { StatusReport } from "typings";
+import { provisionHost } from "lib/lib-provisioning";
 
 export const buyServer = (ns: NS): StatusReport => {
   const ownServers = ns.getPurchasedServers();
@@ -19,6 +20,7 @@ export const buyServer = (ns: NS): StatusReport => {
   const confirmedHostname = ns.purchaseServer(newHostname, purchaseServerRam);
 
   if (confirmedHostname.length) {
+    provisionHost(ns, confirmedHostname);
     return [
       true,
       `buyServer: success, ${confirmedHostname}@${purchaseServerRam}`,
