@@ -1,11 +1,13 @@
 import { humanReadableMoney } from "helper";
 import { NS } from "@ns";
 import type { HostDetails } from "typings";
+import { getExistingBatchScripts } from "lib/lib-hosts";
 
 export const hostInfo = (ns: NS, host: string): HostDetails => {
   const moneyMax = ns.getServerMaxMoney(host);
   const moneyCurrent = ns.getServerMoneyAvailable(host);
   const percentDiff = (100 - (moneyCurrent * 100) / moneyMax).toFixed(4);
+  const existingBatchScripts = getExistingBatchScripts(ns);
 
   return {
     host,
@@ -18,5 +20,6 @@ export const hostInfo = (ns: NS, host: string): HostDetails => {
     cs: ns.getServerSecurityLevel(host).toFixed(2),
     rh: Math.round(ns.getServerRequiredHackingLevel(host)),
     hc: +(ns.hackAnalyzeChance(host) * 100).toFixed(2),
+    batchJob: existingBatchScripts.includes(host),
   };
 };

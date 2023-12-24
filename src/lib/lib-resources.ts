@@ -15,6 +15,7 @@ import { hostInfo } from "lib/lib-host-info";
 import { calcWeakenThreads } from "lib/lib-weaken";
 import { sendMessages } from "lib/lib-messages";
 import { calculateThreadsGrow } from "lib/lib-grow";
+import { getExistingBatchScripts } from "lib/lib-hosts";
 
 const getScriptToRun = (type: string) => {
   if (type === "grow") {
@@ -82,9 +83,10 @@ const TIME_MARGIN_IN_SECONDS = 5;
 
 export const resourceManagerSingleHost = (ns: NS, host: string) => {
   const jobPlan = generateJobPlan(ns, host);
+  // ns.tprint(JSON.stringify(jobPlan, null, 2));
   const jobsWithThreads = jobPlan
-    .filter((jp) => jp.threads > 0)
-    .sort((a, b) => b.time - a.time);
+    .filter((jp) => jp.threads > 0 && jp.time)
+    .sort((a, b) => b?.time - a?.time);
 
   // we use the sorted jobs, and take the highest running time and add extra safety margin
   const estimatedRunTime =
@@ -99,27 +101,19 @@ export const getHackingHosts = (ns: NS) => {
     const hasRoot = ns.hasRootAccess(host);
     const info = hostInfo(ns, host);
 
-    return hasRoot && info.hc >= 70;
+    return hasRoot && info.mm > 1;
   });
-};
+}; //
 
 export const resourceManager = async (ns: NS) => {
   const hosts = getHackingHosts(ns);
-
-  // get existing running batch jobs
-  const existingBatchScripts = ns
-    .ps(HOME_SERVER)
-    .reduce((result: string[], script) => {
-      if (script.filename === SCRIPT_BATCH_JOB) {
-        result.push(`${script.args[0]}`);
-      }
-      return result;
-    }, []);
+  const existingBatchScripts = getExistingBatchScripts(ns);
 
   for (const host of hosts) {
     if (!existingBatchScripts.includes(host)) {
-      ns.exec(SCRIPT_BATCH_JOB, HOME_SERVER, 1, host);
-      log(ns, `batch: host:${host}`);
+      const pid = ns.exec(SCRIPT_BATCH_JOB, HOME_SERVER, 1, host);
+      const msg = `exec pid:${pid} script:${SCRIPT_BATCH_JOB} host:${host}`;
+      log(ns, msg);
     }
   }
 };

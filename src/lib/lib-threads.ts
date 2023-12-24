@@ -7,6 +7,7 @@ import {
   SCRIPT_RAM_AVERAGE,
   SCRIPT_WEAKEN,
 } from "constants";
+import { discoverHosts } from "lib/lib-discover-hosts";
 
 export type ThreadsReservedMap = {
   [key: string]: {
@@ -17,7 +18,10 @@ export type ThreadsReservedMap = {
 
 export const totalAvailableRam = (ns: NS) => {
   const resources: { [key: string]: number } = {};
-  const hosts = [...ns.getPurchasedServers(), HOME_SERVER];
+  const hackedServers = discoverHosts(ns).filter((host) =>
+    ns.hasRootAccess(host)
+  );
+  const hosts = [HOME_SERVER, ...ns.getPurchasedServers(), ...hackedServers];
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
@@ -34,12 +38,27 @@ export type ThreadMap = { [key: string]: number };
 export const getThreadsAvailable = ({
   ns,
   reservedThreads,
+  script,
 }: {
   ns: NS;
   reservedThreads: ThreadsReservedMap;
+  script: string;
 }) => {
   const scriptRam = SCRIPT_RAM_AVERAGE;
-  const fleetFreeMemory = totalAvailableRam(ns);
+  const tempFleetFreeMemory = totalAvailableRam(ns);
+  let fleetFreeMemory = tempFleetFreeMemory;
+
+  // cores on home server inc effectiveness of grow and weaken
+  // thus if it's not one of these 2 scripts, try to allocate to the other servers first
+  //
+  if (script === SCRIPT_HACK) {
+    fleetFreeMemory = Object.entries(fleetFreeMemory)
+      .reverse()
+      .reduce(
+        (acc: { [key: string]: number }, [k, v]) => ((acc[k] = v), acc),
+        {}
+      );
+  }
 
   const threadMap: ThreadMap = {};
   let totalThreads = 0;
@@ -292,6 +311,7 @@ export const threadManager = ({
   const { totalThreads, threadMap } = getThreadsAvailable({
     ns,
     reservedThreads,
+    script,
   });
 
   const message = { targetHost, script, threads, allThreads };

@@ -9,6 +9,7 @@ export interface HostDetails {
   ms: number;
   cs: string;
   hc: number;
+  batchJob: boolean;
 }
 export type StatusReport = [boolean, string?];
 

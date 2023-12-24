@@ -81,7 +81,7 @@ export const monitorHosts = ({
       return b.mm - a.mm;
     })
     .map((hostDetails) => {
-      const { host, hmm, hcm, diff, rh, ms, cs, hc } = hostDetails;
+      const { host, hmm, hcm, diff, rh, ms, cs, hc, batchJob } = hostDetails;
       return {
         host,
         hmm,
@@ -91,6 +91,7 @@ export const monitorHosts = ({
         cs,
         rh,
         hc,
+        batchJob,
       };
     });
 
