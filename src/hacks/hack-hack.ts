@@ -10,6 +10,6 @@ export async function main(ns: NS) {
     await ns.sleep(delay);
   }
 
+  // ns.tprint(`hack debug: stock: ${stock}, threads:${threads}`);
   await ns.hack(host, { threads, stock });
 }
-// 1

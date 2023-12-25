@@ -51,6 +51,7 @@ type ExecJobProps = {
   threads: number;
   waitTime?: number;
   allThreads?: boolean;
+  stocks?: boolean;
 };
 const execJob = async ({
   ns,
@@ -59,6 +60,7 @@ const execJob = async ({
   threads,
   waitTime = -1,
   allThreads = true,
+  stocks = false,
 }: ExecJobProps) => {
   if (threads === 0) {
     return;
@@ -71,6 +73,7 @@ const execJob = async ({
       script: scriptName,
       threads,
       allThreads,
+      stocks,
     },
   });
 
@@ -244,5 +247,12 @@ export const maxHack = async (ns: NS, host: string) => {
     threads: hackThreads,
     waitTime: Math.ceil(ns.getHackTime(host) / 1000) + TIME_MARGIN_IN_SECONDS,
     allThreads: false,
+    stocks: true,
   });
+};
+
+export const hardenServer = async (ns: NS, host: string) => {
+  while (true) {
+    await ns.sleep(1000);
+  }
 };

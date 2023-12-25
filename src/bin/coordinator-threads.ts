@@ -59,11 +59,13 @@ export async function main(ns: NS) {
 
     if (message) {
       // log(ns, JSON.stringify(message));
-      const { targetHost, script, threads, allThreads } = message.payload;
+      const { targetHost, script, threads, allThreads, stocks } =
+        message.payload;
       const newReservedThreads = threadManager({
         ns,
         targetHost: `${targetHost}`,
         script: `${script}`,
+        stocks: Boolean(stocks),
         threads: +threads,
         reservedThreads: cheapClone(reservedThreads),
         allThreads: Boolean(allThreads),

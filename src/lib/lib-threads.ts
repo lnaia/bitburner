@@ -107,14 +107,16 @@ const execScript = ({
   scriptExecPlan,
   targetHost,
   script,
+  stocks = false,
 }: {
   ns: NS;
   scriptExecPlan: ExecPlan[];
   targetHost: string;
   script: string;
+  stocks?: boolean;
 }): ExecPlan[] => {
   return scriptExecPlan.map(({ host, threadsUsed }) => {
-    const pid = ns.exec(script, host, threadsUsed, targetHost);
+    const pid = ns.exec(script, host, threadsUsed, targetHost, stocks);
 
     // const msg = `exec pid:${pid} script:${script} host:${targetHost} threads:${threadsUsed} from:${host}`;
     // log(ns, msg);
@@ -138,6 +140,7 @@ export type RequestExecProps = {
   message: MessagePayload;
   totalThreads: number;
   threadMap: ThreadMap;
+  stocks?: boolean;
 };
 
 export const requestExecScript = ({
@@ -145,6 +148,7 @@ export const requestExecScript = ({
   message,
   totalThreads,
   threadMap,
+  stocks = false,
 }: RequestExecProps): [number, ExecPlan[]?] => {
   const { script, threads, targetHost, allThreads } = message;
   const scriptExecutionTime = getScriptExecutionTime(ns, script, targetHost);
@@ -197,6 +201,7 @@ export const requestExecScript = ({
     scriptExecPlan,
     targetHost,
     script,
+    stocks,
   });
 
   // extra seconds of reserved time as a security margin
@@ -300,6 +305,7 @@ export const threadManager = ({
   threads,
   reservedThreads,
   allThreads,
+  stocks = false,
 }: {
   ns: NS;
   targetHost: string;
@@ -307,6 +313,7 @@ export const threadManager = ({
   threads: number;
   reservedThreads: ThreadsReservedMap;
   allThreads: boolean;
+  stocks?: boolean;
 }) => {
   const { totalThreads, threadMap } = getThreadsAvailable({
     ns,
@@ -320,6 +327,7 @@ export const threadManager = ({
     message,
     totalThreads,
     threadMap,
+    stocks,
   });
 
   return combineReservedThreads({
