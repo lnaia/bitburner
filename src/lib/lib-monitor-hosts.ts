@@ -80,10 +80,10 @@ export const monitorHosts = ({
 
       return b.mm - a.mm;
     })
-    .map((hostDetails) => {
+    .map((hostDetails, index) => {
       const { host, hmm, hcm, diff, rh, ms, cs, hc, batchJob } = hostDetails;
       return {
-        host,
+        host: `${index}@${host}`,
         hmm,
         hcm,
         diff,
@@ -95,9 +95,12 @@ export const monitorHosts = ({
       };
     });
 
+  const maxSize = 10;
+  const shortList = list.slice(0, maxSize);
+
   ns.clearLog();
-  log(ns, "monitor-hosts");
+  log(ns, `monitor-hosts, ${maxSize} shown out of ${list.length}`);
   const print = ns.print.bind(ns);
   // @ts-expect-error
-  printObjList(list, print);
+  printObjList(shortList, print);
 };
