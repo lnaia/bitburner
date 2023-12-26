@@ -56,10 +56,10 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
     }
   };
 
-  upgradeRam();
+  upgradeCache();
   upgradeLevel();
   upgradeCore();
-  upgradeCache();
+  upgradeRam();
 
   return [upgradeType.length > 0, `${nodeIndex}:${upgradeType.join(", ")}`];
 };
