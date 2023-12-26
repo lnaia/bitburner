@@ -1,5 +1,23 @@
 import { NS } from "@ns";
-import { REMOTE_SERVER_PREFIX, HOME_SERVER, DARKWEB_SERVER } from "constants";
+import {
+  REMOTE_SERVER_PREFIX,
+  HOME_SERVER,
+  DARKWEB_SERVER,
+  HACKNET_NODE_PREFIX,
+} from "constants";
+
+// some bitnodes allow you to run scripts on your hacknet nodes instead of servers
+export const getHacknetNodeHostsnames = (ns: NS) => {
+  // @todo verify on non upgraded hacknet servers, how to make sure we only return hosts *if* this is possible
+  const nodes = ns.hacknet.numNodes();
+  const nodeHostnames: string[] = [];
+
+  for (let i = 0; i < nodes; i += 1) {
+    nodeHostnames.push(`${HACKNET_NODE_PREFIX}-${i}`);
+  }
+
+  return nodeHostnames;
+};
 
 export const isAllowedHost = (host: string) => {
   const regex = new RegExp(

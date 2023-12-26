@@ -1,13 +1,20 @@
 import { NS } from "@ns";
 import type { StatusReport } from "typings";
-import { HOME_SERVER } from "constants";
+import { HACKNET_NODE_PREFIX, HOME_SERVER } from "constants";
+import { provisionHost } from "lib/lib-provisioning";
 
 export const buyNode = (ns: NS): StatusReport => {
   const cost = ns.hacknet.getPurchaseNodeCost();
   const availableFunds = ns.getServerMoneyAvailable(HOME_SERVER);
   if (availableFunds >= cost) {
-    ns.hacknet.purchaseNode();
-    return [true, "buyNode: success"];
+    const nodeId = ns.hacknet.purchaseNode();
+
+    if (nodeId !== -1) {
+      provisionHost(ns, `${HACKNET_NODE_PREFIX}-${nodeId}`);
+      return [true, "buyNode: success"];
+    } else {
+      return [false, "buyNode: failed - unknown error"];
+    }
   }
 
   return [false, "buyNode: failed, not enough funds"];
@@ -41,9 +48,18 @@ const upgradeNode = (ns: NS, nodeIndex: number): StatusReport => {
     }
   };
 
+  const upgradeCache = () => {
+    const costs = ns.hacknet.getCacheUpgradeCost(nodeIndex, 1);
+    if (!isNaN(costs) && costs > 0 && availableFunds() >= costs) {
+      ns.hacknet.upgradeCore(nodeIndex, 1);
+      upgradeType.push("cache");
+    }
+  };
+
   upgradeRam();
   upgradeLevel();
   upgradeCore();
+  upgradeCache();
 
   return [upgradeType.length > 0, `${nodeIndex}:${upgradeType.join(", ")}`];
 };

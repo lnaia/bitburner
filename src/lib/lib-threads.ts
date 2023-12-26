@@ -7,7 +7,11 @@ import {
   SCRIPT_RAM_AVERAGE,
   SCRIPT_WEAKEN,
 } from "constants";
-import { discoverHosts } from "lib/lib-discover-hosts";
+import {
+  discoverHosts,
+  getHacknetNodeHostsnames,
+} from "lib/lib-discover-hosts";
+import { isHomeUsageAllowed } from "./lib-use-home-server";
 
 export type ThreadsReservedMap = {
   [key: string]: {
@@ -17,11 +21,22 @@ export type ThreadsReservedMap = {
 };
 
 export const totalAvailableRam = (ns: NS) => {
+  const hacknetNodes = getHacknetNodeHostsnames(ns);
   const resources: { [key: string]: number } = {};
   const hackedServers = discoverHosts(ns).filter((host) =>
     ns.hasRootAccess(host)
   );
-  const hosts = [HOME_SERVER, ...ns.getPurchasedServers(), ...hackedServers];
+  const hosts = [
+    ...ns.getPurchasedServers(),
+    ...hackedServers,
+    ...hacknetNodes,
+  ];
+
+  // by default home usage isn't allowed, unless a file is created.
+  // for more info see respective bin/toggle
+  if (isHomeUsageAllowed(ns)) {
+    hosts.unshift(HOME_SERVER);
+  }
 
   for (const host of hosts) {
     const serverMaxRam = ns.getServerMaxRam(host);
