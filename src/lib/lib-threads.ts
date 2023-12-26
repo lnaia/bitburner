@@ -11,7 +11,7 @@ import {
   discoverHosts,
   getHacknetNodeHostsnames,
 } from "lib/lib-discover-hosts";
-import { isHomeUsageAllowed } from "./lib-use-home-server";
+import { isHomeUsageAllowed } from "lib/lib-use-home-server";
 
 export type ThreadsReservedMap = {
   [key: string]: {

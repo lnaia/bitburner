@@ -8,16 +8,16 @@ export const isHomeUsageAllowed = (ns: NS) => {
 
 export const toggleHomeUsage = (ns: NS) => {
   const homeUsageAllowed = isHomeUsageAllowed(ns);
-  log(ns, `${HOME_SERVER_USAGE_FILE} is allowed? ${homeUsageAllowed}`);
+  log(ns, `start:${HOME_SERVER_USAGE_FILE} is allowed:${homeUsageAllowed}`);
 
   if (homeUsageAllowed) {
-    const result = ns.rm(HOME_SERVER_USAGE_FILE, HOME_SERVER);
-    log(ns, `rm ${HOME_SERVER_USAGE_FILE} attempted with ${result}`);
+    ns.rm(HOME_SERVER_USAGE_FILE, HOME_SERVER);
   } else {
     ns.write(HOME_SERVER_USAGE_FILE, ".");
-    log(
-      ns,
-      `rm ${HOME_SERVER_USAGE_FILE} attempted with ${isHomeUsageAllowed(ns)}`
-    );
   }
+
+  log(
+    ns,
+    `finish:${HOME_SERVER_USAGE_FILE} is allowed:${isHomeUsageAllowed(ns)}`
+  );
 };
