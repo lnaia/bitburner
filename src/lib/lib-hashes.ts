@@ -9,22 +9,28 @@ const getHashMaxCount = (ns: NS, upgradeName: string) => {
     return 0;
   }
 
-  const count = Math.floor(
-    ns.hacknet.numHashes() / ns.hacknet.hashCost(upgradeName)
-  );
+  let hashUpgradeCounter = 1;
+  let hashUpgradeCost = ns.hacknet.hashCost(upgradeName, hashUpgradeCounter);
 
-  // do batches of 50% of possible calc
-  // this because, there's an increment on every upgrade spent that's not taken into account directly
-  const bestGuess = Math.floor(count * 0.5);
+  // not enough for a single upgrade
+  if (existingHashes < hashUpgradeCost) {
+    return 0;
+  }
+
+  while (existingHashes >= hashUpgradeCost) {
+    hashUpgradeCounter += 1;
+    hashUpgradeCost = ns.hacknet.hashCost(upgradeName, hashUpgradeCounter);
+  }
 
   //   log(
   //     ns,
-  //     `getHashMaxCount existingHashes:${existingHashes} hashCost:${ns.hacknet.hashCost(
-  //       upgradeName
-  //     )}`
+  //     `getHashMaxCount hashUpgradeCounter:${
+  //       hashUpgradeCounter - 1
+  //     } hashUpgradeCost:${hashUpgradeCost} existingHashes:${existingHashes}`
   //   );
 
-  return bestGuess;
+  // always the previous
+  return hashUpgradeCounter - 1;
 };
 
 export const reduceMinSec = (ns: NS, host: string) => {
