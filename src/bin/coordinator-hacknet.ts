@@ -1,5 +1,5 @@
 import { NS } from "@ns";
-import { buyNode, upgradeNodes } from "lib/lib-shop-nodes";
+import { buyNode, upgradeNodesCheapestUpgradeFirst } from "lib/lib-shop-nodes";
 import { log } from "lib/lib-log";
 import type { StatusReport } from "typings";
 
@@ -17,8 +17,8 @@ export async function main(ns: NS) {
 
   const ONE_SECOND = 1000;
   while (true) {
+    upgradeNodesCheapestUpgradeFirst(ns);
     logPositiveStatus(buyNode(ns));
-    upgradeNodes(ns).forEach((status) => logPositiveStatus(status));
     await ns.sleep(ONE_SECOND);
   }
 }
