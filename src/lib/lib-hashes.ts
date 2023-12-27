@@ -50,7 +50,7 @@ export const spendHashes = (ns: NS) => {
   const hostDetailsList = discoverHosts(ns)
     .filter((host) => ns.hasRootAccess(host))
     .map((host) => hostInfo(ns, host))
-    .filter((host) => host.mm > 0 && host.ms >= 4)
+    .filter((host) => host.mm > 0 && host.ms >= 4 && host.hc <= 90)
     .sort((a, b) => b.mm - a.mm);
 
   hostDetailsList.forEach((hostDetails) => {
