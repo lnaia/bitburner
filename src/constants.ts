@@ -12,6 +12,7 @@ export const SCRIPT_MONITOR_HOST = "bin/monitor-host.js";
 export const SCRIPT_RAM_AVERAGE = 1.75;
 export const HOME_SERVER_USAGE_FILE = "use-home-server.txt";
 export const HACKED_SERVERS_USAGE_FILE = "use-hacked-servers.txt";
+export const HACKNET_SERVERS_USAGE_FILE = "use-hacknet-servers.txt";
 
 export const MESSAGE_TYPE = {
   MESSAGE_TYPE_EXEC_SCRIPT: "MESSAGE_TYPE_EXEC_SCRIPT",

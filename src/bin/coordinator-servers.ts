@@ -17,7 +17,7 @@ export async function main(ns: NS) {
 
   const ONE_SECOND = 1000;
   while (true) {
-    logPositiveStatus(buyServer(ns));
+    // logPositiveStatus(buyServer(ns));
     upgradeServers(ns).forEach((status) => logPositiveStatus(status));
     await ns.sleep(ONE_SECOND);
   }
