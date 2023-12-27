@@ -11,6 +11,7 @@ export const SCRIPT_WEAKEN = "hacks/hack-weaken.js";
 export const SCRIPT_MONITOR_HOST = "bin/monitor-host.js";
 export const SCRIPT_RAM_AVERAGE = 1.75;
 export const HOME_SERVER_USAGE_FILE = "use-home-server.txt";
+export const HACKED_SERVERS_USAGE_FILE = "use-hacked-servers.txt";
 
 export const MESSAGE_TYPE = {
   MESSAGE_TYPE_EXEC_SCRIPT: "MESSAGE_TYPE_EXEC_SCRIPT",
@@ -20,4 +21,3 @@ export const MESSAGE_PORTS = {
   [MESSAGE_TYPE.MESSAGE_TYPE_EXEC_SCRIPT]: 1,
 };
 export const NO_MESSAGE = "NULL PORT DATA";
-//

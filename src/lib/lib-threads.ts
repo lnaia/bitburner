@@ -12,6 +12,7 @@ import {
   getHacknetNodeHostsnames,
 } from "lib/lib-discover-hosts";
 import { isHomeUsageAllowed } from "lib/lib-use-home-server";
+import { isHackedServerUsageAllowed } from "lib/lib-use-hacked-servers";
 
 export type ThreadsReservedMap = {
   [key: string]: {
@@ -23,19 +24,20 @@ export type ThreadsReservedMap = {
 export const totalAvailableRam = (ns: NS) => {
   const hacknetNodes = getHacknetNodeHostsnames(ns);
   const resources: { [key: string]: number } = {};
-  const hackedServers = discoverHosts(ns).filter((host) =>
-    ns.hasRootAccess(host)
-  );
-  const hosts = [
-    ...ns.getPurchasedServers(),
-    ...hackedServers,
-    ...hacknetNodes,
-  ];
+  const hosts = [...ns.getPurchasedServers(), ...hacknetNodes];
 
   // by default home usage isn't allowed, unless a file is created.
   // for more info see respective bin/toggle
   if (isHomeUsageAllowed(ns)) {
     hosts.unshift(HOME_SERVER);
+  }
+
+  // on some bitnodes, using hacked hosts is the worst possible outcome
+  // due to the lack of cores > 1
+  if (isHackedServerUsageAllowed(ns)) {
+    discoverHosts(ns)
+      .filter((host) => ns.hasRootAccess(host))
+      .forEach((host) => hosts.push(host));
   }
 
   for (const host of hosts) {
